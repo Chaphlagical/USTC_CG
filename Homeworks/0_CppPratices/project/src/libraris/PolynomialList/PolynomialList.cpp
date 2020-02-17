@@ -11,7 +11,7 @@ void PolynomialList::Compress()
 	it1 = m_Polynomial.begin();
 	for (; it1 != m_Polynomial.end(); it1++)
 	{
-		for (it2=it1; ++it2 != m_Polynomial.end();)
+		for (it2 = it1; ++it2 != m_Polynomial.end();)
 		{
 			if (it1->deg == it2->deg)
 			{

@@ -2,8 +2,19 @@
 #ifndef _DYNAMICARRAY_H_
 #define _DYNAMICARRAY_H_
 
+#ifdef _WIN32
+#  ifdef DArray_EXPORTS
+#    define DECLSPEC __declspec(dllexport)
+#  else
+#    define DECLSPEC __declspec(dllimport)
+#  endif
+#else // non windows
+#  define DECLSPEC
+#endif
+
+
 // interfaces of Dynamic Array class DArray
-class DArray
+class DECLSPEC DArray
 {
 public:
 	DArray();			// default constructor

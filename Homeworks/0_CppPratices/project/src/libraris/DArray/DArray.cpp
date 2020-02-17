@@ -63,7 +63,7 @@ void DArray::Init()
 void DArray::Free()
 {
 	if (m_pData)
-	{ 
+	{
 		delete[] m_pData;
 		m_pData = NULL;
 	}
@@ -177,7 +177,7 @@ bool DArray::PushBack(double dValue)
 
 		pt[m_nSize] = dValue;
 		delete[] m_pData;
-		m_nSize ++;
+		m_nSize++;
 		m_pData = pt;
 	}
 
@@ -199,7 +199,7 @@ bool DArray::DeleteAt(int nIndex)
 			pt[i - 1] = m_pData[i];
 
 		delete[] m_pData;
-		m_nSize --;
+		m_nSize--;
 		m_nMax = m_nSize;
 		m_pData = pt;
 
@@ -224,11 +224,11 @@ bool DArray::InsertAt(int nIndex, double dValue)
 				m_pData[i] = m_pData[i - 1];
 			}
 			m_pData[nIndex] = dValue;
-			m_nSize ++;
+			m_nSize++;
 		}
 		else
 		{
-			double *pt=NULL;
+			double *pt = NULL;
 
 			if (m_nMax == 0)
 			{
@@ -247,8 +247,8 @@ bool DArray::InsertAt(int nIndex, double dValue)
 			for (int i = nIndex + 1; i < m_nSize + 1; i++)
 				pt[i] = m_pData[i - 1];
 
-			m_nSize ++;
-			delete [] m_pData;
+			m_nSize++;
+			delete[] m_pData;
 			m_pData = pt;
 			return true;
 		}
