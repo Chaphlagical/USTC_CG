@@ -7,6 +7,7 @@ int main(int argc, char* argv[])
 
 	QApplication a(argc, argv);
 	MiniDraw w;
+	w.setWindowIcon(QIcon(QString("../src/img/favicon.png")));	//	设置主窗口图标
 	w.show();
 	return a.exec();
 }

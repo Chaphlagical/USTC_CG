@@ -28,6 +28,7 @@ public:
 	QAction* Action_Line_Color;
 	QAction* Action_Fill_Color;
 	QAction* Action_Width;
+	QAction* Action_Save;
 
 	void Creat_Menu();
 	void Creat_ToolBar();

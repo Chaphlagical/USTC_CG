@@ -14,6 +14,7 @@
 #include <qpainter.h>
 #include <qcolordialog.h>
 #include <qinputdialog.h>
+#include <qfiledialog.h>
 #include <QWidget>
 
 #include <vector>
@@ -60,6 +61,7 @@ public slots:
 	void setLineColor();
 	void setFillColor();
 	void setWidth();
+	void save();
 };
 
 #endif // VIEWWIDGET_H

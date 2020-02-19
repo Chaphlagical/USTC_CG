@@ -70,6 +70,17 @@ void ViewWidget::setFillColor()
 	fill_color = QColorDialog::getColor(Qt::black, this);
 }
 
+void ViewWidget::save()
+{
+	QPixmap pix = this->grab();	//获取当前截图
+	QString strFile = "a.png";
+	QString fileName = QFileDialog::getSaveFileName(this, "Save", strFile, "PNG (*.png);;BMP (*.bmp);;JPEG (*.jpg *.jpeg)");
+	if (!fileName.isNull())
+	{
+		pix.save(fileName);
+	}
+}
+
 void ViewWidget::setWidth()
 {
 	QInputDialog diag(this);
