@@ -46,6 +46,7 @@ FetchContent_MakeAvailable(UCMake)
 # 获取 Qt5
 find_package(Qt5 REQUIRED Widgets)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+Ubpa_AddTarget(MODE "EXE" QT ON LIBS "Qt5::Widgets")
 
 include_directories (
 	${PROJECT_SOURCE_DIR}/include
