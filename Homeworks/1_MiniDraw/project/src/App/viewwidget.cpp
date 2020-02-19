@@ -11,14 +11,14 @@ ViewWidget::ViewWidget(QWidget* parent)
 
 ViewWidget::~ViewWidget()
 {
-	/*for (size_t i = 0; i < shape_list_.size(); i++)
+	for (int i = 0; i < shape_list_.size(); i++)
 	{
-		if (shape_list_[1])
+		if (shape_list_[i])
 		{
 			delete shape_list_[i];
 			shape_list_[i] = NULL;
 		}
-	}*/
+	}
 }
 
 void ViewWidget::setLine()
@@ -34,6 +34,11 @@ void ViewWidget::setRect()
 void ViewWidget::setEllipse()
 {
 	type_ = Shape::kEllipse;
+}
+
+void ViewWidget::setFreedraw()
+{
+	type_ = Shape::kFreedraw;
 }
 
 void ViewWidget::mousePressEvent(QMouseEvent* event)
@@ -54,6 +59,10 @@ void ViewWidget::mousePressEvent(QMouseEvent* event)
 		
 		case Shape::kEllipse:
 			shape_ = new Ellip();
+			break;
+
+		case Shape::kFreedraw:
+			shape_ = new Freedraw();
 			break;
 		}
 		if (shape_ != NULL)

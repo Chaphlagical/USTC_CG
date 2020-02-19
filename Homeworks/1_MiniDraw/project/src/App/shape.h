@@ -16,10 +16,12 @@ public:
 		kLine = 1,
 		kRect = 2,
 		kEllipse = 3,
-		kPolygon = 4
+		kPolygon = 4,
+		kFreedraw = 5
 	};
 
 protected:
 	QPoint start;
 	QPoint end;
+	QPainterPath path;
 };

@@ -7,6 +7,7 @@
 #include "Line.h"
 #include "Rect.h"
 #include "Ellipse.h"
+#include "Freedraw.h"
 
 #include <qevent.h>
 #include <qpainter.h>
@@ -46,7 +47,7 @@ public slots:
 	void setLine();
 	void setRect();
 	void setEllipse();
-
+	void setFreedraw();
 };
 
 #endif // VIEWWIDGET_H
