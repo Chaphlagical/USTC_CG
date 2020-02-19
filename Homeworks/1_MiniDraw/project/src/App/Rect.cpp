@@ -4,6 +4,7 @@ using namespace minidraw;
 
 Rect::Rect()
 {
+	type_ = kRect;
 }
 
 Rect::~Rect()

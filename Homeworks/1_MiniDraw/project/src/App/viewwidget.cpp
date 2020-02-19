@@ -181,7 +181,7 @@ void ViewWidget::paintEvent(QPaintEvent*)
 	{
 		pen.setColor(shape_list_[i]->line_color);
 		pen.setWidth(shape_list_[i]->width);
-		if (type_ != Shape::kFreedraw)	//	自由绘画不设置填充色
+		if (shape_list_[i]->type_!=Shape::kFreedraw)	//	自由绘画不设置填充色
 			painter.setBrush(QBrush(shape_list_[i]->fill_color));
 		painter.setPen(pen);
 		shape_list_[i]->Draw(painter);

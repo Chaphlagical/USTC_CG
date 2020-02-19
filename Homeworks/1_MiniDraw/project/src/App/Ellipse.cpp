@@ -2,6 +2,7 @@
 using namespace minidraw;
 Ellipse::Ellipse()
 {
+	type_ = kEllipse;
 }
 
 Ellipse::~Ellipse()

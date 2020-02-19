@@ -4,6 +4,7 @@ using namespace minidraw;
 
 Polygon::Polygon()
 {
+	type_ = kPolygon;
 	finish = false;
 	polygon.push_back(start);
 }

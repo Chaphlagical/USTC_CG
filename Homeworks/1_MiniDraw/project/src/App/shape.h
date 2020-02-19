@@ -16,7 +16,7 @@ public:
 	QColor line_color;
 	QColor fill_color;
 	int width;
-
+	
 public:
 	enum Type
 	{
@@ -27,6 +27,7 @@ public:
 		kPolygon = 4,
 		kFreedraw = 5,
 	};
+	Type type_;
 
 protected:
 	QPoint start;

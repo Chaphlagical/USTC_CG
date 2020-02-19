@@ -2,6 +2,7 @@
 using namespace minidraw;
 Freedraw::Freedraw()
 {
+	type_ = kFreedraw;
 }
 
 Freedraw::~Freedraw()

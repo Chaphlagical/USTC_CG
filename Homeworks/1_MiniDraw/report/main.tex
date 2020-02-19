@@ -1,0 +1,250 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Wenneker Assignment
+% LaTeX Template
+% Version 2.0 (12/1/2019)
+%
+% This template originates from:
+% http://www.LaTeXTemplates.com
+%
+% Authors:
+% Vel (vel@LaTeXTemplates.com)
+% Frits Wenneker
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[14pt]{scrartcl} % Font size
+
+\input{structure.tex} % Include the file specifying the document structure and custom commands
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{	
+	\normalfont\normalsize
+	%\vspace{25pt} % Whitespace
+	\rule{\linewidth}{0.5pt}\\ % Thin top horizontal rule
+	\vspace{20pt} % Whitespace
+	{\huge 实验一	MiniDraw}\\ % The assignment title
+	\vspace{12pt} % Whitespace
+	\rule{\linewidth}{2pt}\\ % Thick bottom horizontal rule
+	\vspace{12pt} % Whitespace
+}
+
+\author{\LARGE ID: 58		陈文博} % Your name
+
+\date{\normalsize\today} % Today's date (\today) or a custom date
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	FIGURE EXAMPLE
+%----------------------------------------------------------------------------------------
+
+\section{实验要求}
+
+%\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+%	\centering
+%	\includegraphics[width=0.5\columnwidth]{swallow.jpg} % Example image
+%	\caption{European swallow.}
+%\end{figure}
+
+\begin{itemize}
+	\item[*] 写一个画图小程序 MiniDraw，要求画直线 (Line)，椭圆 (Ellipse)，矩形 (Rectangle)，多边形 (Polygon) 等图形元素（图元）
+	\item[*] 每种图元需用一个类（对象）来封装，如 `CLine`，`CEllipse`，`CRect`，`CPolygon`，`CFreehand` 
+	\item[*] 各种图元从一个父类来继承，如 `CFigure` 
+	\item[*] 学习类的继承和多态
+\end{itemize}
+
+\section{功能描述}
+
+在实验基本要求基础上，我还增加了一下功能：
+\begin{itemize}
+	\item 
+\end{itemize}
+
+
+
+%------------------------------------------------
+
+\section{开发环境}
+
+\textbf{IDE}：Microsoft Visual Studio 2019 community\\
+\textbf{CMake}：3.16.3\\
+\textbf{Qt}：5.14.1
+
+
+%----------------------------------------------------------------------------------------
+%	TEXT EXAMPLE
+%----------------------------------------------------------------------------------------
+
+\section{架构设计}
+
+\subsection{文件结构}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{1.png} % Example image
+	\caption{文件结构}
+\end{figure}
+
+%------------------------------------------------
+
+\subsection{使用的类}
+
+工程在原有的MiniDraw框架上修改得到，在原有的类的基础上，新增椭圆类\textbf{Ellipse}、自由绘图类\textbf{Freedraw}、多边形类\textbf{Polygon}。\\
+\textbf{遇到的问题}：\\定义Ellipse类和Polygon类后，在引用时发现类名与\textbf{wingdi.h}文件中的函数名冲突。\\
+\textbf{解决方法}：定义名称空间\textbf{minidraw}，将表示形状的所有类放到名称空间下避免冲突。
+
+%------------------------------------------------
+
+\subsubsection{Suppose ``chuck" implies vomiting.}
+
+A woodchuck can ingest 361.92 cm\textsuperscript{3} (22.09 cu in) of wood per day. Assuming immediate expulsion on ingestion with a 5\% retainment rate, a woodchuck could chuck \textbf{343.82 cm\textsuperscript{3}} of wood per day.
+
+%------------------------------------------------
+
+\paragraph{Bonus: suppose there is no woodchuck.}
+
+Fusce varius orci ac magna dapibus porttitor. In tempor leo a neque bibendum sollicitudin. Nulla pretium fermentum nisi, eget sodales magna facilisis eu. Praesent aliquet nulla ut bibendum lacinia. Donec vel mauris vulputate, commodo ligula ut, egestas orci. Suspendisse commodo odio sed hendrerit lobortis. Donec finibus eros erat, vel ornare enim mattis et.
+
+%----------------------------------------------------------------------------------------
+%	EQUATION EXAMPLES
+%----------------------------------------------------------------------------------------
+
+\section{Interpreting Equations}
+
+\subsection{Identify the author of Equation \ref{eq:bayes} below and briefly describe it in English.}
+
+\begin{align} 
+	\label{eq:bayes}
+	\begin{split}
+		P(A|B) = \frac{P(B|A)P(A)}{P(B)}
+	\end{split}					
+\end{align}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent porttitor arcu luctus, imperdiet urna iaculis, mattis eros. Pellentesque iaculis odio vel nisl ullamcorper, nec faucibus ipsum molestie. Sed dictum nisl non aliquet porttitor. Etiam vulputate arcu dignissim, finibus sem et, viverra nisl. Aenean luctus congue massa, ut laoreet metus ornare in. Nunc fermentum nisi imperdiet lectus tincidunt vestibulum at ac elit. Nulla mattis nisl eu malesuada suscipit.
+
+%------------------------------------------------
+
+\subsection{Try to make sense of some more equations.}
+
+\begin{align} 
+	\begin{split}
+		(x+y)^3 &= (x+y)^2(x+y)\\
+		&=(x^2+2xy+y^2)(x+y)\\
+		&=(x^3+2x^2y+xy^2) + (x^2y+2xy^2+y^3)\\
+		&=x^3+3x^2y+3xy^2+y^3
+	\end{split}					
+\end{align}
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
+\begin{align}
+	A = 
+	\begin{bmatrix}
+		A_{11} & A_{21} \\
+		A_{21} & A_{22}
+	\end{bmatrix}
+\end{align}
+Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.
+
+%----------------------------------------------------------------------------------------
+%	LIST EXAMPLES
+%----------------------------------------------------------------------------------------
+
+\section{Viewing Lists}
+
+\subsection{Bullet Point List}
+
+\begin{itemize}
+	\item First item in a list 
+		\begin{itemize}
+		\item First item in a list 
+			\begin{itemize}
+			\item First item in a list 
+			\item Second item in a list 
+			\end{itemize}
+		\item Second item in a list 
+		\end{itemize}
+	\item Second item in a list 
+\end{itemize}
+
+%------------------------------------------------
+
+\subsection{Numbered List}
+
+\begin{enumerate}
+	\item First item in a list 
+	\item Second item in a list 
+	\item Third item in a list
+\end{enumerate}
+
+%----------------------------------------------------------------------------------------
+%	TABLE EXAMPLE
+%----------------------------------------------------------------------------------------
+
+\section{Interpreting a Table}
+
+\begin{table}[h] % [h] forces the table to be output where it is defined in the code (it suppresses floating)
+	\centering % Centre the table
+	\begin{tabular}{l l l}
+		\toprule
+		\textit{Per 50g} & \textbf{Pork} & \textbf{Soy} \\
+		\midrule
+		Energy & 760kJ & 538kJ\\
+		Protein & 7.0g & 9.3g\\
+		Carbohydrate & 0.0g & 4.9g\\
+		Fat & 16.8g & 9.1g\\
+		Sodium & 0.4g & 0.4g\\
+		Fibre & 0.0g & 1.4g\\
+		\bottomrule
+	\end{tabular}
+	\caption{Sausage nutrition.}
+\end{table}
+
+%------------------------------------------------
+
+\subsection{The table above shows the nutritional consistencies of two sausage types. Explain their relative differences given what you know about daily adult nutritional recommendations.}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent porttitor arcu luctus, imperdiet urna iaculis, mattis eros. Pellentesque iaculis odio vel nisl ullamcorper, nec faucibus ipsum molestie. Sed dictum nisl non aliquet porttitor. Etiam vulputate arcu dignissim, finibus sem et, viverra nisl. Aenean luctus congue massa, ut laoreet metus ornare in. Nunc fermentum nisi imperdiet lectus tincidunt vestibulum at ac elit. Nulla mattis nisl eu malesuada suscipit.
+
+%----------------------------------------------------------------------------------------
+%	CODE LISTING EXAMPLE
+%----------------------------------------------------------------------------------------
+
+\section{Reading a Code Listing}
+
+\lstinputlisting[
+	caption=Luftballons Perl Script., % Caption above the listing
+	label=lst:luftballons, % Label for referencing this listing
+	language=Perl, % Use Perl functions/syntax highlighting
+	frame=single, % Frame around the code listing
+	showstringspaces=false, % Don't put marks in string spaces
+	numbers=left, % Line numbers on left
+	numberstyle=\tiny, % Line numbers styling
+	]{luftballons.pl}
+
+%------------------------------------------------
+
+\subsection{How many luftballons will be output by the Listing \ref{lst:luftballons} above?}
+
+Aliquam arcu turpis, ultrices sed luctus ac, vehicula id metus. Morbi eu feugiat velit, et tempus augue. Proin ac mattis tortor. Donec tincidunt, ante rhoncus luctus semper, arcu lorem lobortis justo, nec convallis ante quam quis lectus. Aenean tincidunt sodales massa, et hendrerit tellus mattis ac. Sed non pretium nibh. Donec cursus maximus luctus. Vivamus lobortis eros et massa porta porttitor.
+
+%------------------------------------------------
+
+\subsection{Identify the regular expression in Listing \ref{lst:luftballons} and explain how it relates to the anti-war sentiments found in the rest of the script.}
+
+Fusce varius orci ac magna dapibus porttitor. In tempor leo a neque bibendum sollicitudin. Nulla pretium fermentum nisi, eget sodales magna facilisis eu. Praesent aliquet nulla ut bibendum lacinia. Donec vel mauris vulputate, commodo ligula ut, egestas orci. Suspendisse commodo odio sed hendrerit lobortis. Donec finibus eros erat, vel ornare enim mattis et.
+
+%----------------------------------------------------------------------------------------
+
+\end{document}

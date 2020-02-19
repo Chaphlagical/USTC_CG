@@ -4,6 +4,7 @@ using namespace minidraw;
 
 Line::Line()
 {
+	type_ = kLine;
 }
 
 Line::~Line()
