@@ -6,11 +6,11 @@ namespace minidraw
 {
 	class Rect :public Shape
 	{
-	public:
-		Rect();
-		~Rect();
+		public:
+			Rect();
+			~Rect();
 
-		void Draw(QPainter& painter);
+			void Draw(QPainter& painter);
 	};
 }
 

@@ -7,11 +7,11 @@ namespace minidraw
 {
 	class Ellipse :public Shape
 	{
-	public:
-		Ellipse();
-		~Ellipse();
+		public:
+			Ellipse();
+			~Ellipse();
 
-		void Draw(QPainter& painter);
+			void Draw(QPainter& painter);
 	};
 
 }

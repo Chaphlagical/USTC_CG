@@ -6,11 +6,13 @@
 namespace minidraw {
 	class Polygon :public Shape
 	{
-	public:
-		Polygon();
-		~Polygon();
+		public:
+			Polygon();
+			~Polygon();
 
-		void Draw(QPainter& painter);
+			void Draw(QPainter& painter);
+		protected:
+			QPolygon polygon;
 	};
 
 }

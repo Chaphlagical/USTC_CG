@@ -8,14 +8,14 @@ namespace minidraw
 {
 	class Freedraw :public Shape
 	{
-	public:
-		Freedraw();
-		~Freedraw();
+		public:
+			Freedraw();
+			~Freedraw();
 
-		void Draw(QPainter& painter);
+			void Draw(QPainter& painter);
 
-	protected:
-		QPainterPath path;
+		protected:
+			QPainterPath path;
 	};
 }
 
