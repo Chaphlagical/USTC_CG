@@ -1,5 +1,7 @@
 #include "Line.h"
+
 using namespace minidraw;
+
 Line::Line()
 {
 }
