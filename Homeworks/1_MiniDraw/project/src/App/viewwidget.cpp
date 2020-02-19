@@ -67,7 +67,9 @@ void ViewWidget::setLineColor()
 
 void ViewWidget::setFillColor()
 {
-	fill_color = QColorDialog::getColor(Qt::black, this);
+	QColor default_color = QColor(190, 230, 250);
+	default_color.setAlphaF(0);
+	fill_color = QColorDialog::getColor(default_color, this);
 }
 
 void ViewWidget::save()
@@ -171,18 +173,26 @@ void ViewWidget::mouseReleaseEvent(QMouseEvent* event)
 		}
 	}
 }
-
+# include <iostream>
 void ViewWidget::paintEvent(QPaintEvent*)
 {
-	QPainter painter(this);	//	定义painter在this指向的控件中绘制
+	QPainter painter(this);
+	QColor default_color = QColor(190, 230, 250);
 	QPen pen;
+	QBrush brush;
+	default_color.setAlphaF(0);
 
 	for (int i = 0; i < shape_list_.size(); i++)
 	{
 		pen.setColor(shape_list_[i]->line_color);
 		pen.setWidth(shape_list_[i]->width);
-		if (shape_list_[i]->type_!=Shape::kFreedraw)	//	自由绘画不设置填充色
-			painter.setBrush(QBrush(shape_list_[i]->fill_color));
+		if (shape_list_[i]->type_ != Shape::kFreedraw) {	//	自由绘画不设置填充色
+			painter.setBrush(shape_list_[i]->fill_color);
+		}
+		else
+			painter.setBrush(default_color);
+		//brush.setColor(shape_list_[i]->fill_color);
+		//painter.setBrush(brush);
 		painter.setPen(pen);
 		shape_list_[i]->Draw(painter);
 	}
