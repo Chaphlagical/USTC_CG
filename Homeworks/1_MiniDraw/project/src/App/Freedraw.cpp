@@ -1,5 +1,5 @@
 # include "Freedraw.h"
-
+using namespace minidraw;
 Freedraw::Freedraw()
 {
 }
