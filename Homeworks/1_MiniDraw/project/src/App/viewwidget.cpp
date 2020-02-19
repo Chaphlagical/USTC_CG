@@ -11,14 +11,14 @@ ViewWidget::ViewWidget(QWidget* parent)
 
 ViewWidget::~ViewWidget()
 {
-	for (size_t i = 0; i < shape_list_.size(); i++)
+	/*for (size_t i = 0; i < shape_list_.size(); i++)
 	{
 		if (shape_list_[1])
 		{
 			delete shape_list_[i];
 			shape_list_[i] = NULL;
 		}
-	}
+	}*/
 }
 
 void ViewWidget::setLine()
@@ -47,13 +47,13 @@ void ViewWidget::mousePressEvent(QMouseEvent* event)
 			break;
 		case Shape::kDefault:
 			break;
-
+		
 		case Shape::kRect:
 			shape_ = new Rect();
 			break;
-
+		
 		case Shape::kEllipse:
-			shape_ = new Ellipse();
+			shape_ = new Ellip();
 			break;
 		}
 		if (shape_ != NULL)

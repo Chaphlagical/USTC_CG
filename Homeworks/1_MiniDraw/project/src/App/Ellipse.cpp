@@ -1,14 +1,14 @@
 #include "Ellipse.h"
 
-Ellipse::Ellipse()
+Ellip::Ellip()
 {
 }
 
-Ellipse::~Ellipse()
+Ellip::~Ellip()
 {
 }
 
-void Ellipse::Draw(QPainter& painter)
+void Ellip::Draw(QPainter& painter)
 {
 	painter.drawLine(start, end);
 }

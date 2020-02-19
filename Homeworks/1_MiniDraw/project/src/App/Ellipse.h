@@ -1,12 +1,15 @@
-#pragma once
+#ifndef ELLIPSE_H
+#define ELLIPSE_H
 
 #include"shape.h"
 
-class Ellipse :public Shape
+class Ellip :public Shape
 {
 public:
-	Ellipse();
-	~Ellipse();
+	Ellip();
+	~Ellip();
 
 	void Draw(QPainter& painter);
 };
+
+#endif 
