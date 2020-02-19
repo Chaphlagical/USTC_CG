@@ -22,6 +22,7 @@ public:
 	QAction *Action_Rect;
 	QAction* Action_Ellipse;
 	QAction* Action_Freedraw;
+	QAction* Action_Polygon;
 
 	void Creat_Menu();
 	void Creat_ToolBar();

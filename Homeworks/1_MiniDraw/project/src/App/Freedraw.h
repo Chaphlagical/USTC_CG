@@ -11,6 +11,9 @@ public:
 	~Freedraw();
 
 	void Draw(QPainter& painter);
+
+protected:
+	QPainterPath path;
 };
 
 #endif
