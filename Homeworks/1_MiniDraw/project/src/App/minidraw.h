@@ -20,6 +20,7 @@ public:
 	QAction *Action_About;
 	QAction *Action_Line;
 	QAction *Action_Rect;
+	QAction* Action_Ellipse;
 
 	void Creat_Menu();
 	void Creat_ToolBar();
@@ -29,7 +30,7 @@ public:
 
 private:
 	Ui::MiniDrawClass ui;
-	ViewWidget*	view_widget_;
+	ViewWidget*	view_widget_;	//	ÉùÃ÷viewWidgetÖ¸Õë
 };
 
 #endif // MINIDRAW_H
