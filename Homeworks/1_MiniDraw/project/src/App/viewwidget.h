@@ -48,6 +48,7 @@ public slots:
 	void setRect();
 	void setEllipse();
 	void setFreedraw();
+	void setPolygon();
 };
 
 #endif // VIEWWIDGET_H

@@ -28,6 +28,9 @@ void MiniDraw::Creat_Action()
 
 	Action_Freedraw = new QAction(tr("&Freedraw"), this);
 	connect(Action_Freedraw, &QAction::triggered, view_widget_, &ViewWidget::setFreedraw);
+
+	Action_Polygon = new QAction(tr("&Polygon"), this);
+	connect(Action_Polygon, &QAction::triggered, view_widget_, &ViewWidget::setPolygon);
 }
 
 void MiniDraw::Creat_ToolBar()
@@ -35,6 +38,7 @@ void MiniDraw::Creat_ToolBar()
 	pToolBar = addToolBar(tr("&Main"));	pToolBar->addAction(Action_About);	pToolBar->addAction(Action_Line);	pToolBar->addAction(Action_Rect);
 	pToolBar->addAction(Action_Ellipse);
 	pToolBar->addAction(Action_Freedraw);
+	pToolBar->addAction(Action_Polygon);
 }
 
 void MiniDraw::Creat_Menu()
@@ -42,6 +46,7 @@ void MiniDraw::Creat_Menu()
 	pMenu = menuBar()->addMenu(tr("&Figure Tool"));	pMenu->addAction(Action_About);	pMenu->addAction(Action_Line);	pMenu->addAction(Action_Rect);
 	pMenu->addAction(Action_Ellipse);
 	pMenu->addAction(Action_Freedraw);
+	pMenu->addAction(Action_Polygon);
 }
 
 void MiniDraw::AboutBox()
