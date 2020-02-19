@@ -23,5 +23,4 @@ public:
 protected:
 	QPoint start;
 	QPoint end;
-	QPainterPath path;
 };
