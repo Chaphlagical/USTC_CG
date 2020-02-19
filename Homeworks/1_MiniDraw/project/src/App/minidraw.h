@@ -6,6 +6,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include <qmessagebox.h>
+#include <qcolordialog.h>
 
 class MiniDraw : public QMainWindow
 {
@@ -23,6 +24,10 @@ public:
 	QAction* Action_Ellipse;
 	QAction* Action_Freedraw;
 	QAction* Action_Polygon;
+	QAction* Action_Undo;
+	QAction* Action_Line_Color;
+	QAction* Action_Fill_Color;
+	QAction* Action_Width;
 
 	void Creat_Menu();
 	void Creat_ToolBar();

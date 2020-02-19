@@ -31,6 +31,18 @@ void MiniDraw::Creat_Action()
 
 	Action_Polygon = new QAction(tr("&Polygon"), this);
 	connect(Action_Polygon, &QAction::triggered, view_widget_, &ViewWidget::setPolygon);
+
+	Action_Undo = new QAction(tr("&Undo"), this);
+	connect(Action_Undo, &QAction::triggered, view_widget_, &ViewWidget::undo);
+
+	Action_Line_Color = new QAction(tr("&Line Color"), this);
+	connect(Action_Line_Color, &QAction::triggered, view_widget_, &ViewWidget::setLineColor);
+
+	Action_Fill_Color = new QAction(tr("&Fill Color"), this);
+	connect(Action_Fill_Color, &QAction::triggered, view_widget_, &ViewWidget::setFillColor);
+
+	Action_Width = new QAction(tr("&Line Width"), this);
+	connect(Action_Width, &QAction::triggered, view_widget_, &ViewWidget::setWidth);
 }
 
 void MiniDraw::Creat_ToolBar()
@@ -39,6 +51,10 @@ void MiniDraw::Creat_ToolBar()
 	pToolBar->addAction(Action_Ellipse);
 	pToolBar->addAction(Action_Freedraw);
 	pToolBar->addAction(Action_Polygon);
+	pToolBar->addAction(Action_Undo);
+	pToolBar->addAction(Action_Line_Color);
+	pToolBar->addAction(Action_Fill_Color);
+	pToolBar->addAction(Action_Width);
 }
 
 void MiniDraw::Creat_Menu()
@@ -47,11 +63,15 @@ void MiniDraw::Creat_Menu()
 	pMenu->addAction(Action_Ellipse);
 	pMenu->addAction(Action_Freedraw);
 	pMenu->addAction(Action_Polygon);
+	pMenu->addAction(Action_Undo);
+	pMenu->addAction(Action_Line_Color);
+	pMenu->addAction(Action_Fill_Color);
+	pMenu->addAction(Action_Width);
 }
 
 void MiniDraw::AboutBox()
 {
-	QMessageBox::about(this, tr("About"), tr("MiniDraw"));
+	QMessageBox::about(this, tr("About"), tr("MiniDraw \n by Chaf"));
 }
 
 MiniDraw::~MiniDraw()

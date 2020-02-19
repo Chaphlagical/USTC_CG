@@ -11,8 +11,10 @@ namespace minidraw {
 			~Polygon();
 
 			void Draw(QPainter& painter);
-		protected:
+			void update(int mode);
+		private:
 			QPolygon polygon;
+			bool finish;
 	};
 
 }

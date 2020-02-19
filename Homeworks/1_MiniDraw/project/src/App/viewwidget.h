@@ -12,6 +12,8 @@
 
 #include <qevent.h>
 #include <qpainter.h>
+#include <qcolordialog.h>
+#include <qinputdialog.h>
 #include <QWidget>
 
 #include <vector>
@@ -31,9 +33,13 @@ private:
 	bool draw_status_;	//绘制当前状态
 	QPoint start_point_;	//生成图元的起始点
 	QPoint end_point_;	//当前图元的终点
+	QColor line_color;
+	QColor fill_color;
+	int width;
 	Shape::Type type_;
 	Shape* shape_;
 	std::vector<Shape*> shape_list_;
+	int mode;
 
 
 public:
@@ -50,6 +56,10 @@ public slots:
 	void setEllipse();
 	void setFreedraw();
 	void setPolygon();
+	void undo();
+	void setLineColor();
+	void setFillColor();
+	void setWidth();
 };
 
 #endif // VIEWWIDGET_H
