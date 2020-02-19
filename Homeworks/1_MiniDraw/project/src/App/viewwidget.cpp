@@ -41,6 +41,11 @@ void ViewWidget::setFreedraw()
 	type_ = Shape::kFreedraw;
 }
 
+void ViewWidget::setPolygon()
+{
+	type_ = Shape::kPolygon;
+}
+
 void ViewWidget::mousePressEvent(QMouseEvent* event)
 {
 	if (Qt::LeftButton == event->button())	//	еп╤ойг╥ЯйС╠ЙвС╩В
