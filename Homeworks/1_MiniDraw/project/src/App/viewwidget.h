@@ -8,6 +8,7 @@
 #include "Rect.h"
 #include "Ellipse.h"
 #include "Freedraw.h"
+#include "Polygon.h"
 
 #include <qevent.h>
 #include <qpainter.h>

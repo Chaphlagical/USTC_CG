@@ -3,13 +3,17 @@
 
 #include"shape.h"
 
-class Ellip :public Shape
+namespace minidraw
+{
+	class Ellipse :public Shape
 {
 public:
-	Ellip();
-	~Ellip();
+	Ellipse();
+	~Ellipse();
 
 	void Draw(QPainter& painter);
 };
+}
+
 
 #endif 

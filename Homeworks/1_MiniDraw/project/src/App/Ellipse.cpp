@@ -1,14 +1,14 @@
 #include "Ellipse.h"
-
-Ellip::Ellip()
+using namespace minidraw;
+Ellipse::Ellipse()
 {
 }
 
-Ellip::~Ellip()
+Ellipse::~Ellipse()
 {
 }
 
-void Ellip::Draw(QPainter& painter)
+void Ellipse::Draw(QPainter& painter)
 {
 	painter.drawEllipse(start.x(), start.y(),
 		end.x() - start.x(), end.y() - start.y());

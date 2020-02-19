@@ -2,12 +2,16 @@
 
 #include"Shape.h"
 
-class Rect:public Shape
+namespace minidraw
 {
-public:
-	Rect();
-	~Rect();
+	class Rect :public Shape
+	{
+	public:
+		Rect();
+		~Rect();
 
-	void Draw(QPainter &painter);
-};
+		void Draw(QPainter& painter);
+	};
+}
+
 

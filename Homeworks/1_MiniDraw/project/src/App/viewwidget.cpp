@@ -58,11 +58,15 @@ void ViewWidget::mousePressEvent(QMouseEvent* event)
 			break;
 		
 		case Shape::kEllipse:
-			shape_ = new Ellip();
+			shape_ = new minidraw::Ellip();
 			break;
 
 		case Shape::kFreedraw:
 			shape_ = new Freedraw();
+			break;
+
+		case Shape::kPolygon:
+			shape_ = new minidraw::Poly();
 			break;
 		}
 		if (shape_ != NULL)

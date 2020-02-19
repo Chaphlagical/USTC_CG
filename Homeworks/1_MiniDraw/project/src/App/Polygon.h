@@ -3,13 +3,18 @@
 
 #include"shape.h"
 
-class Polygon :public Shape
-{
-public:
-	Polygon();
-	~Polygon();
+namespace minidraw {
+	class Poly :public Shape
+	{
+	public:
+		Poly();
+		~Poly();
 
-	void Draw(QPainter& painter);
-};
+		void Draw(QPainter& painter);
+	};
+
+}
+
+
 
 #endif 

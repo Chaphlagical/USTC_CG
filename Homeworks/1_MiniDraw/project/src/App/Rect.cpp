@@ -1,5 +1,7 @@
 #include "Rect.h"
 
+using namespace minidraw;
+
 Rect::Rect()
 {
 }

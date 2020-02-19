@@ -4,16 +4,20 @@
 #include"shape.h"
 #include <qpainterpath.h>
 
-class Freedraw :public Shape
+namespace minidraw
 {
-public:
-	Freedraw();
-	~Freedraw();
+	class Freedraw :public Shape
+	{
+	public:
+		Freedraw();
+		~Freedraw();
 
-	void Draw(QPainter& painter);
+		void Draw(QPainter& painter);
 
-protected:
-	QPainterPath path;
-};
+	protected:
+		QPainterPath path;
+	};
+}
+
 
 #endif

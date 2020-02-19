@@ -1,14 +1,15 @@
 #include "Polygon.h"
+using namespace minidraw;
 
-Polygon::Polygon()
+Poly::Poly()
 {
 }
 
-Polygon::~Polygon()
+Poly::~Poly()
 {
 }
 
-void Polygon::Draw(QPainter& painter)
+void Poly::Draw(QPainter& painter)
 {
 	painter.drawEllipse(start.x(), start.y(),
 		end.x() - start.x(), end.y() - start.y());

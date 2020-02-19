@@ -17,7 +17,8 @@ public:
 		kRect = 2,
 		kEllipse = 3,
 		kPolygon = 4,
-		kFreedraw = 5
+		kFreedraw = 5,
+		kPolygon = 6
 	};
 
 protected:

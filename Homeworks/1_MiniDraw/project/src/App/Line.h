@@ -2,12 +2,14 @@
 
 #include"shape.h"
 
-class Line :public Shape
+namespace minidraw
 {
-public:
-	Line();
-	~Line();
+	class Line :public Shape
+	{
+	public:
+		Line();
+		~Line();
 
-	void Draw(QPainter& painter);
-};
-
+		void Draw(QPainter& painter);
+	};
+}
