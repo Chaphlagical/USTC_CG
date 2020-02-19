@@ -48,25 +48,25 @@ void ViewWidget::mousePressEvent(QMouseEvent* event)
 		switch (type_)
 		{
 		case Shape::kLine:
-			shape_ = new Line();
+			shape_ = new minidraw::Line();
 			break;
 		case Shape::kDefault:
 			break;
 		
 		case Shape::kRect:
-			shape_ = new Rect();
+			shape_ = new minidraw::Rect();
 			break;
 		
 		case Shape::kEllipse:
-			shape_ = new minidraw::Ellip();
+			shape_ = new minidraw::Ellipse();
 			break;
 
 		case Shape::kFreedraw:
-			shape_ = new Freedraw();
+			shape_ = new minidraw::Freedraw();
 			break;
 
 		case Shape::kPolygon:
-			shape_ = new minidraw::Poly();
+			shape_ = new minidraw::Polygon();
 			break;
 		}
 		if (shape_ != NULL)

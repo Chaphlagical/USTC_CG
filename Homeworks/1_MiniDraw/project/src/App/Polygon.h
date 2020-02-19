@@ -4,11 +4,11 @@
 #include"shape.h"
 
 namespace minidraw {
-	class Poly :public Shape
+	class Polygon :public Shape
 	{
 	public:
-		Poly();
-		~Poly();
+		Polygon();
+		~Polygon();
 
 		void Draw(QPainter& painter);
 	};
