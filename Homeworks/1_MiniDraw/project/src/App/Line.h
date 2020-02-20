@@ -6,10 +6,10 @@ namespace minidraw
 {
 	class Line :public Shape
 	{
-		public:
-			Line();
-			~Line();
+	public:
+		Line();
+		~Line();
 
-			void Draw(QPainter& painter);
+		void Draw(QPainter& painter);
 	};
 }
