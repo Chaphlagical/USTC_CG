@@ -179,7 +179,6 @@ void ViewWidget::paintEvent(QPaintEvent*)
 	QPainter painter(this);
 	QColor default_color = QColor(190, 230, 250);
 	QPen pen;
-	QBrush brush;
 	default_color.setAlphaF(0);
 
 	for (int i = 0; i < shape_list_.size(); i++)
@@ -191,8 +190,6 @@ void ViewWidget::paintEvent(QPaintEvent*)
 		}
 		else
 			painter.setBrush(default_color);
-		//brush.setColor(shape_list_[i]->fill_color);
-		//painter.setBrush(brush);
 		painter.setPen(pen);
 		shape_list_[i]->Draw(painter);
 	}

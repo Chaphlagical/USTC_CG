@@ -17,7 +17,7 @@ MiniDraw::MiniDraw(QWidget* parent)
 void MiniDraw::Creat_Action()
 {
 	Action_About = new QAction(tr("&About"), this);
-	Action_About->setIcon(QIcon(QString("../src/img/about.png")));
+	Action_About->setIcon(QIcon(QString("../src/img/about.png")));	//	Ìí¼ÓÍ¼±ê
 	connect(Action_About, &QAction::triggered, this, &MiniDraw::AboutBox);
 	Action_Line = new QAction(tr("&Line"), this);
 	Action_Line->setIcon(QIcon(QString("../src/img/line.png")));

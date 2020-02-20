@@ -70,10 +70,10 @@
 
 在实验基本要求基础上，我还增加了一下功能：
 \begin{itemize}
-	\item 设置画笔颜色、宽度
-	\item 闭合图形颜色填充
-	\item 撤销绘图
-	\item 保存画板
+	\item 设置画笔颜色(color)、宽度(width)
+	\item 闭合图形颜色填充(fill)
+	\item 撤销(Undo)绘图
+	\item 保存(Save)画板
 	\item 给工具栏、菜单栏和主窗口设置了图标
 \end{itemize}
 基本效果如下：
@@ -109,153 +109,201 @@
 \end{figure}
 
 %------------------------------------------------
+\pagebreak
+\subsection{各个类的继承关系}
 
-\subsection{使用的类}
-
-工程在原有的MiniDraw框架上修改得到，在原有的类的基础上，新增椭圆类\textbf{Ellipse}、自由绘图类\textbf{Freedraw}、多边形类\textbf{Polygon}。\\
-\textbf{遇到的问题}：\\定义Ellipse类和Polygon类后，在引用时发现类名与\textbf{wingdi.h}文件中的函数名冲突。\\
-\textbf{解决方法}：定义名称空间\textbf{minidraw}，将表示形状的所有类放到名称空间下避免冲突。
-
-%------------------------------------------------
-
-\subsubsection{Suppose ``chuck" implies vomiting.}
-
-A woodchuck can ingest 361.92 cm\textsuperscript{3} (22.09 cu in) of wood per day. Assuming immediate expulsion on ingestion with a 5\% retainment rate, a woodchuck could chuck \textbf{343.82 cm\textsuperscript{3}} of wood per day.
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.2\columnwidth]{3.png} % Example image
+	\caption{各个类的继承关系}
+\end{figure}
 
 %------------------------------------------------
+\pagebreak
+\section{设计难点与解决}
 
-\paragraph{Bonus: suppose there is no woodchuck.}
+\subsection{Freedraw的实现}
 
-Fusce varius orci ac magna dapibus porttitor. In tempor leo a neque bibendum sollicitudin. Nulla pretium fermentum nisi, eget sodales magna facilisis eu. Praesent aliquet nulla ut bibendum lacinia. Donec vel mauris vulputate, commodo ligula ut, egestas orci. Suspendisse commodo odio sed hendrerit lobortis. Donec finibus eros erat, vel ornare enim mattis et.
-
-%----------------------------------------------------------------------------------------
-%	EQUATION EXAMPLES
-%----------------------------------------------------------------------------------------
-
-\section{Interpreting Equations}
-
-\subsection{Identify the author of Equation \ref{eq:bayes} below and briefly describe it in English.}
-
-\begin{align} 
-	\label{eq:bayes}
-	\begin{split}
-		P(A|B) = \frac{P(B|A)P(A)}{P(B)}
-	\end{split}					
-\end{align}
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent porttitor arcu luctus, imperdiet urna iaculis, mattis eros. Pellentesque iaculis odio vel nisl ullamcorper, nec faucibus ipsum molestie. Sed dictum nisl non aliquet porttitor. Etiam vulputate arcu dignissim, finibus sem et, viverra nisl. Aenean luctus congue massa, ut laoreet metus ornare in. Nunc fermentum nisi imperdiet lectus tincidunt vestibulum at ac elit. Nulla mattis nisl eu malesuada suscipit.
-
+使用Qt自带的类QPainterPath存储Freedraw产生的轨迹点，在绘图刷新阶段使用painter的drawPath方法进行绘制。这种方法比循环调用drawLine方法效率要高得多。
 %------------------------------------------------
 
-\subsection{Try to make sense of some more equations.}
 
-\begin{align} 
-	\begin{split}
-		(x+y)^3 &= (x+y)^2(x+y)\\
-		&=(x^2+2xy+y^2)(x+y)\\
-		&=(x^3+2x^2y+xy^2) + (x^2y+2xy^2+y^3)\\
-		&=x^3+3x^2y+3xy^2+y^3
-	\end{split}					
-\end{align}
+\subsection{Polygon的实现}
 
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
-\begin{align}
-	A = 
-	\begin{bmatrix}
-		A_{11} & A_{21} \\
-		A_{21} & A_{22}
-	\end{bmatrix}
-\end{align}
-Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.
+和Freedraw类似，Polygon也需要一个存储多边形各个顶点的结构，Qt同样提供了QPolygon类实现该功能。由于Polygon涉及到两种鼠标操作：左击开始选取顶点（存储点）；右击连接闭合图形。为此引入类方法update，在shape父类中添加虚函数update，在Polygon子类中定义，目的是通过鼠标左击右击修改控制变量mode来切换绘点模式和连接闭合模式，实现功能要求。
 
-%----------------------------------------------------------------------------------------
-%	LIST EXAMPLES
-%----------------------------------------------------------------------------------------
+\subsection{Undo的实现}
 
-\section{Viewing Lists}
+画板为实现显示之前所有绘制的图像，维护了一个vector类来存储所有产生的shape子类，要实现undo，只需要将vector中最后一个添加的元素删除即可，这里要注意在pop\_back之前应该先delete最后一个元素，否则会发生内存泄漏。
 
-\subsection{Bullet Point List}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.6\columnwidth]{10.png} % Example image
+	\caption{程序截图}
+\end{figure}
 
-\begin{itemize}
-	\item First item in a list 
-		\begin{itemize}
-		\item First item in a list 
-			\begin{itemize}
-			\item First item in a list 
-			\item Second item in a list 
-			\end{itemize}
-		\item Second item in a list 
-		\end{itemize}
-	\item Second item in a list 
-\end{itemize}
+\pagebreak
+\subsection{设置线宽、线色和颜色填充}
+绘图的线宽、线色和填充色可以通过对painter进行设置，为了能够保存并显示所有形状的颜色，在父类shape中添加相应的属性line\_color、fill\_color和width，设置相关Action并添加到工具栏中。用对话框qcolordialog和qinputdialog进行颜色选择和线宽输入，在遍历shape\_list\_时读取对象的属性修改painter，达到相应的效果。
 
-%------------------------------------------------
+\subsection{保存图片}
+利用QPixmap类获取图像和QFileDialog进行路径选择可以很容易的实现画板图像保存。
 
-\subsection{Numbered List}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.6\columnwidth]{9.png} % Example image
+	\caption{程序截图}
+\end{figure}
 
-\begin{enumerate}
-	\item First item in a list 
-	\item Second item in a list 
-	\item Third item in a list
-\end{enumerate}
 
-%----------------------------------------------------------------------------------------
-%	TABLE EXAMPLE
-%----------------------------------------------------------------------------------------
+\subsection{图标设置}
+由于添加功能后工具栏文字很长，甚至一部分被自动隐藏，很不美观，故想到用图标代替各文字按钮。方法很简单，从网上下载相关图标
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.6\columnwidth]{6.png} % Example image
+	\caption{下载好的图标}
+\end{figure}
 
-\section{Interpreting a Table}
+\pagebreak
+对各个Action的定义中添加Icon：
 
-\begin{table}[h] % [h] forces the table to be output where it is defined in the code (it suppresses floating)
-	\centering % Centre the table
-	\begin{tabular}{l l l}
-		\toprule
-		\textit{Per 50g} & \textbf{Pork} & \textbf{Soy} \\
-		\midrule
-		Energy & 760kJ & 538kJ\\
-		Protein & 7.0g & 9.3g\\
-		Carbohydrate & 0.0g & 4.9g\\
-		Fat & 16.8g & 9.1g\\
-		Sodium & 0.4g & 0.4g\\
-		Fibre & 0.0g & 1.4g\\
-		\bottomrule
-	\end{tabular}
-	\caption{Sausage nutrition.}
-\end{table}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.6\columnwidth]{7.png} % Example image
+	\caption{程序截图}
+\end{figure}
 
-%------------------------------------------------
+生成运行得到的效果：
 
-\subsection{The table above shows the nutritional consistencies of two sausage types. Explain their relative differences given what you know about daily adult nutritional recommendations.}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.6\columnwidth]{8.png} % Example image
+	\caption{实现效果}
+\end{figure}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent porttitor arcu luctus, imperdiet urna iaculis, mattis eros. Pellentesque iaculis odio vel nisl ullamcorper, nec faucibus ipsum molestie. Sed dictum nisl non aliquet porttitor. Etiam vulputate arcu dignissim, finibus sem et, viverra nisl. Aenean luctus congue massa, ut laoreet metus ornare in. Nunc fermentum nisi imperdiet lectus tincidunt vestibulum at ac elit. Nulla mattis nisl eu malesuada suscipit.
+\pagebreak
+\subsection{关于两个工具栏问题}
 
-%----------------------------------------------------------------------------------------
-%	CODE LISTING EXAMPLE
-%----------------------------------------------------------------------------------------
+如下图所示，按照原框架生成的GUI会出现两个工具栏问题，这是由于在minidraw.ui中已经定义了一个默认的工具栏"mainToolBar"，程序中使用addToolBar函数将会新建另外一个工具栏。
 
-\section{Reading a Code Listing}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.6\columnwidth]{4.png} % Example image
+	\caption{两个工具栏现象}
+\end{figure}
 
-\lstinputlisting[
-	caption=Luftballons Perl Script., % Caption above the listing
-	label=lst:luftballons, % Label for referencing this listing
-	language=Perl, % Use Perl functions/syntax highlighting
-	frame=single, % Frame around the code listing
-	showstringspaces=false, % Don't put marks in string spaces
-	numbers=left, % Line numbers on left
-	numberstyle=\tiny, % Line numbers styling
-	]{luftballons.pl}
 
-%------------------------------------------------
 
-\subsection{How many luftballons will be output by the Listing \ref{lst:luftballons} above?}
+解决该问题的方法是在minidraw.ui中删去ToolBar一项，在minidraw.h中包含头文件qtoolbar.h，即可解决问题，效果如下：
 
-Aliquam arcu turpis, ultrices sed luctus ac, vehicula id metus. Morbi eu feugiat velit, et tempus augue. Proin ac mattis tortor. Donec tincidunt, ante rhoncus luctus semper, arcu lorem lobortis justo, nec convallis ante quam quis lectus. Aenean tincidunt sodales massa, et hendrerit tellus mattis ac. Sed non pretium nibh. Donec cursus maximus luctus. Vivamus lobortis eros et massa porta porttitor.
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.6\columnwidth]{5.png} % Example image
+	\caption{修正效果}
+\end{figure}
 
-%------------------------------------------------
+\pagebreak
 
-\subsection{Identify the regular expression in Listing \ref{lst:luftballons} and explain how it relates to the anti-war sentiments found in the rest of the script.}
 
-Fusce varius orci ac magna dapibus porttitor. In tempor leo a neque bibendum sollicitudin. Nulla pretium fermentum nisi, eget sodales magna facilisis eu. Praesent aliquet nulla ut bibendum lacinia. Donec vel mauris vulputate, commodo ligula ut, egestas orci. Suspendisse commodo odio sed hendrerit lobortis. Donec finibus eros erat, vel ornare enim mattis et.
+\section{实验效果}
 
+\subsection{绘制直线}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.6\columnwidth]{12.png} % Example image
+	\caption{绘制直线}
+\end{figure}
+
+\subsection{绘制矩形}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.6\columnwidth]{13.png} % Example image
+	\caption{绘制矩形}
+\end{figure}
+
+
+\pagebreak
+\subsection{绘制椭圆}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.6\columnwidth]{14.png} % Example image
+	\caption{绘制直线}
+\end{figure}
+
+\subsection{自由绘图}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.6\columnwidth]{15.png} % Example image
+	\caption{自由绘图}
+\end{figure}
+
+\pagebreak
+
+\subsection{绘制多边形}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.6\columnwidth]{16.png} % Example image
+	\caption{绘制多边形}
+\end{figure}
+
+\subsection{撤销操作}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=0.9\columnwidth]{17.png}
+		\caption{撤销前}
+	\end{minipage}%
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=0.9 \columnwidth]{18.png}
+		\caption{撤销后}
+	\end{minipage}
+\end{figure}
+
+\pagebreak
+\subsection{修改线色}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1\columnwidth]{19.png} % Example image
+	\caption{修改线色}
+\end{figure}
+
+\subsection{修改填充色}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.8\columnwidth]{20.png} % Example image
+	\caption{修改填充色}
+\end{figure}
+
+\pagebreak
+\subsection{修改线宽}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.8\columnwidth]{21.png} % Example image
+	\caption{修改线宽}
+\end{figure}
+
+\subsection{保存图片}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1\columnwidth]{22.png} % Example image
+	\caption{保存图片}
+\end{figure}
+
+\pagebreak
+\subsection{总结}
+
+这次实验总体上难度不算大，因为一些电脑原先环境的原因，前期比较多的时间花在环境配置上，虽然之前没接触过Qt，对C++也不是很熟，但在理清框架的连接关系之后还是不禁赞叹面向对象的强大，原理理清之后各种功能无非就是拼凑衔接而已，期待后续实验。
 %----------------------------------------------------------------------------------------
 
 \end{document}

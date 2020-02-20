@@ -7,6 +7,7 @@
 #include <QtWidgets/QMainWindow>
 #include <qmessagebox.h>
 #include <qcolordialog.h>
+#include <qtoolbar.h> 
 
 class MiniDraw : public QMainWindow
 {

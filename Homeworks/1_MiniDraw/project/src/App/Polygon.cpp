@@ -1,3 +1,4 @@
+
 #include "Polygon.h"
 
 using namespace minidraw;
@@ -15,7 +16,7 @@ Polygon::~Polygon()
 
 void Polygon::update(int mode)
 {
-	switch (mode)
+	switch (mode)	
 	{
 	case 0:
 		finish = true;
