@@ -72,6 +72,7 @@
 \begin{itemize}
 	\item 设置画笔颜色(color)、宽度(width)
 	\item 闭合图形颜色填充(fill)
+	\item 绘制平滑曲线
 	\item 撤销(Undo)绘图
 	\item 保存(Save)画板
 	\item 给工具栏、菜单栏和主窗口设置了图标
@@ -138,7 +139,7 @@
 
 \begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
 	\centering
-	\includegraphics[width=0.6\columnwidth]{10.png} % Example image
+	\includegraphics[width=0.7\columnwidth]{10.png} % Example image
 	\caption{程序截图}
 \end{figure}
 
@@ -155,7 +156,10 @@
 	\caption{程序截图}
 \end{figure}
 
+\subsection{绘制曲线}
+在绘制多边形的基础上利用QVector类存储各个顶点，通过鼠标左键选择各个采样点，最后通过右键点击通过QPainter的CubicTo方法插值生成平滑曲线
 
+\pagebreak
 \subsection{图标设置}
 由于添加功能后工具栏文字很长，甚至一部分被自动隐藏，很不美观，故想到用图标代替各文字按钮。方法很简单，从网上下载相关图标
 \begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
@@ -164,12 +168,11 @@
 	\caption{下载好的图标}
 \end{figure}
 
-\pagebreak
 对各个Action的定义中添加Icon：
 
 \begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
 	\centering
-	\includegraphics[width=0.6\columnwidth]{7.png} % Example image
+	\includegraphics[width=0.7\columnwidth]{7.png} % Example image
 	\caption{程序截图}
 \end{figure}
 
@@ -301,6 +304,22 @@
 \end{figure}
 
 \pagebreak
+
+\subsection{绘制曲线}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=0.9\columnwidth]{23.png}
+		\caption{选点}
+	\end{minipage}%
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=0.9 \columnwidth]{24.png}
+		\caption{画线}
+	\end{minipage}
+\end{figure}
+
 \subsection{总结}
 
 这次实验总体上难度不算大，因为一些电脑原先环境的原因，前期比较多的时间花在环境配置上，虽然之前没接触过Qt，对C++也不是很熟，但在理清框架的连接关系之后还是不禁赞叹面向对象的强大，原理理清之后各种功能无非就是拼凑衔接而已，期待后续实验。
