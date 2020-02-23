@@ -1,5 +1,6 @@
 #pragma once
 #include <QWidget>
+#include <qvector.h>
 
 QT_BEGIN_NAMESPACE
 class QImage;
@@ -29,9 +30,20 @@ public slots:
 	void Mirror(bool horizontal=false, bool vertical=true);		// Mirror image vertically or horizontally
 	void TurnGray();											// Turn image to gray-scale map
 	void Restore();												// Restore image to origin
+	void Choose();												//Choose anchor points
+
+	void mousePressEvent(QMouseEvent* mouseevent);
+	void mouseMoveEvent(QMouseEvent* mouseevent);
+	void mouseReleaseEvent(QMouseEvent* mouseevent);
 
 private:
 	QImage		*ptr_image_;				// image 
 	QImage		*ptr_image_backup_;
+	QVector<QPoint> src_list_;
+	QVector<QPoint> tar_list_;
+	QPoint start_;
+	QPoint end_;
+	bool draw_status_;
+	bool choose_status_;
 };
 

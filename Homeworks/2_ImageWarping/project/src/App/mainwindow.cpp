@@ -77,6 +77,10 @@ void MainWindow::CreateActions()
 	action_restore_ = new QAction(tr("Restore"), this);
 	action_restore_->setStatusTip(tr("Show origin image"));
 	connect(action_restore_, &QAction::triggered, imagewidget_, &ImageWidget::Restore);
+
+	action_choose_ = new QAction(tr("Choose Points"), this);
+	action_choose_->setStatusTip(tr("Show origin image"));
+	connect(action_choose_, &QAction::triggered, imagewidget_, &ImageWidget::Choose);
 }
 
 void MainWindow::CreateMenus()
@@ -94,6 +98,7 @@ void MainWindow::CreateMenus()
 	menu_edit_->addAction(action_mirror_);
 	menu_edit_->addAction(action_gray_);
 	menu_edit_->addAction(action_restore_);
+	menu_edit_->addAction(action_choose_);
 }
 
 void MainWindow::CreateToolBars()
@@ -109,6 +114,7 @@ void MainWindow::CreateToolBars()
 	toolbar_file_->addAction(action_mirror_);
 	toolbar_file_->addAction(action_gray_);
 	toolbar_file_->addAction(action_restore_);
+	toolbar_file_->addAction(action_choose_);
 }
 
 void MainWindow::CreateStatusBar()

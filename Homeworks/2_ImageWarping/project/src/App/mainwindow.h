@@ -37,21 +37,22 @@ private:
 private:
 	Ui::MainWindowClass ui;
 
-	QMenu		*menu_file_;
-	QMenu		*menu_edit_;
-	QMenu		*menu_help_;
+	QMenu* menu_file_;
+	QMenu* menu_edit_;
+	QMenu* menu_help_;
 	QToolBar	*toolbar_file_;
 	QToolBar	*toolbar_edit_;
-	QAction		*action_new_;
-	QAction		*action_open_;
-	QAction		*action_save_;
-	QAction		*action_saveas_;
-	QAction		*action_invert_;
-	QAction		*action_mirror_;
-	QAction		*action_gray_;
-	QAction		*action_restore_;
+	QAction* action_new_;
+	QAction* action_open_;
+	QAction* action_save_;
+	QAction* action_saveas_;
+	QAction* action_invert_;
+	QAction* action_mirror_;;
+	QAction* action_gray_;
+	QAction* action_restore_;
+	QAction* action_choose_;
 
-	ImageWidget		*imagewidget_;
+	ImageWidget* imagewidget_;
 };
 
 #endif // MAINWINDOW_H
