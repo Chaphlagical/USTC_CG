@@ -30,7 +30,8 @@ void ImageWidget::paintEvent(QPaintEvent *paintevent)
 	painter.drawRect(back_rect);
 
 	// Draw image
-	QRect rect = QRect( (width()-ptr_image_->width())/2, (height()-ptr_image_->height())/2, ptr_image_->width(), ptr_image_->height());
+	//QRect rect = QRect( (width()-ptr_image_->width())/2, (height()-ptr_image_->height())/2, ptr_image_->width(), ptr_image_->height());
+	QRect rect = QRect(0, 0, ptr_image_->width(), ptr_image_->height());
 	painter.drawImage(rect, *ptr_image_); 
 
 	// Draw points and lines
@@ -215,4 +216,14 @@ void ImageWidget::mouseReleaseEvent(QMouseEvent* mouseevent)
 		draw_status_ = false;
 		update();
 	}
+}
+
+void ImageWidget::IDW()
+{
+	WarpingIDW warping;
+	warping.InitAnchor(src_list_, tar_list_);
+	warping.ImageWarping(*(ptr_image_));
+	src_list_.clear();
+	tar_list_.clear();
+	update();
 }

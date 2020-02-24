@@ -2,6 +2,7 @@
 #define WARPINGIDW_H
 
 #include "Warping.h"
+#include <ANN/ANN.h>
 
 class WarpingIDW :public Warping
 {
@@ -14,15 +15,14 @@ public:
 
 private:
 	void Get_T();
-	void Get_weight();
+	void Get_weight(QPoint p);
 
 private:
-	Eigen::Matrix2d T;
+	Eigen::MatrixXd T;
 	QVector <double> weight;
-
+	double weight_sum;
+	int mu;
 };
 
-#endif 
-
-
+#endif
 

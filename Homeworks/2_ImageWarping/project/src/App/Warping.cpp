@@ -1,4 +1,5 @@
 #include "Warping.h"
+#include<ANN/ANN.h>
 
 Warping::Warping()
 {
@@ -15,3 +16,7 @@ double Warping::Distance(QPoint p, QPoint q)
 	return sqrt(d);
 }
 
+void Warping::FillHole(QImage& image, Eigen::MatrixXd& mask)
+{
+	ANNpointArray dataPts = annAllocPts(image.height() * image.width(), 2);
+}

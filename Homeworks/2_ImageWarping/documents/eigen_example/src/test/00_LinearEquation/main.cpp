@@ -6,7 +6,7 @@ using namespace std;
 using namespace Eigen;
 
 int main() {
-	MatrixXf A(4, 4);
+	/*MatrixXf A(4, 4);
 
 	float data[4][4] = {
 		{1, 0, 0, 0},
@@ -28,7 +28,18 @@ int main() {
 
 	MatrixXf x = A.colPivHouseholderQr().solve(b);
 
-	cout << x << endl;
+	cout << x << endl;*/
 
+	MatrixXd A(4, 4);
+	Vector4d V;
+	V << 1, 2, 3, 4;
+	A << 1, 2, 3,0,
+		4, 5, 6,0,
+		7, 8, 9,0,
+		10, 11, 12,0;
+	//Map<MatrixXd> B(A.col(1).data(),2,2);
+	//MatrixXd B = A.col(1).reshaped(2,2).transpose();
+	MatrixXd D = A.col(1).reshaped(2, 2).transpose();
+	cout << D;
 	return 0;
 }

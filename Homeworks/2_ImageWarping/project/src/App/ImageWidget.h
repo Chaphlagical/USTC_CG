@@ -1,6 +1,7 @@
 #pragma once
 #include <QWidget>
 #include <qvector.h>
+#include "WarpingIDW.h"
 
 QT_BEGIN_NAMESPACE
 class QImage;
@@ -31,6 +32,7 @@ public slots:
 	void TurnGray();											// Turn image to gray-scale map
 	void Restore();												// Restore image to origin
 	void Choose();												//Choose anchor points
+	void IDW();													// Inverse distance-weighted interpolation methods
 
 	void mousePressEvent(QMouseEvent* mouseevent);
 	void mouseMoveEvent(QMouseEvent* mouseevent);

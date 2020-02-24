@@ -2,6 +2,7 @@
 #define WARPING_H
 
 #include <qvector.h>
+#include <qimage.h>
 #include <Eigen/Dense>
 
 QT_BEGIN_NAMESPACE
@@ -17,6 +18,7 @@ public:
 	virtual QPoint PointConvert(QPoint p)=0;
 	virtual void ImageWarping(QImage& image)=0;
 	double Distance(QPoint p, QPoint q);
+	void FillHole(QImage& image, Eigen::MatrixXd& mask);
 
 protected:
 	QVector<QPoint> p_points;

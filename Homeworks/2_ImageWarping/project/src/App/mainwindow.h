@@ -51,6 +51,7 @@ private:
 	QAction* action_gray_;
 	QAction* action_restore_;
 	QAction* action_choose_;
+	QAction* action_IDW_;
 
 	ImageWidget* imagewidget_;
 };
