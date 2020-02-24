@@ -7,15 +7,18 @@
 - 课程主页：[Computer Graphics 2020 (Spring Summer)](http://staff.ustc.edu.cn/~lgliu/Courses/ComputerGraphics_2020_spring-summer/default.htm) 
 - 授课教师：[刘利刚教授](http://staff.ustc.edu.cn/~lgliu) 
 
-每个课程作业是作为一个 Github 项目来进行发布（如下第 1 部分），具体的使用方法请详细查看[【攻略】](strategy.md) 。
-
-本页面的第 2 部分提供了课程所需的相关软件的下载链接及使用说明，第 3 部分提供了课程相关的辅助资料。
+课程的每个作业是作为一个 Github 项目来进行发布（如下第 1 部分），如下第 2 部分提供了课程所需的相关软件的下载链接及使用说明，第 3 部分提供了课程相关的辅助资料。
 
 ## 1. 课程作业 [->](Homeworks/) 
 
-- [0. C++ 课前热身练习](Homeworks/0_CppPratices) 
-- [1. 画图小工具](Homeworks/1_MiniDraw) 
-- [2. 图像扭曲](Homeworks/2_ImageWarping) 
+本课程将通过精心设计的系统性编程作业（每周一个），来系统地理解和熟悉计算机图形学的基本内容及发展。通过这些编程作业，同学们能够学习到：
+- 计算机图形学的主要内容及算法实现
+- OpenGL图形渲染管线及GPU shader编程
+- 图像处理算法及实现
+- C++面向对象编程思想和方法，了解基础的设计模式和架构思维
+- 快速看懂及使用网上的代码、库及各种资料
+- 从问题到抽象、到数学建模再到算法实现的方法
+- 使用Unity3D引擎开发3D游戏
 
 ## 2. 相关软件 [->](Softwares/) 
 
