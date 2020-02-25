@@ -2,6 +2,7 @@
 #include <QWidget>
 #include <qvector.h>
 #include "WarpingIDW.h"
+#include "Warping.h"
 
 QT_BEGIN_NAMESPACE
 class QImage;
@@ -33,6 +34,7 @@ public slots:
 	void Restore();												// Restore image to origin
 	void Choose();												//Choose anchor points
 	void IDW();													// Inverse distance-weighted interpolation methods
+	void Fix();														//FIx image
 
 	void mousePressEvent(QMouseEvent* mouseevent);
 	void mouseMoveEvent(QMouseEvent* mouseevent);
@@ -47,5 +49,7 @@ private:
 	QPoint end_;
 	bool draw_status_;
 	bool choose_status_;
+	Warping* warping_;
+	Eigen::MatrixXd mask;
 };
 

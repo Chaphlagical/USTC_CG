@@ -85,6 +85,10 @@ void MainWindow::CreateActions()
 	action_IDW_ = new QAction(tr("IDW"), this);
 	action_IDW_->setStatusTip(tr("Show origin image"));
 	connect(action_IDW_, &QAction::triggered, imagewidget_, &ImageWidget::IDW);
+
+	action_Fix_ = new QAction(tr("Fix"), this);
+	action_Fix_->setStatusTip(tr("Show origin image"));
+	connect(action_Fix_, &QAction::triggered, imagewidget_, &ImageWidget::Fix);
 }
 
 void MainWindow::CreateMenus()
@@ -104,6 +108,7 @@ void MainWindow::CreateMenus()
 	menu_edit_->addAction(action_restore_);
 	menu_edit_->addAction(action_choose_);
 	menu_edit_->addAction(action_IDW_);
+	menu_edit_->addAction(action_Fix_);
 }
 
 void MainWindow::CreateToolBars()
@@ -121,6 +126,7 @@ void MainWindow::CreateToolBars()
 	toolbar_file_->addAction(action_restore_);
 	toolbar_file_->addAction(action_choose_);
 	toolbar_file_->addAction(action_IDW_);
+	toolbar_file_->addAction(action_Fix_);
 }
 
 void MainWindow::CreateStatusBar()

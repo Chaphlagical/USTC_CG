@@ -11,6 +11,8 @@ ImageWidget::ImageWidget(void)
 {
 	ptr_image_ = new QImage();
 	ptr_image_backup_ = new QImage();
+	mask.resize(0, 0);
+	mask.setZero();
 	choose_status_ = false;
 }
 
@@ -30,8 +32,8 @@ void ImageWidget::paintEvent(QPaintEvent *paintevent)
 	painter.drawRect(back_rect);
 
 	// Draw image
-	//QRect rect = QRect( (width()-ptr_image_->width())/2, (height()-ptr_image_->height())/2, ptr_image_->width(), ptr_image_->height());
-	QRect rect = QRect(0, 0, ptr_image_->width(), ptr_image_->height());
+	QRect rect = QRect( (width()-ptr_image_->width())/2, (height()-ptr_image_->height())/2, ptr_image_->width(), ptr_image_->height());
+	//QRect rect = QRect(0, 0, ptr_image_->width(), ptr_image_->height());
 	painter.drawImage(rect, *ptr_image_); 
 
 	// Draw points and lines
@@ -50,6 +52,8 @@ void ImageWidget::paintEvent(QPaintEvent *paintevent)
 void ImageWidget::Open()
 {
 	choose_status_ = false;
+
+	mask.resize(0, 0);
 
 	// Open file
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Read Image"), ".", tr("Images(*.bmp *.png *.jpg)"));
@@ -211,6 +215,7 @@ void ImageWidget::mouseReleaseEvent(QMouseEvent* mouseevent)
 {
 	if (choose_status_&&draw_status_)
 	{
+		
 		src_list_.push_back(start_);
 		tar_list_.push_back(end_);
 		draw_status_ = false;
@@ -220,10 +225,20 @@ void ImageWidget::mouseReleaseEvent(QMouseEvent* mouseevent)
 
 void ImageWidget::IDW()
 {
-	WarpingIDW warping;
-	warping.InitAnchor(src_list_, tar_list_);
-	warping.ImageWarping(*(ptr_image_));
+	warping_ =new WarpingIDW((width() - ptr_image_->width()) / 2, (height() - ptr_image_->height()) / 2);
+	warping_->InitAnchor(src_list_, tar_list_);
+	mask=warping_->ImageWarping(*(ptr_image_));
 	src_list_.clear();
 	tar_list_.clear();
+	update();
+}
+
+void ImageWidget::Fix()
+{
+	if (mask.size() > 0)
+	{
+		std::cout << mask.size();
+		warping_->FillHole(*(ptr_image_), mask, 2,4);
+	}
 	update();
 }

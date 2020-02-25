@@ -39,7 +39,12 @@ int main() {
 		10, 11, 12,0;
 	//Map<MatrixXd> B(A.col(1).data(),2,2);
 	//MatrixXd B = A.col(1).reshaped(2,2).transpose();
-	MatrixXd D = A.col(1).reshaped(2, 2).transpose();
-	cout << D;
+	//MatrixXd D = A.col(1).reshaped(2, 2).transpose();
+	Eigen::MatrixXd kernel(3, 3);
+	double v = 1 / 3;
+	kernel << 0.3, 0.3, 0.3,
+		0.3, 0.0, 0.3,
+		0.3, 0.3, 0.3;
+	std::cout << kernel << std::endl;
 	return 0;
 }

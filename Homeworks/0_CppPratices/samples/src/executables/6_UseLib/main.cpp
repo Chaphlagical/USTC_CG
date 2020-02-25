@@ -2,6 +2,7 @@
 
 #include <list>
 #include <iostream>
+#include <ANN/ANN.h>
 
 using namespace std;
 

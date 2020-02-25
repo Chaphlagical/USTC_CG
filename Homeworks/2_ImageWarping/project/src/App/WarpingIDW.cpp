@@ -3,8 +3,18 @@
 
 WarpingIDW::WarpingIDW()
 {
+	win_width = 0;
+	win_height = 0;
 	mu = -2;
 	weight_sum = 0;
+}
+
+WarpingIDW::WarpingIDW(int width, int height)
+{
+	mu = -2;
+	weight_sum = 0;
+	win_width = width;
+	win_height = height;
 }
 
 WarpingIDW::~WarpingIDW()
@@ -16,7 +26,11 @@ void WarpingIDW::InitAnchor(QVector<QPoint>src_list_, QVector<QPoint>tar_list_)
 {
 	p_points = src_list_;
 	q_points = tar_list_;
-	//std::cout << "bbbb";
+	for (int i = 0; i < p_points.size(); i++)
+	{
+		p_points[i] = QPoint(p_points[i].x() - win_width, p_points[i].y() - win_height);
+		q_points[i] = QPoint(q_points[i].x() - win_width, q_points[i].y() - win_height);
+	}
 	T.resize(p_points.size(), 4);
 	Get_T();
 	
@@ -29,10 +43,6 @@ QPoint WarpingIDW::PointConvert(QPoint p)
 	convert_vactor.setZero();
 	vector_p << p.x(), p.y();
 	Get_weight(p);
-//	for (int i =0;i< weight.size(); i++)
-//		std::cout << weight[i]/weight_sum << " ";
-//	std::cout << std::endl;
-	//std::cout << weight[0] << std::endl;
 	if (weight.empty())
 	{
 		return p;
@@ -41,28 +51,24 @@ QPoint WarpingIDW::PointConvert(QPoint p)
 	{
 		for (int i = 0; i < weight.size(); i++)
 		{
-			//std::cout << "aaaa"<<std::endl;
-			//std::cout << T;
 			Eigen::MatrixXd T_ = T.row(i).reshaped(2, 2);
-			//std::cout << "ccc";
 			Eigen::Vector2d vector_q_i;
 			Eigen::Vector2d vector_p_i;
 			vector_q_i<< q_points[i].x(), q_points[i].y();
 			vector_p_i << p_points[i].x(), p_points[i].y();
 			convert_vactor += (weight[i]/weight_sum)*(vector_q_i + T_ * (vector_p - vector_p_i));
-			//std::cout <<vector_p - vector_p_i << std::endl;
 		}
 	}
 	return QPoint(convert_vactor.x(),convert_vactor.y());
 }
 
-void WarpingIDW::ImageWarping(QImage& image)
+Eigen::MatrixXd WarpingIDW::ImageWarping(QImage& image)
 {
-	//Eigen::MatrixXd new_image(image.width(), image.height);
-	//new_image.setZero();
+	Eigen::MatrixXd mask(image.width(), image.height());
+	mask.setZero();
 	QImage image_copy(image);
 	QPoint convert_point;
-
+	
 	for (int i = 0; i < image.width(); i++)
 	{
 		for (int j = 0; j < image.height(); j++)
@@ -71,22 +77,23 @@ void WarpingIDW::ImageWarping(QImage& image)
 		}
 	}
 	
-	for (int i = 0; i < image.width(); i++)
+	for (int i =0; i < image.width(); i++)
 	{
 		for (int j = 0; j < image.height(); j++)
 		{
 			convert_point = PointConvert(QPoint(i, j));
-			//std::cout << i<<" "<<j<<" "<<convert_point.x() << " " << convert_point.y() << std::endl;
 			if (convert_point.x() > 0 && convert_point.x() < image.width())
 			{
 				if (convert_point.y() > 0 && convert_point.y() < image.height())
 				{
 					image.setPixel(convert_point, image_copy.pixel(i, j));
-					//std::cout << convert_point.x() << " " << convert_point.y() << std::endl;
+					mask(convert_point.x(), convert_point.y()) = 1;
 				}
 			}
 		}
 	}
+	//FillHole(image,mask,30,4);
+	return mask;
 }
 
 void WarpingIDW::Get_T()
@@ -135,7 +142,6 @@ void WarpingIDW::Get_T()
 			}
 		}
 	}
-	//std::cout << T;
 }
 
 void WarpingIDW::Get_weight(QPoint p)
