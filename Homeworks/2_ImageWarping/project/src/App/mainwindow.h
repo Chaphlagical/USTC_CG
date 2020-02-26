@@ -52,7 +52,10 @@ private:
 	QAction* action_restore_;
 	QAction* action_choose_;
 	QAction* action_IDW_;
+	QAction* action_RBF_;
 	QAction* action_Fix_;
+	QAction* action_Convolution_;
+	QAction* action_Undo_;
 
 	ImageWidget* imagewidget_;
 };

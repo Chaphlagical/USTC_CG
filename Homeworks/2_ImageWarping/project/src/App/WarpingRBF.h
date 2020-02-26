@@ -11,16 +11,16 @@ public:
 	~WarpingRBF();
 	void InitAnchor(QVector<QPoint>src_list_, QVector<QPoint>tar_list_);
 	QPoint PointConvert(QPoint p);
-	Eigen::MatrixXd ImageWarping(QImage& image);
+	//Eigen::MatrixXd ImageWarping(QImage& image);
 
 private:
-	void Get_T();
-	void Get_weight(QPoint p);
+	void Get_weight();
 
 private:
-	QVector <double> weight;
+	Eigen::VectorXd weight_x, weight_y;
+	QVector <double> radius;
 	double weight_sum;
-	int mu;
+	double mu;
 };
 
 #endif

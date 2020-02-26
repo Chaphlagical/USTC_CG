@@ -18,7 +18,7 @@ public:
 	virtual ~Warping();
 	virtual void InitAnchor(QVector<QPoint>src_list_, QVector<QPoint>tar_list_)=0;
 	virtual QPoint PointConvert(QPoint p)=0;
-	virtual Eigen::MatrixXd ImageWarping(QImage& image)=0;
+	Eigen::MatrixXd ImageWarping(QImage& image);
 	double Distance(QPoint p, QPoint q);
 	// void FillHole(QImage& image, Eigen::MatrixXd& mask);
 	void FillHole(QImage& image, Eigen::MatrixXd& mask, int threshold=25, int count=4);

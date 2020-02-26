@@ -79,16 +79,28 @@ void MainWindow::CreateActions()
 	connect(action_restore_, &QAction::triggered, imagewidget_, &ImageWidget::Restore);
 
 	action_choose_ = new QAction(tr("Choose Points"), this);
-	action_choose_->setStatusTip(tr("Show origin image"));
+	action_choose_->setStatusTip(tr("Select anchor point"));
 	connect(action_choose_, &QAction::triggered, imagewidget_, &ImageWidget::Choose);
 
 	action_IDW_ = new QAction(tr("IDW"), this);
-	action_IDW_->setStatusTip(tr("Show origin image"));
+	action_IDW_->setStatusTip(tr("IDW warping method"));
 	connect(action_IDW_, &QAction::triggered, imagewidget_, &ImageWidget::IDW);
 
+	action_RBF_ = new QAction(tr("RBF"), this);
+	action_RBF_->setStatusTip(tr("RBF warping method"));
+	connect(action_RBF_, &QAction::triggered, imagewidget_, &ImageWidget::RBF);
+
+	action_Convolution_ = new QAction(tr("Convolution"), this);
+	action_Convolution_->setStatusTip(tr("Image convolution"));
+	connect(action_Convolution_, &QAction::triggered, imagewidget_, &ImageWidget::Convolution);
+
 	action_Fix_ = new QAction(tr("Fix"), this);
-	action_Fix_->setStatusTip(tr("Show origin image"));
+	action_Fix_->setStatusTip(tr("Fix image"));
 	connect(action_Fix_, &QAction::triggered, imagewidget_, &ImageWidget::Fix);
+
+	action_Undo_ = new QAction(tr("Undo"), this);
+	action_Undo_->setStatusTip(tr("Undo"));
+	connect(action_Undo_, &QAction::triggered, imagewidget_, &ImageWidget::Undo);
 }
 
 void MainWindow::CreateMenus()
@@ -108,7 +120,10 @@ void MainWindow::CreateMenus()
 	menu_edit_->addAction(action_restore_);
 	menu_edit_->addAction(action_choose_);
 	menu_edit_->addAction(action_IDW_);
+	menu_edit_->addAction(action_RBF_);
+	menu_edit_->addAction(action_Convolution_);
 	menu_edit_->addAction(action_Fix_);
+	menu_edit_->addAction(action_Undo_);
 }
 
 void MainWindow::CreateToolBars()
@@ -126,7 +141,10 @@ void MainWindow::CreateToolBars()
 	toolbar_file_->addAction(action_restore_);
 	toolbar_file_->addAction(action_choose_);
 	toolbar_file_->addAction(action_IDW_);
+	toolbar_file_->addAction(action_RBF_);
+	toolbar_file_->addAction(action_Convolution_);
 	toolbar_file_->addAction(action_Fix_);
+	toolbar_file_->addAction(action_Undo_);
 }
 
 void MainWindow::CreateStatusBar()

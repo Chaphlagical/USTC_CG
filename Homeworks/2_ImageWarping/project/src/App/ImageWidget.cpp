@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QtWidgets> 
 #include <iostream>
+#include <sstream>
 
 using std::cout;
 using std::endl;
@@ -12,13 +13,24 @@ ImageWidget::ImageWidget(void)
 	ptr_image_ = new QImage();
 	ptr_image_backup_ = new QImage();
 	mask.resize(0, 0);
+	kernel.resize(0, 0);
 	mask.setZero();
+	kernel.setZero();
 	choose_status_ = false;
+	warping_ = NULL;
+	draw_status_ = false;
 }
 
 
 ImageWidget::~ImageWidget(void)
 {
+	mask.resize(0, 0);
+	kernel.resize(0, 0);
+	delete warping_;
+	src_list_.clear();
+	tar_list_.clear();
+	delete ptr_image_;
+	delete ptr_image_backup_;
 }
 
 void ImageWidget::paintEvent(QPaintEvent *paintevent)
@@ -37,16 +49,26 @@ void ImageWidget::paintEvent(QPaintEvent *paintevent)
 	painter.drawImage(rect, *ptr_image_); 
 
 	// Draw points and lines
-	painter.setPen(QPen(Qt::red, 4));
 	for (int i = 0; i < src_list_.size(); i++)
 	{
+		painter.setPen(QPen(Qt::blue, 10));
+		painter.drawPoint(src_list_[i]);
+		painter.setPen(QPen(Qt::green, 10));
+		painter.drawPoint(tar_list_[i]);
+		painter.setPen(QPen(Qt::red, 3));
 		painter.drawLine(src_list_[i], tar_list_[i]);
 	}
 	if (draw_status_)
 	{
+		painter.setPen(QPen(Qt::red, 3));
 		painter.drawLine(start_, end_);
+		painter.setPen(QPen(Qt::blue, 10));
+		painter.drawPoint(start_);
+		painter.setPen(QPen(Qt::green, 10));
+		painter.drawPoint(end_);
 	}
 	painter.end();
+
 }
 
 void ImageWidget::Open()
@@ -225,9 +247,21 @@ void ImageWidget::mouseReleaseEvent(QMouseEvent* mouseevent)
 
 void ImageWidget::IDW()
 {
+	delete warping_;
 	warping_ =new WarpingIDW((width() - ptr_image_->width()) / 2, (height() - ptr_image_->height()) / 2);
 	warping_->InitAnchor(src_list_, tar_list_);
 	mask=warping_->ImageWarping(*(ptr_image_));
+	src_list_.clear();
+	tar_list_.clear();
+	update();
+}
+
+void ImageWidget::RBF()
+{
+	delete warping_;
+	warping_ = new WarpingRBF((width() - ptr_image_->width()) / 2, (height() - ptr_image_->height()) / 2);
+	warping_->InitAnchor(src_list_, tar_list_);
+	mask = warping_->ImageWarping(*(ptr_image_));
 	src_list_.clear();
 	tar_list_.clear();
 	update();
@@ -241,4 +275,65 @@ void ImageWidget::Fix()
 		warping_->FillHole(*(ptr_image_), mask, 2,4);
 	}
 	update();
+}
+
+void ImageWidget::Convolution()
+{
+	std::string kernel_string = "";
+	std::string sub_string = "";
+	QVector<double> kernel_value;
+	QInputDialog diag(this);
+	int width=0;
+	diag.setWindowTitle("Input");
+	diag.setLabelText("Input your kernel matrix:");
+	if (diag.exec() == QInputDialog::Accepted)
+	{
+		kernel_string = diag.textValue().toStdString();
+		if (kernel_string[kernel_string.length() - 1] != ';')
+		{
+			QMessageBox::warning(NULL, "Warning", "Please end with ';' and separate with ' '!");
+			return;
+		}
+		
+		for (int i = 0; i < kernel_string.length(); i++)
+		{
+			
+			if (kernel_string[i] == ' ' || kernel_string[i] == ';'|| kernel_string[i] == '\0')
+			{
+				kernel_value.push_back(std::stod(sub_string.c_str()));
+				sub_string = "";
+				width += 1;
+			}
+			else
+			{
+				sub_string += kernel_string[i];
+			}
+		}
+		std::cout << width << std::endl;;
+		kernel.resize(width, kernel_value.size()/width);
+		kernel.setZero();
+		std::cout << kernel;
+		for (int i = 0; i <width; i++)
+		{
+			for (int j = 0; j < kernel_value.size()/width; j++)
+			{
+				kernel(i, j) = kernel_value[i * kernel_value.size()/width + j];
+			}
+		}
+		std::cout << kernel;
+		delete warping_;
+		warping_ = new WarpingIDW();
+		warping_->Convolution(*(ptr_image_), kernel);
+		update();
+	}
+}
+
+void ImageWidget::Undo()
+{
+	if (src_list_.size() > 0)
+	{
+		src_list_.pop_back();
+		tar_list_.pop_back();
+		update();
+	}
 }

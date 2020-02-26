@@ -2,7 +2,10 @@
 #include <QWidget>
 #include <qvector.h>
 #include "WarpingIDW.h"
+#include "WarpingRBF.h"
 #include "Warping.h"
+#include <qinputdialog.h>
+#include <qmessagebox.h>
 
 QT_BEGIN_NAMESPACE
 class QImage;
@@ -34,7 +37,10 @@ public slots:
 	void Restore();												// Restore image to origin
 	void Choose();												//Choose anchor points
 	void IDW();													// Inverse distance-weighted interpolation methods
+	void RBF();													//Radial Basis Function
 	void Fix();														//FIx image
+	void Convolution();										//Image convolution
+	void Undo();													//Undo
 
 	void mousePressEvent(QMouseEvent* mouseevent);
 	void mouseMoveEvent(QMouseEvent* mouseevent);
@@ -51,5 +57,6 @@ private:
 	bool choose_status_;
 	Warping* warping_;
 	Eigen::MatrixXd mask;
+	Eigen::MatrixXd kernel;
 };
 

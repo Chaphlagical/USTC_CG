@@ -1,0 +1,14 @@
+\begin{thebibliography}{1}
+
+\bibitem{ruprecht1995image}
+Detlef Ruprecht and Heinrich Muller.
+\newblock Image warping with scattered data interpolation.
+\newblock {\em IEEE Computer Graphics and Applications}, 15(2):37--43, 1995.
+
+\bibitem{arad1995image}
+Nur Arad and Daniel Reisfeld.
+\newblock Image warping using few anchor points and radial functions.
+\newblock In {\em Computer graphics forum}, volume~14, pages 35--46. Wiley
+  Online Library, 1995.
+
+\end{thebibliography}

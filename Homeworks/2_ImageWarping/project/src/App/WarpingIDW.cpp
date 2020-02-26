@@ -1,5 +1,4 @@
 #include "WarpingIDW.h"
-#include <iostream>
 
 WarpingIDW::WarpingIDW()
 {
@@ -62,40 +61,6 @@ QPoint WarpingIDW::PointConvert(QPoint p)
 	return QPoint(convert_vactor.x(),convert_vactor.y());
 }
 
-Eigen::MatrixXd WarpingIDW::ImageWarping(QImage& image)
-{
-	Eigen::MatrixXd mask(image.width(), image.height());
-	mask.setZero();
-	QImage image_copy(image);
-	QPoint convert_point;
-	
-	for (int i = 0; i < image.width(); i++)
-	{
-		for (int j = 0; j < image.height(); j++)
-		{
-			image.setPixel(i, j, qRgb(255, 255, 255));
-		}
-	}
-	
-	for (int i =0; i < image.width(); i++)
-	{
-		for (int j = 0; j < image.height(); j++)
-		{
-			convert_point = PointConvert(QPoint(i, j));
-			if (convert_point.x() > 0 && convert_point.x() < image.width())
-			{
-				if (convert_point.y() > 0 && convert_point.y() < image.height())
-				{
-					image.setPixel(convert_point, image_copy.pixel(i, j));
-					mask(convert_point.x(), convert_point.y()) = 1;
-				}
-			}
-		}
-	}
-	//FillHole(image,mask,30,4);
-	return mask;
-}
-
 void WarpingIDW::Get_T()
 {
 	if (p_points.size() == 1)
@@ -134,7 +99,7 @@ void WarpingIDW::Get_T()
 					B += sigma * diff_p * diff_q;
 
 				}
-				T_ = (A.inverse().transpose())*B;
+				T_ = (A.inverse())*B;
 				T(i, 0) = T_(0, 0);
 				T(i, 1) = T_(0, 1);
 				T(i, 2) = T_(1, 0);

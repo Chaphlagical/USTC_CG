@@ -11,7 +11,7 @@ public:
 	~WarpingIDW();
 	void InitAnchor(QVector<QPoint>src_list_, QVector<QPoint>tar_list_);
 	QPoint PointConvert(QPoint p);
-	Eigen::MatrixXd ImageWarping(QImage& image);
+	//Eigen::MatrixXd ImageWarping(QImage& image);
 
 private:
 	void Get_T();

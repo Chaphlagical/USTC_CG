@@ -24,6 +24,39 @@ double Warping::Distance(QPoint p, QPoint q)
 	return sqrt(d);
 }
 
+Eigen::MatrixXd Warping::ImageWarping(QImage& image)
+{
+	Eigen::MatrixXd mask(image.width(), image.height());
+	mask.setZero();
+	QImage image_copy(image);
+	QPoint convert_point;
+
+	for (int i = 0; i < image.width(); i++)
+	{
+		for (int j = 0; j < image.height(); j++)
+		{
+			image.setPixel(i, j, qRgb(255, 255, 255));
+		}
+	}
+
+	for (int i = 0; i < image.width(); i++)
+	{
+		for (int j = 0; j < image.height(); j++)
+		{
+			convert_point = PointConvert(QPoint(i, j));
+			if (convert_point.x() > 0 && convert_point.x() < image.width())
+			{
+				if (convert_point.y() > 0 && convert_point.y() < image.height())
+				{
+					image.setPixel(convert_point, image_copy.pixel(i, j));
+					mask(convert_point.x(), convert_point.y()) = 1;
+				}
+			}
+		}
+	}
+	//FillHole(image,mask,30,4);
+	return mask;
+}
 
 void Warping::Convolution(QImage& image, Eigen::MatrixXd& kernel)
 {
@@ -40,9 +73,19 @@ void Warping::Convolution(QImage& image, Eigen::MatrixXd& kernel)
 QRgb Warping::convolution_(QImage& image, Eigen::MatrixXd& kernel, int x, int y)
 {
 	int low_row = x - (int)floor(kernel.rows()/2);
-	int up_row = x + (int)floor(kernel.rows()/2)+1;
+	int up_row = x + (int)floor((kernel.rows()+1) / 2) ;
 	int low_col = y - (int)floor(kernel.cols()/2);
-	int up_col = y + (int)floor(kernel.cols()/2)+1;
+	int up_col = y + (int)floor((kernel.cols()+1)/2);
+	/*if (kernel.rows() == 1)
+	{
+		low_row = x;
+		up_row = x;
+	}
+	if (kernel.cols() == 1)
+	{
+		low_col = y;
+		up_col = y;
+	}*/
 	low_row = (low_row < 0 ? 0 : low_row);
 	up_row = (up_row > image.width() ? image.width() - 1 : up_row);
 	low_col = (low_col < 0 ? 0 : low_col);
