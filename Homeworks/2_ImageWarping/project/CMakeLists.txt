@@ -58,6 +58,7 @@ link_directories (
 	# $ENV{XXX_LIB_PATH}
 	# ...
 )
+link_libraries(ANN.lib)
 
 add_subdirectory (src)
 

@@ -45,7 +45,6 @@ void ImageWidget::paintEvent(QPaintEvent *paintevent)
 
 	// Draw image
 	QRect rect = QRect( (width()-ptr_image_->width())/2, (height()-ptr_image_->height())/2, ptr_image_->width(), ptr_image_->height());
-	//QRect rect = QRect(0, 0, ptr_image_->width(), ptr_image_->height());
 	painter.drawImage(rect, *ptr_image_); 
 
 	// Draw points and lines
@@ -86,10 +85,6 @@ void ImageWidget::Open()
 		ptr_image_->load(fileName);
 		*(ptr_image_backup_) = *(ptr_image_);
 	}
-
-	//ptr_image_->invertPixels(QImage::InvertRgb);
-	//*(ptr_image_) = ptr_image_->mirrored(true, true);
-	//*(ptr_image_) = ptr_image_->rgbSwapped();
 	cout<<"image size: "<<ptr_image_->width()<<' '<<ptr_image_->height()<<endl;
 	update();
 }
@@ -126,9 +121,6 @@ void ImageWidget::Invert()
 			ptr_image_->setPixel(i, j, qRgb(255-qRed(color), 255-qGreen(color), 255-qBlue(color)) );
 		}
 	}
-
-	// equivalent member function of class QImage
-	// ptr_image_->invertPixels(QImage::InvertRgb);
 	update();
 }
 
@@ -177,9 +169,6 @@ void ImageWidget::Mirror(bool ishorizontal, bool isvertical)
 			}
 		}
 	}
-
-	// equivalent member function of class QImage
-	//*(ptr_image_) = ptr_image_->mirrored(true, true);
 	update();
 }
 

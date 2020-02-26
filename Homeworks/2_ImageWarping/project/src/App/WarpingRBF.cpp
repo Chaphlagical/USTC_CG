@@ -28,6 +28,7 @@ void WarpingRBF::InitAnchor(QVector<QPoint>src_list_, QVector<QPoint>tar_list_)
 {
 	p_points = src_list_;
 	q_points = tar_list_;
+
 	for (int i = 0; i < p_points.size(); i++)
 	{
 		p_points[i] = QPoint(p_points[i].x() - win_width, p_points[i].y() - win_height);
@@ -37,6 +38,8 @@ void WarpingRBF::InitAnchor(QVector<QPoint>src_list_, QVector<QPoint>tar_list_)
 	{
 		return;
 	}
+
+	// get radius
 	for (int i = 0; i < p_points.size(); i++)
 	{
 		int d_min = 1000000;
@@ -62,7 +65,6 @@ void WarpingRBF::Get_weight()
 	Eigen::VectorXd b_x(p_points.size());
 	Eigen::VectorXd b_y(p_points.size());
 	A.setZero(); b_x.setZero(); b_y.setZero();
-	std::cout << "aaa";
 	for (int i = 0; i < A.rows(); i++)
 	{
 		for (int j = 0; j < A.cols(); j++)
@@ -76,7 +78,6 @@ void WarpingRBF::Get_weight()
 	weight_y.resize(p_points.size());
 	weight_x = A.inverse() * b_x;
 	weight_y = A.inverse() * b_y;
-	//std::cout << A << std::endl <<std::endl;
 }
 
 QPoint WarpingRBF::PointConvert(QPoint p)
@@ -89,14 +90,5 @@ QPoint WarpingRBF::PointConvert(QPoint p)
 		convert_x += weight_x(i) * pow(pow(Distance(p_points[i], p), 2) + radius[i] * radius[i], mu);
 		convert_y+=weight_y(i)* pow(pow(Distance(p_points[i], p), 2) + radius[i] * radius[i], mu);
 	}
-	//std::cout << convert_x + p.x() << " " << convert_y + p.y() << std::endl;
 	return QPoint(convert_x+p.x(),convert_y+p.y());
 }
-
-/*Eigen::MatrixXd WarpingRBF::ImageWarping(QImage& image)
-{
-	Eigen::MatrixXd mask(image.width(), image.height());
-
-	return mask;
-}*/
-

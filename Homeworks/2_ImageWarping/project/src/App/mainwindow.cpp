@@ -58,11 +58,12 @@ void MainWindow::CreateActions()
 	action_saveas_->setStatusTip(tr("Save the document under a new name"));
 	connect(action_saveas_, &QAction::triggered, imagewidget_, &ImageWidget::SaveAs);
 
-	action_invert_ = new QAction(tr("Inverse"), this);
+	action_invert_ = new QAction(QIcon("../src/App/Resources/images/inverse.png"),tr("Inverse"), this);
 	action_invert_->setStatusTip(tr("Invert all pixel value in the image"));
 	connect(action_invert_, &QAction::triggered, imagewidget_, &ImageWidget::Invert);
 
 	action_mirror_ = new QAction(tr("Mirror"), this);
+	action_mirror_->setIcon(QIcon(QString("../src/App/Resources/images/mirror.png")));
 	action_mirror_->setStatusTip(tr("Mirror image vertically or horizontally"));
 	// The slot requires more arguments than the signal provides.
 	//connect(action_mirror_, &QAction::triggered, imagewidget_, &ImageWidget::Mirror);
@@ -71,14 +72,17 @@ void MainWindow::CreateActions()
 		});
 
 	action_gray_ = new QAction(tr("Grayscale"), this);
+	action_gray_->setIcon(QIcon(QString("../src/App/Resources/images/gray.png")));
 	action_gray_->setStatusTip(tr("Gray-scale map"));
 	connect(action_gray_, &QAction::triggered, imagewidget_, &ImageWidget::TurnGray);
 
 	action_restore_ = new QAction(tr("Restore"), this);
+	action_restore_->setIcon(QIcon(QString("../src/App/Resources/images/restore.png")));
 	action_restore_->setStatusTip(tr("Show origin image"));
 	connect(action_restore_, &QAction::triggered, imagewidget_, &ImageWidget::Restore);
 
 	action_choose_ = new QAction(tr("Choose Points"), this);
+	action_choose_->setIcon(QIcon(QString("../src/App/Resources/images/choose_points.png")));
 	action_choose_->setStatusTip(tr("Select anchor point"));
 	connect(action_choose_, &QAction::triggered, imagewidget_, &ImageWidget::Choose);
 
@@ -95,10 +99,12 @@ void MainWindow::CreateActions()
 	connect(action_Convolution_, &QAction::triggered, imagewidget_, &ImageWidget::Convolution);
 
 	action_Fix_ = new QAction(tr("Fix"), this);
+	action_Fix_->setIcon(QIcon(QString("../src/App/Resources/images/fix.png")));
 	action_Fix_->setStatusTip(tr("Fix image"));
 	connect(action_Fix_, &QAction::triggered, imagewidget_, &ImageWidget::Fix);
 
 	action_Undo_ = new QAction(tr("Undo"), this);
+	action_Undo_->setIcon(QIcon(QString("../src/App/Resources/images/undo.png")));
 	action_Undo_->setStatusTip(tr("Undo"));
 	connect(action_Undo_, &QAction::triggered, imagewidget_, &ImageWidget::Undo);
 }
