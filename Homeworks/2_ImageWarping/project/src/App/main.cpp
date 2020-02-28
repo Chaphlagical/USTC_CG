@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 	MainWindow w;
 	w.setWindowIcon(QIcon(QString("../src/App/Resources/images/favicon.png")));
+	w.setWindowTitle(QString("ImageWarping"));
 	w.show();
 	return a.exec();
 }
