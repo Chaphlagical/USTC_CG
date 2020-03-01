@@ -1,7 +1,7 @@
 #ifndef FREEDRAW_H
 #define FREEDRAW_H
 
-#include"shape.h"
+#include"Shape.h"
 #include <qpainterpath.h>
 
 namespace poissonedit

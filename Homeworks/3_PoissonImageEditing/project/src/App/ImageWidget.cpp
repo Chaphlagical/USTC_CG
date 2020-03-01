@@ -5,6 +5,7 @@
 #include <iostream>
 #include "ChildWindow.h"
 
+
 using std::cout;
 using std::endl;
 
@@ -21,6 +22,7 @@ ImageWidget::ImageWidget(ChildWindow* relatewindow)
 	point_end_ = QPoint(0, 0);
 
 	source_window_ = NULL;
+	shape_ = NULL;
 }
 
 ImageWidget::~ImageWidget(void)
@@ -74,8 +76,12 @@ void ImageWidget::paintEvent(QPaintEvent* paintevent)
 	// Draw choose region
 	painter.setBrush(Qt::NoBrush);
 	painter.setPen(Qt::red);
-	painter.drawRect(point_start_.x(), point_start_.y(),
-		point_end_.x() - point_start_.x(), point_end_.y() - point_start_.y());
+	if (shape_ != NULL)
+	{
+		shape_->Draw(painter);
+	}
+	//painter.drawRect(point_start_.x(), point_start_.y(),
+	//	point_end_.x() - point_start_.x(), point_end_.y() - point_start_.y());
 
 	painter.end();
 }
@@ -89,6 +95,8 @@ void ImageWidget::mousePressEvent(QMouseEvent* mouseevent)
 		case kChoose:
 			is_choosing_ = true;
 			point_start_ = point_end_ = mouseevent->pos();
+			shape_->set_start(point_start_);
+			shape_->set_end(point_end_);
 			break;
 
 		case kPaste:
@@ -144,6 +152,7 @@ void ImageWidget::mouseMoveEvent(QMouseEvent* mouseevent)
 		if (is_choosing_)
 		{
 			point_end_ = mouseevent->pos();
+			shape_->set_end(point_end_);
 		}
 		break;
 
@@ -220,7 +229,12 @@ void ImageWidget::Open(QString filename)
 	// Load file
 	if (!filename.isEmpty())
 	{
-		image_->load(filename);
+		image_mat_ = cv::imread(filename.toStdString());
+		cv::cvtColor(image_mat_, image_mat_, cv::COLOR_BGR2RGB);
+		image_mat_backup_ = image_mat_.clone();
+		std::cout << image_mat_.cols << " " << image_mat_.rows<<" " << image_mat_.step << std::endl;
+		*(image_) =QImage((unsigned char*)(image_mat_.data), image_mat_.cols, image_mat_.rows, image_mat_.step, QImage::Format_RGB888);
+		//image_->load(filename);
 		*(image_backup_) = *(image_);
 	}
 

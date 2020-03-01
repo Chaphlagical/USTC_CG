@@ -40,6 +40,7 @@ private:
 	QMenu* menu_file_;
 	QMenu* menu_edit_;
 	QMenu* menu_help_;
+	QComboBox* combobox_;
 	QToolBar	*toolbar_file_;
 	QToolBar	*toolbar_edit_;
 	QAction* action_new_;

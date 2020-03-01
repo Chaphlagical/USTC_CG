@@ -40,22 +40,30 @@ void WarpingRBF::InitAnchor(QVector<QPoint>src_list_, QVector<QPoint>tar_list_)
 	}
 
 	// get radius
-	for (int i = 0; i < p_points.size(); i++)
+	if (p_points.size() > 1)
 	{
-		int d_min = 1000000;
-		for (int j = 0; j < p_points.size(); j++)
+		for (int i = 0; i < p_points.size(); i++)
 		{
-			if (i != j)
+			int d_min = 1000000;
+			for (int j = 0; j < p_points.size(); j++)
 			{
-				int dist = Distance(p_points[i], p_points[j]);
-				if (dist < d_min)
+				if (i != j)
 				{
-					d_min = dist;
+					int dist = Distance(p_points[i], p_points[j]);
+					if (dist < d_min)
+					{
+						d_min = dist;
+					}
 				}
 			}
+			radius.push_back(d_min);
 		}
-		radius.push_back(d_min);
 	}
+	else
+	{
+		radius.push_back(0);
+	}
+	
 	Get_weight();
 }
 
@@ -65,30 +73,42 @@ void WarpingRBF::Get_weight()
 	Eigen::VectorXd b_x(p_points.size());
 	Eigen::VectorXd b_y(p_points.size());
 	A.setZero(); b_x.setZero(); b_y.setZero();
-	for (int i = 0; i < A.rows(); i++)
+	if (p_points.size() > 1)
 	{
-		for (int j = 0; j < A.cols(); j++)
+		for (int i = 0; i < A.rows(); i++)
 		{
-			A(i, j) = pow(pow(Distance(p_points[i], p_points[j]), 2) + radius[j] * radius[j], mu);		
+			for (int j = 0; j < A.cols(); j++)
+			{
+				A(i, j) = pow(pow(Distance(p_points[i], p_points[j]), 2) + radius[j] * radius[j], mu);
+			}
+			b_x(i) = (double)q_points[i].x() - (double)p_points[i].x();
+			b_y(i) = (double)q_points[i].y() - (double)p_points[i].y();
 		}
-		b_x(i) = q_points[i].x() - p_points[i].x();
-		b_y(i) = q_points[i].y() - p_points[i].y();
+		weight_x.resize(p_points.size());
+		weight_y.resize(p_points.size());
+		weight_x = A.inverse() * b_x;
+		weight_y = A.inverse() * b_y;
 	}
-	weight_x.resize(p_points.size());
-	weight_y.resize(p_points.size());
-	weight_x = A.inverse() * b_x;
-	weight_y = A.inverse() * b_y;
 }
 
 QPoint WarpingRBF::PointConvert(QPoint p)
 {
 	double convert_x = 0;
 	double convert_y = 0;
-
-	for (int i = 0; i < p_points.size(); i++)
+	if (p_points.size() > 1)
 	{
-		convert_x += weight_x(i) * pow(pow(Distance(p_points[i], p), 2) + radius[i] * radius[i], mu);
-		convert_y+=weight_y(i)* pow(pow(Distance(p_points[i], p), 2) + radius[i] * radius[i], mu);
+		for (int i = 0; i < p_points.size(); i++)
+		{
+			convert_x += weight_x(i) * pow(pow(Distance(p_points[i], p), 2) + radius[i] * radius[i], mu);
+			convert_y += weight_y(i) * pow(pow(Distance(p_points[i], p), 2) + radius[i] * radius[i], mu);
+		}
 	}
-	return QPoint(convert_x+p.x(),convert_y+p.y());
+	else
+	{
+		convert_x = (double)q_points[0].x() -(double) p_points[0].x();
+		convert_y = (double)q_points[0].y() - (double)p_points[0].y();
+	}
+	return QPoint(convert_x + p.x(), convert_y + p.y());
+
+	
 }

@@ -232,6 +232,7 @@ void MainWindow::ChooseRect()
 	if (!window)
 		return;
 	window->imagewidget_->set_draw_status_to_choose();
+	window->imagewidget_->shape_=new poissonedit::Rect;
 	child_source_ = window;
 }
 

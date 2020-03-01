@@ -1,5 +1,10 @@
 #pragma once
 #include <QWidget>
+#include "Shape.h"
+#include "Rect.h"
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/core/core.hpp>
 
 class ChildWindow;
 QT_BEGIN_NAMESPACE
@@ -51,6 +56,7 @@ public slots:
 public:
 	QPoint						point_start_;					// Left top point of rectangle region
 	QPoint						point_end_;						// Right bottom point of rectangle region
+	Shape						*shape_;
 
 private:
 	QImage						*image_;						// image 
@@ -63,5 +69,8 @@ private:
 	DrawStatus					draw_status_;					// Enum type of draw status
 	bool						is_choosing_;
 	bool						is_pasting_;
+	cv::Mat					image_mat_;
+	cv::Mat					image_mat_backup_;
+
 };
 

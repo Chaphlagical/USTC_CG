@@ -83,5 +83,9 @@ link_directories (
 	# $ENV{XXX_LIB_PATH}
 	# ...
 )
+link_libraries (
+	${OpenCV_DIR}/x64/vc15/lib/opencv_world420d.lib
+	${OpenCV_DIR}/x64/vc15/lib/opencv_world420.lib
+)
 
 Ubpa_AddSubDirsRec(src)
