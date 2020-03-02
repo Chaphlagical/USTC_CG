@@ -116,19 +116,24 @@ void ImageWidget::mousePressEvent(QMouseEvent* mouseevent)
 				- source_window_->imagewidget_->point_start_.rx() + 1;
 			int h = source_window_->imagewidget_->point_end_.ry()
 				- source_window_->imagewidget_->point_start_.ry() + 1;
+			Eigen::MatrixXi inside_mask = source_window_->imagewidget_->shape_->inside_mask_;
 
 			// Paste
 			if ((xpos + w < image_->width()) && (ypos + h < image_->height()))
 			{
 				// Restore image
-			//	*(image_) = *(image_backup_);
+				*(image_) = *(image_backup_);
 
 				// Paste
 				for (int i = 0; i < w; i++)
 				{
 					for (int j = 0; j < h; j++)
 					{
-						image_->setPixel(xpos + i, ypos + j, source_window_->imagewidget_->image()->pixel(xsourcepos + i, ysourcepos + j));
+						if (inside_mask(i, j) == 1)
+						{
+							image_->setPixel(xpos + i, ypos + j, source_window_->imagewidget_->image()->pixel(xsourcepos + i, ysourcepos + j));
+						}
+						
 					}
 				}
 			}
@@ -173,6 +178,7 @@ void ImageWidget::mouseMoveEvent(QMouseEvent* mouseevent)
 				- source_window_->imagewidget_->point_start_.rx() + 1;
 			int h = source_window_->imagewidget_->point_end_.ry()
 				- source_window_->imagewidget_->point_start_.ry() + 1;
+			Eigen::MatrixXi inside_mask = source_window_->imagewidget_->shape_->inside_mask_;
 
 			// Paste
 			if ((xpos > 0) && (ypos > 0) && (xpos + w < image_->width()) && (ypos + h < image_->height()))
@@ -185,7 +191,10 @@ void ImageWidget::mouseMoveEvent(QMouseEvent* mouseevent)
 				{
 					for (int j = 0; j < h; j++)
 					{
-						image_->setPixel(xpos + i, ypos + j, source_window_->imagewidget_->image()->pixel(xsourcepos + i, ysourcepos + j));
+						if (inside_mask(i, j) == 1)
+						{
+							image_->setPixel(xpos + i, ypos + j, source_window_->imagewidget_->image()->pixel(xsourcepos + i, ysourcepos + j));
+						}
 					}
 				}
 			}
@@ -205,9 +214,16 @@ void ImageWidget::mouseReleaseEvent(QMouseEvent* mouseevent)
 	case kChoose:
 		if (is_choosing_)
 		{
+			
 			point_end_ = mouseevent->pos();
 			is_choosing_ = false;
 			draw_status_ = kNone;
+			if (shape_->type_ == Shape::kRect)
+			{
+				shape_->InitPoints(point_start_, point_end_);
+				shape_->GetInsideMask();
+			}
+
 		}
 
 	case kPaste:
