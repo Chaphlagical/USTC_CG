@@ -32,7 +32,7 @@ public:
 	int ImageHeight();											// Height of image
 	void set_draw_status_to_choose();
 	void set_draw_status_to_paste();
-	QImage* image();
+	const cv::Mat& image();
 	void set_source_window(ChildWindow* childwindow);
 
 protected:
@@ -71,6 +71,7 @@ private:
 	bool						is_pasting_;
 	cv::Mat					image_mat_;
 	cv::Mat					image_mat_backup_;
+	Eigen::MatrixXi inside_mask;
 
 };
 

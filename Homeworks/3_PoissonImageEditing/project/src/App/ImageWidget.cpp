@@ -31,12 +31,14 @@ ImageWidget::~ImageWidget(void)
 
 int ImageWidget::ImageWidth()
 {
-	return image_->width();
+	//return image_->width();
+	return image_mat_.cols;
 }
 
 int ImageWidget::ImageHeight()
 {
-	return image_->height();
+	//return image_->height();
+	return image_mat_.rows;
 }
 
 void ImageWidget::set_draw_status_to_choose()
@@ -49,9 +51,9 @@ void ImageWidget::set_draw_status_to_paste()
 	draw_status_ = kPaste;
 }
 
-QImage* ImageWidget::image()
+const cv::Mat& ImageWidget::image()
 {
-	return image_;
+	return image_mat_;
 }
 
 void ImageWidget::set_source_window(ChildWindow* childwindow)
@@ -70,8 +72,13 @@ void ImageWidget::paintEvent(QPaintEvent* paintevent)
 	painter.drawRect(back_rect);
 
 	// Draw image
+	//QRect rect = QRect(0, 0, image_->width(), image_->height());
+//	QRect rect = QRect(0, 0, image_mat_.rows, image_mat_.s);
+	*(image_) = QImage((unsigned char*)(image_mat_.data), image_mat_.cols, image_mat_.rows, image_mat_.step, QImage::Format_RGB888);
 	QRect rect = QRect(0, 0, image_->width(), image_->height());
 	painter.drawImage(rect, *image_);
+	//cv::imshow("a",image_mat_);
+	//cv::waitKey(0);
 
 	// Draw choose region
 	painter.setBrush(Qt::NoBrush);
@@ -108,6 +115,7 @@ void ImageWidget::mousePressEvent(QMouseEvent* mouseevent)
 			int ypos = mouseevent->pos().ry();
 
 			// Start point in source image
+
 			int xsourcepos = source_window_->imagewidget_->point_start_.rx();
 			int ysourcepos = source_window_->imagewidget_->point_start_.ry();
 
@@ -116,29 +124,42 @@ void ImageWidget::mousePressEvent(QMouseEvent* mouseevent)
 				- source_window_->imagewidget_->point_start_.rx() + 1;
 			int h = source_window_->imagewidget_->point_end_.ry()
 				- source_window_->imagewidget_->point_start_.ry() + 1;
-			Eigen::MatrixXi inside_mask = source_window_->imagewidget_->shape_->inside_mask_;
+			inside_mask = source_window_->imagewidget_->shape_->inside_mask_;
+			
+			//source_window_->imagewidget_->shape_->GetPoisson(QPoint(xpos,ypos),image_mat_);
+
 
 			// Paste
-			if ((xpos + w < image_->width()) && (ypos + h < image_->height()))
+			//if ((xpos + w < image_->width()) && (ypos + h < image_->height()))
+			if ((xpos + w <image_mat_.cols) && (ypos + h < image_mat_.rows))
 			{
 				// Restore image
-				*(image_) = *(image_backup_);
+//				*(image_) = *(image_backup_);
+				//image_mat_ = image_mat_backup_.clone();
 
 				// Paste
-				for (int i = 0; i < w; i++)
+				/*for (int i = 0; i < h; i++)
 				{
-					for (int j = 0; j < h; j++)
+					for (int j = 0; j < w; j++)
 					{
 						if (inside_mask(i, j) == 1)
 						{
-							image_->setPixel(xpos + i, ypos + j, source_window_->imagewidget_->image()->pixel(xsourcepos + i, ysourcepos + j));
+							image_mat_.at<cv::Vec3b>(ypos+i, xpos+j) = source_window_->imagewidget_->image_mat_.at<cv::Vec3b>(ysourcepos + i, xsourcepos + j );
+							//image_->setPixel(xpos + i, ypos + j, source_window_->imagewidget_->image()->pixel(xsourcepos + i, ysourcepos + j));
+							//QRgb color;
+							//color = qRgb(Poisson_mask.at<cv::Vec3b>(i, j)[0], Poisson_mask.at<cv::Vec3b>(i, j)[1], Poisson_mask.at<cv::Vec3b>(i, j)[2]);
+							//image_->setPixel(xpos + i, ypos + j, color);
 						}
-						
-					}
-				}
-			}
-		}
 
+					}
+				}*/
+				source_window_->imagewidget_->shape_->GetPoisson(mouseevent->pos(), source_window_->imagewidget_->point_start_,
+					image_mat_, source_window_->imagewidget_->image_mat_);
+			}
+			
+		}
+		
+		
 		update();
 		break;
 
@@ -178,25 +199,30 @@ void ImageWidget::mouseMoveEvent(QMouseEvent* mouseevent)
 				- source_window_->imagewidget_->point_start_.rx() + 1;
 			int h = source_window_->imagewidget_->point_end_.ry()
 				- source_window_->imagewidget_->point_start_.ry() + 1;
-			Eigen::MatrixXi inside_mask = source_window_->imagewidget_->shape_->inside_mask_;
+			//Eigen::MatrixXi inside_mask = source_window_->imagewidget_->shape_->inside_mask_;
 
 			// Paste
-			if ((xpos > 0) && (ypos > 0) && (xpos + w < image_->width()) && (ypos + h < image_->height()))
+	//		if ((xpos > 0) && (ypos > 0) && (xpos + w < image_->width()) && (ypos + h < image_->height()))
+			if ((xpos > 0) && (ypos > 0) && (xpos + w < image_mat_.cols) && (ypos + h < image_mat_.rows))
 			{
 				// Restore image 
-				*(image_) = *(image_backup_);
+				//*(image_) = *(image_backup_);
+				image_mat_ = image_mat_backup_.clone();
 
 				// Paste
-				for (int i = 0; i < w; i++)
+				/*for (int i = 0; i < h; i++)
 				{
-					for (int j = 0; j < h; j++)
+					for (int j = 0; j < w; j++)
 					{
 						if (inside_mask(i, j) == 1)
 						{
-							image_->setPixel(xpos + i, ypos + j, source_window_->imagewidget_->image()->pixel(xsourcepos + i, ysourcepos + j));
+							image_mat_.at<cv::Vec3b>(ypos+i, xpos+j) = source_window_->imagewidget_->image_mat_.at<cv::Vec3b>(ysourcepos + i, xsourcepos + j);
+							//image_->setPixel(xpos + i, ypos + j, source_window_->imagewidget_->image()->pixel(xsourcepos + i, ysourcepos + j));
 						}
 					}
-				}
+				}*/
+
+				source_window_->imagewidget_->shape_->GetPoisson(mouseevent->pos(), source_window_->imagewidget_->point_start_, image_mat_,source_window_->imagewidget_->image_mat_);
 			}
 		}
 
@@ -222,6 +248,7 @@ void ImageWidget::mouseReleaseEvent(QMouseEvent* mouseevent)
 			{
 				shape_->InitPoints(point_start_, point_end_);
 				shape_->GetInsideMask();
+				shape_->PoissonInit(image_mat_);
 			}
 
 		}
@@ -249,9 +276,9 @@ void ImageWidget::Open(QString filename)
 		cv::cvtColor(image_mat_, image_mat_, cv::COLOR_BGR2RGB);
 		image_mat_backup_ = image_mat_.clone();
 		std::cout << image_mat_.cols << " " << image_mat_.rows<<" " << image_mat_.step << std::endl;
-		*(image_) =QImage((unsigned char*)(image_mat_.data), image_mat_.cols, image_mat_.rows, image_mat_.step, QImage::Format_RGB888);
+		
 		//image_->load(filename);
-		*(image_backup_) = *(image_);
+		//*(image_backup_) = *(image_);
 	}
 
 	//	setFixedSize(image_->width(), image_->height());
@@ -262,7 +289,7 @@ void ImageWidget::Open(QString filename)
 		//image_->invertPixels(QImage::InvertRgb);
 		//*(image_) = image_->mirrored(true, true);
 		//*(image_) = image_->rgbSwapped();
-	cout << "image size: " << image_->width() << ' ' << image_->height() << endl;
+	//cout << "image size: " << image_->width() << ' ' << image_->height() << endl;
 	update();
 }
 
@@ -279,19 +306,21 @@ void ImageWidget::SaveAs()
 		return;
 	}
 
-	image_->save(filename);
+	//image_->save(filename);
+	cv::imwrite(filename.toStdString(), image_mat_);
 }
 
 void ImageWidget::Invert()
 {
-	for (int i = 0; i < image_->width(); i++)
+	/*for (int i = 0; i < image_->width(); i++)
 	{
 		for (int j = 0; j < image_->height(); j++)
 		{
 			QRgb color = image_->pixel(i, j);
 			image_->setPixel(i, j, qRgb(255 - qRed(color), 255 - qGreen(color), 255 - qBlue(color)));
 		}
-	}
+	}*/
+	image_mat_ = 255 - image_mat_;
 
 	// equivalent member function of class QImage
 	// image_->invertPixels(QImage::InvertRgb);
@@ -300,7 +329,7 @@ void ImageWidget::Invert()
 
 void ImageWidget::Mirror(bool ishorizontal, bool isvertical)
 {
-	QImage image_tmp(*(image_));
+	/*QImage image_tmp(*(image_));
 	int width = image_->width();
 	int height = image_->height();
 
@@ -340,8 +369,8 @@ void ImageWidget::Mirror(bool ishorizontal, bool isvertical)
 				}
 			}
 		}
-	}
-
+	}*/
+	cv::flip(image_mat_, image_mat_,1);
 	// equivalent member function of class QImage
 	//*(image_) = image_->mirrored(true, true);
 	update();
@@ -349,7 +378,7 @@ void ImageWidget::Mirror(bool ishorizontal, bool isvertical)
 
 void ImageWidget::TurnGray()
 {
-	for (int i = 0; i < image_->width(); i++)
+	/*for (int i = 0; i < image_->width(); i++)
 	{
 		for (int j = 0; j < image_->height(); j++)
 		{
@@ -357,14 +386,15 @@ void ImageWidget::TurnGray()
 			int gray_value = (qRed(color) + qGreen(color) + qBlue(color)) / 3;
 			image_->setPixel(i, j, qRgb(gray_value, gray_value, gray_value));
 		}
-	}
+	}*/
+	cv::cvtColor(image_mat_,image_mat_, cv::COLOR_RGB2GRAY);
 
 	update();
 }
 
 void ImageWidget::Restore()
 {
-	*(image_) = *(image_backup_);
+	image_mat_ = image_mat_backup_.clone();
 	point_start_ = point_end_ = QPoint(0, 0);
 	update();
 }
