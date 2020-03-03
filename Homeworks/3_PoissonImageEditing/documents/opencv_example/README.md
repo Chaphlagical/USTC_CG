@@ -1,4 +1,4 @@
-# OpenCV 示例
+# OpenCV 应用示例
 
 ## 配置说明
 
@@ -10,7 +10,7 @@
   - 将 `your-path-to-opencv/build/x64/vc15/bin` 加到系统变量 Path 中
   - 新建系统变量（用于 CMake 命令 `find_package(OpenCV REQUIRED)`）
     - 变量名：`OpenCV_DIR` 
-    - 变量值：`your-path-to-opencv/build/x64/vc15/lib` 
+    - 变量值：`your-path-to-opencv/build` 
 
 **CMake** 
 
@@ -44,5 +44,5 @@ OpenCV 为这两种数据结构提供了大量的图像 IO，图像处理接口�
 error C2872: “ACCESS_MASK”: 不明确的符号
 ```
 
-因此需要在每个使用 opencv 的地方都手动加上 `cv::`，以避免命名冲突
+因此需要在每个使用 OpenCV 的地方都手动加上 `cv::`，以避免命名冲突
 

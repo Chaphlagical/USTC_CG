@@ -1,4 +1,4 @@
-# 3. 泊松图像编辑
+# 3. 泊松图像编辑 (Poisson Image Editing)
 
 
 ## 作业递交
@@ -9,12 +9,9 @@
 ## 作业要求
 
 - 实现 Poisson Image Editing 算法
-- 任意区域填充的[扫描线算法](documents/ScanningLine.md) 
-- 无缝融合
-  - 大型稀疏方程组求解
+- 实现多边形光栅化的[扫描线转换算法](documents/ScanningLine.md) 
+- 学习使用Eigen库求解大型稀疏方程组
 - 学习使用 OpenCV
-- 项目报告
-  - 各种试验例子
 - 实时拖动区域显示结果（Optional）
   - 矩阵预分解
 
