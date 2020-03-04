@@ -13,11 +13,6 @@ Poisson::~Poisson()
 	
 }
 
-void Poisson::set_insidemask(Eigen::MatrixXi inside_mask)
-{
-	inside_mask_ = inside_mask;
-}
-
 void Poisson::PoissonInit(cv::Mat source_img)
 {
 	width_ = inside_mask_.rows();

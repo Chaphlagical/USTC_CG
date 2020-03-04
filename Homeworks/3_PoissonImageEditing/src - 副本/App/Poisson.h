@@ -6,13 +6,14 @@
 #include <Eigen/Sparse>
 #include<Eigen/IterativeLinearSolvers>
 
-class Poisson
+class Poisson:
+	public ScanLine
 {
 public:
 	Poisson();
 	~Poisson();
 	void PoissonInit(cv::Mat source_img);
-	void set_insidemask(Eigen::MatrixXi inside_mask);
+	
 	void GetPoisson(QPoint paste_point, QPoint source_point, cv::Mat& paste_img_, cv::Mat& source_img_);
 
 private:
@@ -26,7 +27,6 @@ private:
 	int width_, height_;
 	Eigen::SparseMatrix<float> sparse_matrix_;
 	Eigen::SimplicialLLT<Eigen::SparseMatrix<float>> solver;
-	Eigen::MatrixXi inside_mask_;
 	Eigen::VectorXf div_red_;
 	Eigen::VectorXf div_green_ ;
 	Eigen::VectorXf div_blue_ ;

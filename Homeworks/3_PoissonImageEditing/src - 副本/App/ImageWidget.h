@@ -2,9 +2,6 @@
 #include <QWidget>
 #include "Shape.h"
 #include "Rect.h"
-#include "Polygon.h"
-#include "Poisson.h"
-#include "ScanLine.h"
 
 class ChildWindow;
 QT_BEGIN_NAMESPACE
@@ -70,9 +67,7 @@ private:
 	cv::Mat					image_mat_;
 	cv::Mat					image_mat_backup_;
 	cv::Mat					image_mat_last_;
-	Eigen::MatrixXi inside_mask_;
-	Poisson* poisson_;
-	ScanLine* scanline_;
+	Eigen::MatrixXi inside_mask;
 
 };
 

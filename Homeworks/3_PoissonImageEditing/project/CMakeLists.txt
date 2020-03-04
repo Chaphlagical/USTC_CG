@@ -83,9 +83,14 @@ link_directories (
 	# $ENV{XXX_LIB_PATH}
 	# ...
 )
-link_libraries (
-	${OpenCV_DIR}/x64/vc15/lib/opencv_world420d.lib
-	${OpenCV_DIR}/x64/vc15/lib/opencv_world420.lib
-)
+
+#add_executable（MyEXE $ {SOURCES}）
+ 
+#target_link_libraries（MyEXE debug 3PDebugLib）
+#target_link_libraries（MyEXE optimized 3PReleaseLib）
+
+link_libraries (debug ${OpenCV_DIR}/x64/vc15/lib/opencv_world420d.lib)
+	
+link_libraries (optimized ${OpenCV_DIR}/x64/vc15/lib/opencv_world420.lib)
 
 Ubpa_AddSubDirsRec(src)

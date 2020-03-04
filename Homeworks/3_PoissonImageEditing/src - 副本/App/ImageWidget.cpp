@@ -20,29 +20,17 @@ ImageWidget::ImageWidget(ChildWindow* relatewindow)
 
 	source_window_ = NULL;
 	shape_ = NULL;
-	scanline_ = NULL;
-	poisson_ = NULL; 
 
-	inside_mask_.resize(0, 0);
+	inside_mask.resize(0, 0);
 }
 
 ImageWidget::~ImageWidget(void)
 {
+	delete source_window_;
+	delete shape_;
 	image_mat_.release();
 	image_mat_backup_.release();
 	image_mat_last_.release();
-	if (shape_ != NULL)
-	{
-		delete shape_;
-	}
-	if (scanline_ != NULL)
-	{
-		delete scanline_;
-	}
-	if (poisson_ != NULL)
-	{
-		delete poisson_;
-	}
 }
 
 int ImageWidget::ImageWidth()
@@ -108,16 +96,10 @@ void ImageWidget::mousePressEvent(QMouseEvent* mouseevent)
 		switch (draw_status_)
 		{
 		case kChoose:
-			scanline_ = new ScanLine;
-			poisson_ = new Poisson;
 			is_choosing_ = true;
 			point_start_ = point_end_ = mouseevent->pos();
 			shape_->set_start(point_start_);
 			shape_->set_end(point_end_);
-			if (shape_->type_ == Shape::kPolygon)
-			{
-				shape_->update(1);
-			}
 			break;
 
 		case kPaste:
@@ -129,21 +111,21 @@ void ImageWidget::mousePressEvent(QMouseEvent* mouseevent)
 			int ypos = mouseevent->pos().ry();
 
 			// Start point in source image
-			int xsourcepos = source_window_->imagewidget_->scanline_->get_start().rx();
-			int ysourcepos = source_window_->imagewidget_->scanline_->get_start().ry();
+			int xsourcepos = source_window_->imagewidget_->point_start_.rx();
+			int ysourcepos = source_window_->imagewidget_->point_start_.ry();
 
 			// Width and Height of rectangle region
-			int w = source_window_->imagewidget_->scanline_->get_end().rx();
-				- source_window_->imagewidget_->scanline_->get_start().rx() + 1;
-			int h = source_window_->imagewidget_->scanline_->get_end().ry()
-				- source_window_->imagewidget_->scanline_->get_start().ry() + 1;
-			inside_mask_ = source_window_->imagewidget_->inside_mask_;
+			int w = source_window_->imagewidget_->point_end_.rx()
+				- source_window_->imagewidget_->point_start_.rx() + 1;
+			int h = source_window_->imagewidget_->point_end_.ry()
+				- source_window_->imagewidget_->point_start_.ry() + 1;
+			inside_mask = source_window_->imagewidget_->shape_->inside_mask_;
 			
 			// Paste
 			//if ((xpos + w < image_->width()) && (ypos + h < image_->height()))
 			if ((xpos + w <image_mat_.cols) && (ypos + h < image_mat_.rows))
 			{
-				source_window_->imagewidget_->poisson_->GetPoisson(mouseevent->pos(), source_window_->imagewidget_->scanline_->get_start(),
+				source_window_->imagewidget_->shape_->GetPoisson(mouseevent->pos(), source_window_->imagewidget_->point_start_,
 					image_mat_, source_window_->imagewidget_->image_mat_);
 			}
 			
@@ -156,22 +138,6 @@ void ImageWidget::mousePressEvent(QMouseEvent* mouseevent)
 		default:
 			break;
 		}
-	}
-	if (Qt::RightButton == mouseevent->button())
-	{
-		if (draw_status_ == kChoose&&shape_->type_==Shape::kPolygon)
-		{
-			is_choosing_ = false;
-			draw_status_ = kNone;
-			shape_->update(0);
-			scanline_->InitPoints(shape_->get_polygon());
-			scanline_->GetInsideMask();
-			poisson_->set_insidemask(scanline_->inside_mask_);
-			poisson_->PoissonInit(image_mat_);
-			
-			update();
-		}
-		
 	}
 }
 
@@ -197,14 +163,14 @@ void ImageWidget::mouseMoveEvent(QMouseEvent* mouseevent)
 			int ypos = mouseevent->pos().ry();
 
 			// Start point in source image
-			int xsourcepos = source_window_->imagewidget_->scanline_->get_start().rx();
-			int ysourcepos = source_window_->imagewidget_->scanline_->get_start().ry();
+			int xsourcepos = source_window_->imagewidget_->point_start_.rx();
+			int ysourcepos = source_window_->imagewidget_->point_start_.ry();
 
 			// Width and Height of rectangle region
-			int w = source_window_->imagewidget_->scanline_->get_end().rx()
-				- source_window_->imagewidget_->scanline_->get_start().rx() + 1;
-			int h = source_window_->imagewidget_->scanline_->get_end().ry()
-				- source_window_->imagewidget_->scanline_->get_start().ry() + 1;
+			int w = source_window_->imagewidget_->point_end_.rx()
+				- source_window_->imagewidget_->point_start_.rx() + 1;
+			int h = source_window_->imagewidget_->point_end_.ry()
+				- source_window_->imagewidget_->point_start_.ry() + 1;
 			//Eigen::MatrixXi inside_mask = source_window_->imagewidget_->shape_->inside_mask_;
 
 			// Paste
@@ -215,7 +181,7 @@ void ImageWidget::mouseMoveEvent(QMouseEvent* mouseevent)
 				image_mat_ = image_mat_last_.clone();
 
 				// Paste
-				source_window_->imagewidget_->poisson_->GetPoisson(mouseevent->pos(), source_window_->imagewidget_->scanline_->get_start(), image_mat_,source_window_->imagewidget_->image_mat_);
+				source_window_->imagewidget_->shape_->GetPoisson(mouseevent->pos(), source_window_->imagewidget_->point_start_, image_mat_,source_window_->imagewidget_->image_mat_);
 			}
 		}
 
@@ -233,16 +199,17 @@ void ImageWidget::mouseReleaseEvent(QMouseEvent* mouseevent)
 	case kChoose:
 		if (is_choosing_)
 		{
+			
 			point_end_ = mouseevent->pos();
+			is_choosing_ = false;
+			draw_status_ = kNone;
 			if (shape_->type_ == Shape::kRect)
 			{
-				is_choosing_ = false;
-				draw_status_ = kNone;
-				scanline_->InitPoints(point_start_, point_end_);
-				scanline_->GetInsideMask();
-				poisson_->set_insidemask(scanline_->inside_mask_);
-				poisson_->PoissonInit(image_mat_);
+				shape_->InitPoints(point_start_, point_end_);
+				shape_->GetInsideMask();
+				shape_->PoissonInit(image_mat_);
 			}
+
 		}
 
 	case kPaste:
@@ -329,7 +296,6 @@ void ImageWidget::TurnGray()
 void ImageWidget::Restore()
 {
 	image_mat_ = image_mat_backup_.clone();
-	image_mat_last_ = image_mat_backup_.clone();
 	point_start_ = point_end_ = QPoint(0, 0);
 	update();
 }

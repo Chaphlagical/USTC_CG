@@ -38,7 +38,6 @@ private slots:
 
 	// Poisson Image Editing
 	void ChooseRect();							// Choose rectangle region
-	void ChoosePolygon();
 	void Paste();								// Paste rect region to object image
 
 private:
@@ -68,7 +67,6 @@ private:
 	QAction						*action_gray_;
 	QAction						*action_restore_;
 
-	QAction						*action_choose_rect_;
 	QAction						*action_choose_polygon_;
 	QAction						*action_copy_;
 	QAction						*action_paste_;
