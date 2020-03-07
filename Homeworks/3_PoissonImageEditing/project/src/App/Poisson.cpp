@@ -39,6 +39,7 @@ void Poisson::PoissonInit(cv::Mat source_img)
 	}
 	
 	sparse_matrix_.resize(pixels_num_, pixels_num_);
+	sparse_matrix_.setZero();
 	
 	QVector<Eigen::Triplet<float>> coef;
 	for (int i = 0; i < width_; i++)

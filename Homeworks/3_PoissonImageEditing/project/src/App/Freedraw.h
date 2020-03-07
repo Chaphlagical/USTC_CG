@@ -13,6 +13,7 @@ namespace poissonedit
 			~Freedraw();
 
 			void Draw(QPainter& painter);
+			QPainterPath get_path();
 
 		protected:
 			QPainterPath path;

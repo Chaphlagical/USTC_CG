@@ -15,6 +15,7 @@ public:
 	virtual void Draw(QPainter& paint) = 0;
 	virtual void update(int mode){}
 	virtual QPolygon get_polygon() { QPolygon polygon; return polygon;}
+	virtual QPainterPath get_path() { QPainterPath path; return path; }
 
 public:
 	enum Type

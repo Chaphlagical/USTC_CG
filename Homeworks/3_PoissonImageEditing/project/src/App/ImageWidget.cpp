@@ -43,6 +43,7 @@ ImageWidget::~ImageWidget(void)
 	{
 		delete poisson_;
 	}
+	
 }
 
 int ImageWidget::ImageWidth()
@@ -108,8 +109,6 @@ void ImageWidget::mousePressEvent(QMouseEvent* mouseevent)
 		switch (draw_status_)
 		{
 		case kChoose:
-			scanline_ = new ScanLine;
-			poisson_ = new Poisson;
 			is_choosing_ = true;
 			point_start_ = point_end_ = mouseevent->pos();
 			shape_->set_start(point_start_);
@@ -163,6 +162,8 @@ void ImageWidget::mousePressEvent(QMouseEvent* mouseevent)
 		{
 			is_choosing_ = false;
 			draw_status_ = kNone;
+			scanline_ = new ScanLine;
+			poisson_ = new Poisson;
 			shape_->update(0);
 			scanline_->InitPoints(shape_->get_polygon());
 			scanline_->GetInsideMask();
@@ -236,9 +237,23 @@ void ImageWidget::mouseReleaseEvent(QMouseEvent* mouseevent)
 			point_end_ = mouseevent->pos();
 			if (shape_->type_ == Shape::kRect)
 			{
+				scanline_ = new ScanLine;
+				poisson_ = new Poisson;
 				is_choosing_ = false;
 				draw_status_ = kNone;
 				scanline_->InitPoints(point_start_, point_end_);
+				scanline_->GetInsideMask();
+				poisson_->set_insidemask(scanline_->inside_mask_);
+				poisson_->PoissonInit(image_mat_);
+			}
+			if (shape_->type_ == Shape::kFreedraw)
+			{
+				shape_->set_end(point_start_);
+				scanline_ = new ScanLine;
+				poisson_ = new Poisson;
+				is_choosing_ = false;
+				draw_status_ = kNone;
+				scanline_->InitPoints(shape_->get_path());
 				scanline_->GetInsideMask();
 				poisson_->set_insidemask(scanline_->inside_mask_);
 				poisson_->PoissonInit(image_mat_);
@@ -304,12 +319,14 @@ void ImageWidget::Invert()
 			image_mat_.at<cv::Vec3b>(i, j)[2] = 255 - image_mat_.at<cv::Vec3b>(i, j)[2];
 		}
 	}
+	image_mat_last_ = image_mat_.clone();
 	update();
 }
 
 void ImageWidget::Mirror(bool ishorizontal, bool isvertical)
 {
 	cv::flip(image_mat_, image_mat_,1);
+	image_mat_last_ = image_mat_.clone();
 	update();
 }
 
@@ -323,11 +340,14 @@ void ImageWidget::TurnGray()
 			image_mat_.at<cv::Vec3b>(i, j) = cv::Vec3b(gray, gray, gray);
 		}
 	}
+	image_mat_last_ = image_mat_.clone();
 	update();
 }
 
 void ImageWidget::Restore()
 {
+	if(shape_!=NULL)
+		delete shape_;
 	image_mat_ = image_mat_backup_.clone();
 	image_mat_last_ = image_mat_backup_.clone();
 	point_start_ = point_end_ = QPoint(0, 0);

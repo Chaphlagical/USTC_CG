@@ -36,4 +36,5 @@ private:
 	int width_, height_;
 	int start_x_, start_y_, end_x_, end_y_ ;
 
+
 };

@@ -5,6 +5,7 @@
 #include "Polygon.h"
 #include "Poisson.h"
 #include "ScanLine.h"
+#include "Freedraw.h"
 
 class ChildWindow;
 QT_BEGIN_NAMESPACE
