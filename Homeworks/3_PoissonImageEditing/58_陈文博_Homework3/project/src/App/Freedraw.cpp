@@ -9,6 +9,11 @@ Freedraw::~Freedraw()
 {
 }
 
+QPainterPath Freedraw::get_path()
+{
+	return path;
+}
+
 void Freedraw::Draw(QPainter& painter)
 {
 	if (path.elementCount() == 0)

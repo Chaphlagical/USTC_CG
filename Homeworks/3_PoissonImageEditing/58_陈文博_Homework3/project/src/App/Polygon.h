@@ -12,6 +12,8 @@ namespace poissonedit {
 
 			void Draw(QPainter& painter);
 			void update(int mode);
+			QPolygon get_polygon();
+
 		private:
 			QPolygon polygon;
 			bool finish;

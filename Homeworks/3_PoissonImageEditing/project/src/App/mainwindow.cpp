@@ -54,33 +54,47 @@ void MainWindow::CreateActions()
 
 	// Image processing
 	action_invert_ = new QAction(tr("Inverse"), this);
+	action_invert_->setIcon(QIcon(QString("../src/App/Resources/images/inverse.png")));
 	action_invert_->setStatusTip(tr("Invert all pixel value in the image"));
 	connect(action_invert_, SIGNAL(triggered()), this, SLOT(Invert()));
 
 	action_mirror_ = new QAction(tr("Mirror"), this);
+	action_mirror_->setIcon(QIcon(QString("../src/App/Resources/images/mirror.png")));
 	action_mirror_->setStatusTip(tr("Mirror image vertically or horizontally"));
 	connect(action_mirror_, SIGNAL(triggered()), this, SLOT(Mirror()));
 
 	action_gray_ = new QAction(tr("Grayscale"), this);
+	action_gray_->setIcon(QIcon(QString("../src/App/Resources/images/gray.png")));
 	action_gray_->setStatusTip(tr("Gray-scale map"));
 	connect(action_gray_, SIGNAL(triggered()), this, SLOT(GrayScale()));
 
 	action_restore_ = new QAction(tr("Restore"), this);
+	action_restore_->setIcon(QIcon(QString("../src/App/Resources/images/restore.png")));
 	action_restore_->setStatusTip(tr("Show origin image"));
 	connect(action_restore_, SIGNAL(triggered()), this, SLOT(Restore()));
 
 	// Poisson image editting
 	action_choose_rect_ = new QAction(tr("RectChoose"), this);
+	action_choose_rect_->setIcon(QIcon(QString("../src/App/Resources/images/rect.png")));
 	connect(action_choose_rect_, SIGNAL(triggered()), this, SLOT(ChooseRect()));
 
 	action_choose_polygon_ = new QAction(tr("PolygonChoose"), this);
+	action_choose_polygon_->setIcon(QIcon(QString("../src/App/Resources/images/polygon.png")));
 	connect(action_choose_polygon_, SIGNAL(triggered()), this, SLOT(ChoosePolygon()));
 
 	action_choose_freedraw_ = new QAction(tr("FreedrawChoose"), this);
+	action_choose_freedraw_->setIcon(QIcon(QString("../src/App/Resources/images/freedraw.png")));
 	connect(action_choose_freedraw_, SIGNAL(triggered()), this, SLOT(ChooseFreedraw()));
 
 	action_paste_ = new QAction(tr("Paste"), this);
+	action_paste_->setIcon(QIcon(QString("../src/App/Resources/images/paste.png")));
 	connect(action_paste_, SIGNAL(triggered()), this, SLOT(Paste()));
+
+	action_mix_paste_ = new QAction(tr("MixPoisson"), this);
+	connect(action_mix_paste_, SIGNAL(triggered()), this, SLOT(MixPaste()));
+
+	action_poisson_paste_ = new QAction(tr("Poisson"), this);
+	connect(action_poisson_paste_, SIGNAL(triggered()), this, SLOT(PoissonPaste()));
 }
 
 void MainWindow::CreateMenus()
@@ -122,6 +136,8 @@ void MainWindow::CreateToolBars()
 	toolbar_file_->addAction(action_choose_polygon_);
 	toolbar_file_->addAction(action_choose_freedraw_);
 	toolbar_file_->addAction(action_paste_);
+	toolbar_file_->addAction(action_mix_paste_);
+	toolbar_file_->addAction(action_poisson_paste_);
 }
 
 void MainWindow::CreateStatusBar()
@@ -274,6 +290,29 @@ void MainWindow::Paste()
 		return;
 	window->imagewidget_->set_draw_status_to_paste();
 	window->imagewidget_->set_source_window(child_source_);
+	window->imagewidget_->set_normal_paste();
+}
+
+void MainWindow::PoissonPaste()
+{
+	// Paste image rect region to object image
+	ChildWindow* window = GetChildWindow();
+	if (!window)
+		return;
+	window->imagewidget_->set_draw_status_to_paste();
+	window->imagewidget_->set_source_window(child_source_);
+	window->imagewidget_->set_poisson_paste();
+}
+
+void MainWindow::MixPaste()
+{
+	// Paste image rect region to object image
+	ChildWindow* window = GetChildWindow();
+	if (!window)
+		return;
+	window->imagewidget_->set_draw_status_to_paste();
+	window->imagewidget_->set_source_window(child_source_);
+	window->imagewidget_->set_mix_paste();
 }
 
 QMdiSubWindow *MainWindow::FindChild(const QString &filename)

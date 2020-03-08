@@ -13,6 +13,11 @@ Polygon::~Polygon()
 {
 }
 
+QPolygon Polygon::get_polygon()
+{
+	return polygon;
+}
+
 void Polygon::update(int mode)
 {
 	switch (mode)	

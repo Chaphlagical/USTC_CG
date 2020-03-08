@@ -23,6 +23,7 @@ ImageWidget::ImageWidget(ChildWindow* relatewindow)
 	scanline_ = NULL;
 	poisson_ = NULL; 
 
+	paste_status_ = 0;
 	inside_mask_.resize(0, 0);
 }
 
@@ -64,6 +65,21 @@ void ImageWidget::set_draw_status_to_choose()
 void ImageWidget::set_draw_status_to_paste()
 {
 	draw_status_ = kPaste;
+}
+
+void ImageWidget::set_mix_paste()
+{
+	paste_status_ = MIX;
+}
+
+void ImageWidget::set_normal_paste()
+{
+	paste_status_ = NORMAL;
+}
+
+void ImageWidget::set_poisson_paste()
+{
+	paste_status_ = POISSON;
 }
 
 const cv::Mat& ImageWidget::image()
@@ -139,19 +155,29 @@ void ImageWidget::mousePressEvent(QMouseEvent* mouseevent)
 			inside_mask_ = source_window_->imagewidget_->inside_mask_;
 			
 			// Paste
-			//if ((xpos + w < image_->width()) && (ypos + h < image_->height()))
 			if ((xpos + w <image_mat_.cols) && (ypos + h < image_mat_.rows))
 			{
-				source_window_->imagewidget_->poisson_->GetPoisson(mouseevent->pos(), source_window_->imagewidget_->scanline_->get_start(),
-					image_mat_, source_window_->imagewidget_->image_mat_);
+				switch (paste_status_)
+				{
+				case MIX:
+					source_window_->imagewidget_->poisson_->MixingPoisson(mouseevent->pos(), source_window_->imagewidget_->scanline_->get_start(),
+						image_mat_, source_window_->imagewidget_->image_mat_);
+					break;
+				case POISSON:
+					source_window_->imagewidget_->poisson_->GetPoisson(mouseevent->pos(), source_window_->imagewidget_->scanline_->get_start(),
+						image_mat_, source_window_->imagewidget_->image_mat_);
+					break;
+				case NORMAL:
+					source_window_->imagewidget_->poisson_->CopyPaste(mouseevent->pos(), source_window_->imagewidget_->scanline_->get_start(),
+						image_mat_, source_window_->imagewidget_->image_mat_);
+					break;
+				default:
+					break;
+				}
 			}
-			
 		}
-		
-		
 		update();
 		break;
-
 		default:
 			break;
 		}
@@ -206,24 +232,35 @@ void ImageWidget::mouseMoveEvent(QMouseEvent* mouseevent)
 				- source_window_->imagewidget_->scanline_->get_start().rx() + 1;
 			int h = source_window_->imagewidget_->scanline_->get_end().ry()
 				- source_window_->imagewidget_->scanline_->get_start().ry() + 1;
-			//Eigen::MatrixXi inside_mask = source_window_->imagewidget_->shape_->inside_mask_;
 
 			// Paste
-	//		if ((xpos > 0) && (ypos > 0) && (xpos + w < image_->width()) && (ypos + h < image_->height()))
 			if ((xpos > 0) && (ypos > 0) && (xpos + w < image_mat_.cols) && (ypos + h < image_mat_.rows))
 			{
 				// Restore image 
 				image_mat_ = image_mat_last_.clone();
-
 				// Paste
-				source_window_->imagewidget_->poisson_->GetPoisson(mouseevent->pos(), source_window_->imagewidget_->scanline_->get_start(), image_mat_,source_window_->imagewidget_->image_mat_);
+				switch (paste_status_)
+				{
+				case MIX:
+					source_window_->imagewidget_->poisson_->MixingPoisson(mouseevent->pos(), source_window_->imagewidget_->scanline_->get_start(),
+						image_mat_, source_window_->imagewidget_->image_mat_);
+					break;
+				case POISSON:
+					source_window_->imagewidget_->poisson_->GetPoisson(mouseevent->pos(), source_window_->imagewidget_->scanline_->get_start(),
+						image_mat_, source_window_->imagewidget_->image_mat_);
+					break;
+				case NORMAL:
+					source_window_->imagewidget_->poisson_->CopyPaste(mouseevent->pos(), source_window_->imagewidget_->scanline_->get_start(),
+						image_mat_, source_window_->imagewidget_->image_mat_);
+					break;
+				default:
+					break;
+				}
 			}
 		}
-
 	default:
 		break;
 	}
-
 	update();
 }
 
@@ -346,8 +383,12 @@ void ImageWidget::TurnGray()
 
 void ImageWidget::Restore()
 {
-	if(shape_!=NULL)
+	if (shape_ != NULL)
+	{
 		delete shape_;
+		shape_ = NULL;
+	}
+
 	image_mat_ = image_mat_backup_.clone();
 	image_mat_last_ = image_mat_backup_.clone();
 	point_start_ = point_end_ = QPoint(0, 0);

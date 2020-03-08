@@ -14,9 +14,12 @@ public:
 	void PoissonInit(cv::Mat source_img);
 	void set_insidemask(Eigen::MatrixXi inside_mask);
 	void GetPoisson(QPoint paste_point, QPoint source_point, cv::Mat& paste_img_, cv::Mat& source_img_);
+	void MixingPoisson(QPoint paste_point, QPoint source_point, cv::Mat& paste_img_, cv::Mat& source_img_);
+	void CopyPaste(QPoint paste_point, QPoint source_point, cv::Mat& paste_img_, cv::Mat& source_img_);
 
 private:
 	void Predecomposition();
+	double VecLength(cv::Vec3i vec);
 
 private:
 	//cv::Mat source_img_;
