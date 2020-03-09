@@ -6,10 +6,24 @@
 
 安装步骤参考 [setup.md](setup.md) 
 
-## Bug
+## 作业 4
+
+主要完成
+
+- 极小化曲面：[MinSurf.h](inlcude/Engine/MeshEdit/MinSurf.h) 和 [MinSurf.cpp](src/Engine/MeshEdit/MinSurf.cpp) 
+- 参数化：[Paramaterize.h](inlcude/Engine/MeshEdit/Paramaterize.h) 和 [Paramaterize.cpp](src/Engine/MeshEdit/Paramaterize.cpp) 
+
+如果需要改动 UI（如可视化参数化的中间步骤，方便写报告），可仿照 [Attribute.cpp](src/UI/Attribute.cpp) 进行扩充
+
+你需要用到半边结构 [UHEMesh](https://github.com/Ubpa/UHEMesh)，使用方式参考 [IsotropicRemeshing.cpp](src/Engine/MeshEdit/IsotropicRemeshing.cpp) 
+
+另外还要用到 [UGM](https://github.com/Ubpa/UGM)，使用方式参考其中的示例（去下载 UGM 源码并编译看看测试例子）
+
+## Bugs
 
 - 方向光
 - 相机：按钮 To Roamer Camera
+- 法线贴图
 
 ## 依赖库
 
