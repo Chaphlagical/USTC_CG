@@ -3,6 +3,7 @@
 #include <Basic/HeapObj.h>
 #include <UHEMesh/HEMesh.h>
 #include <UGM/UGM>
+#include <Eigen/Sparse>
 
 namespace Ubpa {
 	class TriMesh;
@@ -29,6 +30,15 @@ namespace Ubpa {
 		// kernel part of the algorithm
 		void Minimize();
 
+		//	generate Laplace Matrix
+		void Laplace_init();	
+
+		//	Sparse Matrix Predecomposition
+		void Predecomposition();
+
+		//	Solve Minimum Surface
+		void Solve();
+
 	private:
 		class V;
 		class E;
@@ -44,5 +54,8 @@ namespace Ubpa {
 
 		Ptr<TriMesh> triMesh;
 		const Ptr<HEMesh<V>> heMesh; // vertice order is same with triMesh
+
+		Eigen::SparseMatrix<double> Laplace_matrix;
+		Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
 	};
 }

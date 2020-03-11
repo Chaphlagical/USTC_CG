@@ -121,7 +121,7 @@ $$
 
 ![image-20200308053734074](https://cdn.jsdelivr.net/gh/Ubpa/USTC_CG_Data@master/Homeworks/04_MinSurfMeshPara/image-20200308053734074.jpg)
 
-### 线性方法 Linear method[^Floater97] 
+### 线性方法 Linear method[^Floater97]
 
 将边界固定到平面凸多边形（比如单位圆或单位正方形）上
 

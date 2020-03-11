@@ -87,7 +87,92 @@ bool MinSurf::Run() {
 }
 
 void MinSurf::Minimize() {
-	// TODO
+	
+	Laplace_init();
+
+	Predecomposition();
+
+	Solve();
+
+
 	cout << "WARNING::MinSurf::Minimize:" << endl
 		<< "\t" << "not implemented" << endl;
+}
+
+void MinSurf::Laplace_init()
+{
+	size_t nV = heMesh->NumVertices();
+
+	//	generate Laplace Matrix
+	vector<Eigen::Triplet<double>> Lij;
+
+	for (size_t i = 0; i < nV; i++)
+	{
+		V* v1 = heMesh->Vertices()[i];
+		Lij.push_back(Eigen::Triplet<double>(i, i, 1));
+		if(!v1->IsBoundary())
+		{
+			double connect_num = 0;
+			vector<size_t> index_list;
+			for (size_t j = 0; j < nV; j++)
+			{
+				V* v2 = heMesh->Vertices()[j];
+				if (v1->IsConnectedWith(v2))
+				{
+					index_list.push_back(j);
+					connect_num++;
+				}
+			}
+			for (size_t j = 0; j < index_list.size(); j++)
+			{
+				Lij.push_back(Eigen::Triplet<double>(i, index_list[j], -1 / connect_num));
+			}
+		}
+	}
+
+	Laplace_matrix.resize(nV, nV);
+	Laplace_matrix.setZero();
+
+	Laplace_matrix.setFromTriplets(Lij.begin(), Lij.end());
+	//Laplace_matrix.makeCompressed();
+}
+
+void MinSurf::Predecomposition()
+{
+	solver.compute(Laplace_matrix);
+	if (solver.info() != Eigen::Success)
+	{
+		throw std::exception("Compute Matrix Is Error!");
+		return;
+	}
+}
+
+void MinSurf::Solve()
+{
+	size_t nV = heMesh->NumVertices();
+	Eigen::VectorXd x(nV), y(nV), z(nV);
+	Eigen::VectorXd bx(nV), by(nV), bz(nV);
+	bx.setZero(); by.setZero(); bz.setZero();
+
+	for (size_t i = 0; i < nV; i++)
+	{
+		V* v = heMesh->Vertices()[i];
+		if (v->IsBoundary())
+		{
+			bx(i) = v->pos.at(0);
+			by(i) = v->pos.at(1);
+			bz(i) = v->pos.at(2);
+		}
+	}
+
+	x = solver.solve(bx);
+	y = solver.solve(by);
+	z = solver.solve(bz);
+
+	for (size_t i = 0; i < nV; i++)
+	{
+		heMesh->Vertices()[i]->pos.at(0) = x(i);
+		heMesh->Vertices()[i]->pos.at(1) = y(i);
+		heMesh->Vertices()[i]->pos.at(2) = z(i);
+	}
 }
