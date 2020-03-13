@@ -6,6 +6,10 @@
 #include <Engine/MeshEdit/MinSurf.h>
 #include <Engine/MeshEdit/Paramaterize.h>
 #include <Engine/MeshEdit/IsotropicRemeshing.h>
+#include <Engine/MeshEdit/Boundary_Circle.h>
+#include <Engine/MeshEdit/Boundary_Basic.h>
+#include <Engine/MeshEdit/Boundary_Square.h>
+
 
 #include <Engine/Scene/SObj.h>
 #include <Engine/Scene/AllComponents.h>
@@ -329,6 +333,7 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<Disk> disk) {
 
 void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 	auto grid = GetGrid(attr->componentType2item[typeid(CmptGeometry)]);
+
 	grid->AddText("- Triangle", mesh->GetIndice().size() / 3);
 	grid->AddText("- Vertex", mesh->GetPositions().size());
 
@@ -343,9 +348,78 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 		minSurf->Run();
 		pOGLW->DirtyVAO(mesh);
 	});
-
-	grid->AddButton("Paramaterize", [mesh, pOGLW = attr->pOGLW]() {
+	
+	grid->AddButton("Paramaterize Circle-Uniform", [mesh, pOGLW = attr->pOGLW]() {
 		auto paramaterize = Paramaterize::New(mesh);
+		paramaterize->Set_Uniform_Method();
+		paramaterize->Set_Boundary_Circle();
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+	});
+
+	grid->AddButton("Paramaterize Circle-Uniform-Display", [mesh, pOGLW = attr->pOGLW]() {
+		auto paramaterize = Paramaterize::New(mesh);
+		paramaterize->Set_Uniform_Method();
+		paramaterize->Set_Boundary_Circle();
+		paramaterize->Set_Display();
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+	});
+
+	grid->AddButton("Paramaterize Square-Uniform", [mesh, pOGLW = attr->pOGLW]() {
+		auto paramaterize = Paramaterize::New(mesh);
+		paramaterize->Set_Uniform_Method();
+		paramaterize->Set_Boundary_Square();
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+	});
+
+	grid->AddButton("Paramaterize Square-Uniform-Display", [mesh, pOGLW = attr->pOGLW]() {
+		auto paramaterize = Paramaterize::New(mesh);
+		paramaterize->Set_Uniform_Method();
+		paramaterize->Set_Boundary_Square();
+		paramaterize->Set_Display();
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+	});
+
+	grid->AddButton("Paramaterize Circle-Cotangle", [mesh, pOGLW = attr->pOGLW]() {
+		auto paramaterize = Paramaterize::New(mesh);
+		paramaterize->Set_Cotangent_Method();
+		paramaterize->Set_Boundary_Circle();
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+	});
+
+	grid->AddButton("Paramaterize Circle-Cotangle-Display", [mesh, pOGLW = attr->pOGLW]() {
+		auto paramaterize = Paramaterize::New(mesh);
+		paramaterize->Set_Cotangent_Method();
+		paramaterize->Set_Boundary_Circle();
+		paramaterize->Set_Display();
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+	});
+
+	grid->AddButton("Paramaterize Square-Cotangle", [mesh, pOGLW = attr->pOGLW]() {
+		auto paramaterize = Paramaterize::New(mesh);
+		paramaterize->Set_Cotangent_Method();
+		paramaterize->Set_Boundary_Square();
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+	});
+
+	grid->AddButton("Paramaterize Square-Cotangle-Display", [mesh, pOGLW = attr->pOGLW]() {
+		auto paramaterize = Paramaterize::New(mesh);
+		paramaterize->Set_Cotangent_Method();
+		paramaterize->Set_Boundary_Square();
+		paramaterize->Set_Display();
 		if (paramaterize->Run())
 			printf("Paramaterize done\n");
 		pOGLW->DirtyVAO(mesh);

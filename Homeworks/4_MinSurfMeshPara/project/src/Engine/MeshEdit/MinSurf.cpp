@@ -95,8 +95,8 @@ void MinSurf::Minimize() {
 	Solve();
 
 
-	cout << "WARNING::MinSurf::Minimize:" << endl
-		<< "\t" << "not implemented" << endl;
+	cout << "INFO::MinSurf::Minimize:" << endl
+		<< "\t" << "Success" << endl;
 }
 
 void MinSurf::Laplace_init()
