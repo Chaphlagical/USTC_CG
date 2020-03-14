@@ -81,7 +81,7 @@ $$
 
 又
 
-![image-20200308061030193](https://cdn.jsdelivr.net/gh/Ubpa/USTC_CG_Data@master/Homeworks/04_MinSurfMeshPara/image-20200308061030193.jpg)
+![image-20200308061030193](../report/Figures/1.jpg)
 
 $$
 \lim_{len(y)\to 0}\frac{1}{len(\gamma)}\int_{v\in \gamma}(v_i-v)\mathrm{d}s=H(v_i)\pmb{n}_i
@@ -119,7 +119,7 @@ $$
 
 ### 纹理映射
 
-![image-20200308053734074](https://cdn.jsdelivr.net/gh/Ubpa/USTC_CG_Data@master/Homeworks/04_MinSurfMeshPara/image-20200308053734074.jpg)
+![image-20200308053734074](../report/Figures/3.jpg)
 
 ### 线性方法 Linear method[^Floater97]
 

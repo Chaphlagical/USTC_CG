@@ -122,40 +122,10 @@ void Paramaterize::Set_Display()
 
 void Paramaterize::Init_Boundary()
 {
-	size_t nV = heMesh->NumVertices();
-
-	std::vector<size_t> index_temp;
-	for (size_t i = 0; i < nV; i++)
+	size_t nB = heMesh->Boundaries()[0].size();
+	for (int i = 0; i < nB; i++)
 	{
-		V* v = heMesh->Vertices()[i];
-		if (v->IsBoundary())
-		{
-			index_temp.push_back(i);
-		}
-	}
-	size_t nB = index_temp.size();
-	size_t flag = 0;
-	while (index_temp.size() > 0)
-	{
-		if (boundary_index.size() == 0)
-		{
-			boundary_index.push_back(index_temp[0]);
-			index_temp.erase(index_temp.begin());
-		}
-		for (size_t i = 0; i < index_temp.size(); i++)
-		{
-			if (heMesh->Vertices()[boundary_index[flag]]->IsConnectedWith(heMesh->Vertices()[index_temp[i]]))
-			{
-				boundary_index.push_back(index_temp[i]);
-				index_temp.erase(index_temp.begin() + i);
-				flag++;
-				break;
-			}
-		}
-		if (flag > 1 && heMesh->Vertices()[boundary_index[0]]->IsConnectedWith(heMesh->Vertices()[boundary_index.back()]))
-		{
-			return;
-		}
+		boundary_index.push_back(heMesh->Index(heMesh->Boundaries()[0][i]->Origin()));
 	}
 }
 
@@ -206,20 +176,10 @@ void Paramaterize::Init_Matrix_Uniform()
 		Lij.push_back(Eigen::Triplet<double>(i, i, 1));
 		if (!v1->IsBoundary())
 		{
-			double connect_num = 0;
-			vector<size_t> index_list;
-			for (size_t j = 0; j < nV; j++)
+			double connect_num = v1->AdjVertices().size();
+			for (size_t j = 0; j < connect_num; j++)
 			{
-				V* v2 = heMesh->Vertices()[j];
-				if (v1->IsConnectedWith(v2))
-				{
-					index_list.push_back(j);
-					connect_num++;
-				}
-			}
-			for (size_t j = 0; j < index_list.size(); j++)
-			{
-				Lij.push_back(Eigen::Triplet<double>(i, index_list[j], -1 / connect_num));
+				Lij.push_back(Eigen::Triplet<double>(i, heMesh->Index(v1->AdjVertices()[j]), -1 / connect_num));
 			}
 		}
 	}
@@ -276,9 +236,7 @@ void Paramaterize::Init_Matrix_Cotangent()
 			for (size_t j = 0; j < neighbor_index.size(); j++)
 			{
 				Lij.push_back(Eigen::Triplet<double>(i, neighbor_index[j], -weight_list[j]/weight_sum));
-				cout << weight_list[j] / weight_sum << " ";
 			}
-			cout << endl;
 		}		
 	}
 	Laplace_matrix.resize(nV, nV);
@@ -333,5 +291,4 @@ void Paramaterize::Solve()
 		}
 		texcoords.push_back(pointf2(x(i), y(i)));
 	}
-
 }

@@ -387,7 +387,7 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 		pOGLW->DirtyVAO(mesh);
 	});
 
-	grid->AddButton("Paramaterize Circle-Cotangle", [mesh, pOGLW = attr->pOGLW]() {
+	grid->AddButton("Paramaterize Circle-Cotangent", [mesh, pOGLW = attr->pOGLW]() {
 		auto paramaterize = Paramaterize::New(mesh);
 		paramaterize->Set_Cotangent_Method();
 		paramaterize->Set_Boundary_Circle();
@@ -396,7 +396,7 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 		pOGLW->DirtyVAO(mesh);
 	});
 
-	grid->AddButton("Paramaterize Circle-Cotangle-Display", [mesh, pOGLW = attr->pOGLW]() {
+	grid->AddButton("Paramaterize Circle-Cotangent-Display", [mesh, pOGLW = attr->pOGLW]() {
 		auto paramaterize = Paramaterize::New(mesh);
 		paramaterize->Set_Cotangent_Method();
 		paramaterize->Set_Boundary_Circle();
@@ -406,7 +406,7 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 		pOGLW->DirtyVAO(mesh);
 	});
 
-	grid->AddButton("Paramaterize Square-Cotangle", [mesh, pOGLW = attr->pOGLW]() {
+	grid->AddButton("Paramaterize Square-Cotangent", [mesh, pOGLW = attr->pOGLW]() {
 		auto paramaterize = Paramaterize::New(mesh);
 		paramaterize->Set_Cotangent_Method();
 		paramaterize->Set_Boundary_Square();
@@ -415,7 +415,7 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 		pOGLW->DirtyVAO(mesh);
 	});
 
-	grid->AddButton("Paramaterize Square-Cotangle-Display", [mesh, pOGLW = attr->pOGLW]() {
+	grid->AddButton("Paramaterize Square-Cotangent-Display", [mesh, pOGLW = attr->pOGLW]() {
 		auto paramaterize = Paramaterize::New(mesh);
 		paramaterize->Set_Cotangent_Method();
 		paramaterize->Set_Boundary_Square();

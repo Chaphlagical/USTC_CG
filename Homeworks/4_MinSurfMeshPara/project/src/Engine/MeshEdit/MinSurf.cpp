@@ -112,20 +112,10 @@ void MinSurf::Laplace_init()
 		Lij.push_back(Eigen::Triplet<double>(i, i, 1));
 		if(!v1->IsBoundary())
 		{
-			double connect_num = 0;
-			vector<size_t> index_list;
-			for (size_t j = 0; j < nV; j++)
+			double connect_num = v1->AdjVertices().size();
+			for (size_t j = 0; j < connect_num; j++)
 			{
-				V* v2 = heMesh->Vertices()[j];
-				if (v1->IsConnectedWith(v2))
-				{
-					index_list.push_back(j);
-					connect_num++;
-				}
-			}
-			for (size_t j = 0; j < index_list.size(); j++)
-			{
-				Lij.push_back(Eigen::Triplet<double>(i, index_list[j], -1 / connect_num));
+				Lij.push_back(Eigen::Triplet<double>(i, heMesh->Index(v1->AdjVertices()[j]), -1 / connect_num));
 			}
 		}
 	}
