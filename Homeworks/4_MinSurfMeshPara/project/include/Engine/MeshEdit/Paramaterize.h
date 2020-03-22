@@ -32,7 +32,10 @@ namespace Ubpa {
 		void Set_Uniform_Method();
 		void Set_Cotangent_Method();
 		
+		void Paramaterization();
 		bool Run();
+
+		std::vector<pointf2>Get_texcoord();
 
 	public:
 		enum Boundary_Type
@@ -54,7 +57,7 @@ namespace Ubpa {
 		}display_status;
 
 	private:
-		void Paramaterization();
+		
 		void Init_Boundary();
 		void Set_Boundary();
 		void Init_Matrix_Uniform();

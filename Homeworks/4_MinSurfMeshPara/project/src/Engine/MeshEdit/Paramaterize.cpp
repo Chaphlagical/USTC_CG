@@ -292,3 +292,8 @@ void Paramaterize::Solve()
 		texcoords.push_back(pointf2(x(i), y(i)));
 	}
 }
+
+std::vector<pointf2>Paramaterize::Get_texcoord()
+{
+	return texcoords;
+}
