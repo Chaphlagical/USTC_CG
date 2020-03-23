@@ -22,7 +22,7 @@ namespace Ubpa {
 			DISK,
 		};
 	public:
-		TriMesh() { type = ENUM_TYPE::INVALID; }
+		TriMesh() : type(INVALID) {}
 
 		TriMesh(const std::vector<unsigned>& indice,
 			const std::vector<pointf3>& positions,
@@ -43,8 +43,6 @@ namespace Ubpa {
 			ENUM_TYPE type = ENUM_TYPE::CODE);
 
 	public:
-		static const Ptr<TriMesh> New() { return Ubpa::New<TriMesh>(); }
-
 		static const Ptr<TriMesh> New(const std::vector<unsigned>& indice,
 			const std::vector<pointf3>& positions,
 			const std::vector<normalf>& normals = std::vector<normalf>(),

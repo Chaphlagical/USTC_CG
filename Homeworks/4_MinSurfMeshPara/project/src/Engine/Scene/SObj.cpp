@@ -3,7 +3,7 @@
 #include "SObjSaver.h"
 #include "SObjLoader.h"
 #include "AssimpLoader.h"
-#include "SimpleObjLoader.h"
+#include "SimpleLoader.h"
 
 #include <Engine/Scene/Component.h>
 #include <Engine/Scene/CmptTransform.h>
@@ -68,8 +68,10 @@ const Ptr<SObj> SObj::Load(const string & path) {
 	Ptr<SObj> sobj;
 	if (StrAPI::IsEndWith(path, ".sobj"))
 		sobj = SObjLoader::Load(path);
+	else if (StrAPI::IsEndWith(path, ".tet"))
+		sobj = SimpleLoader::LoadTet(path);
 	else if (StrAPI::IsEndWith(path, ".obj"))
-		sobj = SimpleObjLoader::Load(path);
+		sobj = SimpleLoader::LoadObj(path);
 	else
 		sobj = AssimpLoader::Load(path);
 

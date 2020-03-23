@@ -12,19 +12,20 @@
 #include <Engine/Scene/CmptMaterial.h>
 #include <Engine/Scene/CmptTransform.h>
 #include <Engine/Scene/CmptGeometry.h>
+#include <Engine/Scene/CmptSimu/CmptSimulate.h>
 
 #include <Engine/Primitive/TriMesh.h>
+#include <Engine/Primitive/TetMesh.h>
+#include <Engine/Scene/CmptSimu/MassSpring.h>
 #include <Engine/Material/BSDF_Frostbite.h>
 
 #include <Basic/StrAPI.h>
 #include <Basic/Image.h>
 
 #include <limits>
-
 #include <iostream>
 
 using namespace Ubpa;
-
 using namespace std;
 
 const Ptr<SObj> AssimpLoader::Load(const std::string & path) {
@@ -165,6 +166,18 @@ void AssimpLoader::LoadMesh(Str2Img & str2img, const string & dir, aiMesh *mesh,
 		pos = (scale * (pos.cast_to<vecf3>() + offset)).cast_to<pointf3>();
 
 	auto triMesh = TriMesh::New(indices, poses, normals, texcoords, tangents);
+
+
+	// add CmptSimulate
+	auto spring = MassSpring::New(triMesh);
+	spring->InitSimu();
+
+	//auto springmesh = SObj::New(sobj, "SpringSimulate");
+	//CmptGeometry::New(sobj, spring);
+	CmptSimulate::New(sobj, spring);
+	//CmptTransform::New(springmesh);
+
+
 	CmptGeometry::New(sobj, triMesh);
 
 	auto bsdf = BSDF_Frostbite::New();
