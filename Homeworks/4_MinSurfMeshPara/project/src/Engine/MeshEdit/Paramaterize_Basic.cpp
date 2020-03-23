@@ -114,7 +114,7 @@ void Paramaterize_Basic::Local_Flatten()
 		vecf3 vec0 = polygon->BoundaryVertice()[0]->pos;
 		vecf3 vec1 = polygon->BoundaryVertice()[1]->pos;
 		vecf3 vec2 = polygon->BoundaryVertice()[2]->pos;
-
+		//cout << vec0 << " " << vec1 << " " << vec2 << endl;
 		index_map temp_map;
 		vector<size_t> temp_vec;
 		for (size_t i = 0; i < 3; i++)
@@ -248,13 +248,28 @@ void Paramaterize_Basic::Solve()
 	X = solver.solve(B);
 
 	texcoords.clear();
+
+	double Xmax=-INFINITY, Xmin=INFINITY, Ymax=-INFINITY, Ymin=INFINITY;
+
 	for (size_t i = 0; i < nV; i++)
 	{
-		texcoords.push_back(pointf2(X(i, 0), X(i, 1)));
+		if (X(i, 0) > Xmax)
+			Xmax = X(i, 0);
+		if (X(i, 0) < Xmin)
+			Xmin = X(i, 0);
+		if (X(i, 1) > Ymax)
+			Ymax = X(i, 1);
+		if (X(i, 1) < Ymin)
+			Ymin = X(i, 1);
+	}
+
+	for (size_t i = 0; i < nV; i++)
+	{
+		texcoords.push_back(pointf2((X(i, 0) - Xmin) / (Xmax - Xmin), (X(i, 1) - Ymin) / (Ymax - Ymin)));
 		if (display_status)
 		{
-			heMesh->Vertices()[i]->pos.at(0) = X(i, 0);
-			heMesh->Vertices()[i]->pos.at(1) = X(i, 1);
+			heMesh->Vertices()[i]->pos.at(0) = (X(i, 0) - Xmin) / (Xmax - Xmin);
+			heMesh->Vertices()[i]->pos.at(1) = (X(i, 1) - Ymin) / (Ymax - Ymin);
 			heMesh->Vertices()[i]->pos.at(2) = 0;
 		}
 

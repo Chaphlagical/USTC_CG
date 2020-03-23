@@ -21,15 +21,12 @@ void Parameterize_ASAP_GL::Parameterization()
 	vec_num.push_back(nV - 1);
 	Set_Fixed_num(vec_num);
 	Param_Init();
-	for (size_t t = 0; t < 1; t++)
+	Local_Phase();
+	Matrix_Init();
+	for (size_t t = 0; t < iteration_times; t++)
 	{
-		Local_Phase();
-		Matrix_Init();
-		for (size_t t = 0; t < 10; t++)
-		{
-			B_Init();
-			Solve();
-		}
+		B_Init();
+		Solve();
 	}
 }
 
@@ -53,7 +50,7 @@ void Parameterize_ASAP_GL::Local_Phase()
 		double s = (svd.singularValues()(0) + svd.singularValues()(1)) / 2;
 		Eigen::MatrixXd S(2,2);
 		S << s, 0, 0, s;
-		Lt = U * S * V.transpose()*500;
+		Lt = U * S * V.transpose();
 		L_matrix_list.push_back(Lt);
 	}
 }

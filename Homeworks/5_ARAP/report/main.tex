@@ -1,0 +1,459 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Wenneker Assignment
+% LaTeX Template
+% Version 2.0 (12/1/2019)
+%
+% This template originates from:
+% http://www.LaTeXTemplates.com
+%
+% Authors:
+% Vel (vel@LaTeXTemplates.com)
+% Frits Wenneker
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[14pt]{scrartcl} % Font size
+
+\input{structure.tex} % Include the file specifying the document structure and custom commands
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{	
+	\normalfont\normalsize
+	%\vspace{25pt} % Whitespace
+	\rule{\linewidth}{0.5pt}\\ % Thin top horizontal rule
+	\vspace{20pt} % Whitespace
+	{\huge 实验五	\\ARAP Parameterization}\\ % The assignment title
+	\vspace{12pt} % Whitespace
+	\rule{\linewidth}{2pt}\\ % Thick bottom horizontal rule
+	\vspace{12pt} % Whitespace
+}
+
+\author{\LARGE ID: 58		陈文博} % Your name
+
+\date{\normalsize\today} % Today's date (\today) or a custom date
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	FIGURE EXAMPLE
+%----------------------------------------------------------------------------------------
+
+\section{实验要求}
+
+%\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+%	\centering
+%	\includegraphics[width=0.5\columnwidth]{swallow.jpg} % Example image
+%	\caption{European swallow.}
+%\end{figure}
+
+\begin{itemize}
+	\item[*] 在给定的网格框架上完成作业，实现
+	\begin{itemize}
+		\item ASAP (As-similar-as-possible) 参数化算法
+		\item ARAP (As-rigid-as-possible) 参数化算法
+		\item Hybrid 参数化方法（可选）
+	\end{itemize}
+	\item[*] 对各种参数化方法（包括作业4的Floater方法、ASAP/ARAP方法等）进行比较
+	\item[*] 继续学习和巩固三角网格的数据结构及编程
+	\item[*] 学习和实现矩阵的 SVD 分解
+	\item[*] 进一步巩固使用 Eigen 库求解大型稀疏线性方程组
+	
+
+\end{itemize}
+
+%------------------------------------------------
+
+\section{开发环境}
+
+\textbf{IDE}：Microsoft Visual Studio 2019 community\\
+\textbf{CMake}：3.16.3\\
+\textbf{Qt}：5.14.1\\
+\textbf{Eigen}：3.3.7\\
+\textbf{Assimp}：5.0.1\\
+\textbf{tinyxml2}：8.0.0\\
+\textbf{Others}
+
+
+%----------------------------------------------------------------------------------------
+%	TEXT EXAMPLE
+%----------------------------------------------------------------------------------------
+\pagebreak
+\section{算法原理}
+
+\subsection{基本方法}
+非固定边界参数化基本步骤：将三维三角网格每个三角形全等映射到二维平面上，通过设计合适的算法，将每个三角形合并成二维网格（如下图所示）
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{bg.png} % Example image
+	\caption{基本步骤 }
+\end{figure}
+
+寻找最佳映射，即求解以下能量函数：
+\begin{equation}
+E(u,L)=\sum\limits^T_{t=1}A_t\|J_t(u)-Lt\|^2_F
+\end{equation}
+其中$L_t$为各个三角形的线性变换，每个$L_t$都有相似的结构，
+当变换为相似变换时，$L_t$有以下形式：
+
+\begin{equation}
+M=\left\{\begin{bmatrix}a&b\\-b&a\end{bmatrix}:a,b\in \boldsymbol R \right\}
+\end{equation}
+
+当变换为全等变换时，$L_t$有以下形式：
+
+\begin{equation}
+M=\left\{\begin{bmatrix}\cos\theta&\sin\theta\\-\sin\theta&\cos\theta\end{bmatrix}:\theta\in [0,2\pi) \right\}
+\end{equation}
+
+能量函数可重写为：
+\begin{equation}
+E(u,L)=\frac{1}{2}\sum\limits^T_{t=1}\sum\limits^2_{i=0}\cot(\theta_t^i)\|(u^i_t-u_t^{i+1})-L_t(x_t^i-x_t^{i+1})\|^2
+\end{equation}
+
+目标即求解最优化问题：
+\begin{equation}
+(u,L)=\arg\min_{(u,L)}E(u,L)\ \ s.t.\ \ L_t\in M
+\end{equation}
+
+\subsection{ASAP全局解法}
+取$L_t$为：
+\begin{equation}
+M=\left\{\begin{bmatrix}a&b\\-b&a\end{bmatrix}:a,b\in \boldsymbol R \right\}
+\end{equation}
+此时$\theta_t^i$和$x_t^i$为已知量，可以以$a$,$b$和$u$作为未知量建立稀疏线性方程组进行优化问题求解
+
+\subsection{Local/Global 方法}
+\textbf{最优的$L$拟合矩阵}\\
+利用SVD分解，可将$J$矩阵做以下分解：
+\begin{equation}
+J=U\Sigma V^T
+\end{equation}
+
+对于全等映射，$L$的拟合矩阵为：
+\begin{equation}
+L=UV^T
+\end{equation}
+即奇异值取1，当需要进行相似映射时，奇异值取其平均数$(\sigma_1+\sigma_2)/2$\\
+
+\textbf{Local Phase}\\
+利用二维三角形和当前估计坐标进行估计$J_t(u)$
+\begin{equation}
+J_t(u)\sim S_t(u)=\sum\limits_{t=0}^2 \cot(\theta_t^i)(u_t^i-u_t^{i+1})(x_t^i-x_t^{i+1})^T
+\end{equation}
+
+\textbf{Global Phase}\\
+迭代求解新的估计坐标：
+\begin{equation}
+\begin{aligned}
+&\sum\limits_{j\in N(t)}[\cot(\theta_{ij})+\cot(\theta_{ji}(u_i-u_j)\\
+&=\sum\limits_{j\in N(t)}[\cot(\theta_{ij})L_{t(i,j)}+\cot(\theta_{ji}L_{t(j,i)})(x_i-x_j)\\
+&\forall t=1,\cdots,n
+\end{aligned}
+)\end{equation}
+
+\textbf{初始化}\\
+使用Local/Global方法需要进行初始化，可采用固定边界的参数化作为初始参数坐标
+
+\pagebreak
+\section{设计难点与解决}
+
+\subsection{关于ASAP全局解法的方程组构建}
+
+一开始采用直接求导方法进行计算，由于在$x$和$y$方向都应求一次导加上$a$和$b$各为$T$维未知向量，直接求导将得到$2n+4T$个方程，$2n+2T$个未知量，系数矩阵非方阵，考虑求最小二乘解$AX=b\Leftrightarrow X=(A^TA)^{-1}A^Tb$，但由于情况复杂，计算结果未能调试成功，之后参考了文献\cite{liu2008local}中的附录B给出的ASAP方法下$a$,$b$和$u$的关系，即可实现将未知量数目减少至$2n$，简化了计算，由于时间受限暂未调试成功
+%------------------------------------------------
+
+\subsection{关于纹理映射问题}
+一开始直接导入纹理坐标，发现纹理未能完全覆盖参数化平面，在网上查阅资料后发现可以通过修改OpenGL的参数实现纹理循环，而后在做ASAP的Local/Global方法时，由于特征值尺度不一导致展开的参数化平面大小随机（如下图）
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{not_normalize.png} % Example image
+	\caption{参数化平面过大}
+\end{figure}
+
+后改为使用公式$\frac{x-x_{min}}{x_{max}-x_{min}}$进行归一化，将纹理坐标约束在0~1之间
+
+\pagebreak
+
+\section{实验效果}
+
+\subsection{ARAP Local/Global方法}
+\begin{table}[h] % [h] forces the table to be output where it is defined in the code (it suppresses floating)
+	\centering % Centre the table
+	\begin{tabular}{l l l l}
+		\toprule
+		\centering
+		\textbf{原曲面} & \textbf{原网格} & \textbf{参数化网格} &\textbf{纹理映射}\\
+		\midrule
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{ball.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{ball_mesh.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{ball_ARAP_3_mesh.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{ball_ARAP_3.png}
+		\end{minipage}\\
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{bunny.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{bunny_mesh.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{bunny_ARAP_3_mesh.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.8\linewidth]{bunny_ARAP_3.png}
+		\end{minipage}\\
+		
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{cow.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{cow_mesh.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.8\linewidth]{cow_ARAP_3_mesh.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{cow_ARAP_3.png}
+		\end{minipage}\\
+		
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{grag.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.8\linewidth]{grag_mesh.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{garg_ARAP_3_mesh.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{garg_ARAP_3.png}
+		\end{minipage}\\
+		
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{iris.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{iris_mesh.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{iris_ARAP_3_mesh.png}
+		\end{minipage}&
+		\begin{minipage}[t]{0.2\linewidth}
+			\centering
+			\includegraphics[width=0.9\linewidth]{iris_ARAP_3.png}
+		\end{minipage}\\
+		
+		
+	\end{tabular}
+	\caption{ARAP Local/Global方法 \\圆边界cotangent方法初始化 迭代3次}
+\end{table}			
+ 
+ 
+ \pagebreak
+ 
+ \subsection{ASAP Local/Global方法}
+ \begin{table}[h] % [h] forces the table to be output where it is defined in the code (it suppresses floating)
+ 	\centering % Centre the table
+ 	\begin{tabular}{l l l l}
+ 		\toprule
+ 		\centering
+ 		\textbf{原曲面} & \textbf{原网格} & \textbf{参数化网格} &\textbf{纹理映射}\\
+ 		\midrule
+ 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{ball.png}
+ 		\end{minipage}&
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{ball_mesh.png}
+ 		\end{minipage}&
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{ball_ASAP_10_mesh.png}
+ 		\end{minipage}&
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{ball_ASAP_10.png}
+ 		\end{minipage}\\
+ 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{bunny.png}
+ 		\end{minipage}&
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{bunny_mesh.png}
+ 		\end{minipage}&
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{bunny_ASAP_10_mesh.png}
+ 		\end{minipage}&
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{bunny_ASAP_10.png}
+ 		\end{minipage}\\
+ 		
+ 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{grag.png}
+ 		\end{minipage}&
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{grag_mesh.png}
+ 		\end{minipage}&
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{garg_ASAP_10_mesh.png}
+ 		\end{minipage}&
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{garg_ASAP_10.png}
+ 		\end{minipage}\\
+ 		
+ 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{iris.png}
+ 		\end{minipage}&
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{iris_mesh.png}
+ 		\end{minipage}&
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{iris_ASAP_10_mesh.png}
+ 		\end{minipage}&
+ 		\begin{minipage}[t]{0.2\linewidth}
+ 			\centering
+ 			\includegraphics[width=1.1\linewidth]{iris_ASAP_10.png}
+ 		\end{minipage}\\
+ 		
+ 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 		
+ 		
+ 	\end{tabular}
+ 	\caption{ASAP Local/Global方法 圆边界cotangent方法初始化 \\迭代10次}
+ \end{table}			
+
+
+\pagebreak
+ \subsubsection{ARAP迭代次数的影响}
+\textbf{初始状态}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{ball_circle_cotangent_mesh.png} % Example image
+\end{figure}
+\\
+\textbf{迭代一次}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{ball_ARAP_1_mesh.png} % Example image
+\end{figure}
+\pagebreak
+\\
+\textbf{迭代两次}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{ball_ARAP_2_mesh.png} % Example image
+	\end{figure}
+\\
+\textbf{迭代三次}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{ball_ARAP_3_mesh.png} % Example image
+\end{figure}
+\pagebreak
+\\
+\textbf{迭代十次}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{ball_ARAP_10_mesh.png} % Example image
+\end{figure}
+\\
+\textbf{迭代一百次}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{ball_ARAP_100_mesh.png} % Example image
+\end{figure}
+\\
+可见ARAP的收敛是很快的
+\pagebreak
+\subsection{初始条件对ARAP的影响}
+\textbf{cotangent权重，圆边界，迭代三次}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{ball_ARAP_3_mesh.png} % Example image
+\end{figure}
+\\
+\textbf{cotangent权重，正方形边界，迭代三次}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{cotangent_square.png} % Example image
+\end{figure}
+\pagebreak
+\\
+\textbf{uniform权重，圆形边界，迭代三次}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{uniform_circle.png} % Example image
+\end{figure}
+\\
+\textbf{uniform权重，正方形形边界，迭代三次}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{uniform_square.png} % Example image
+\end{figure}
+\\
+可见使用不同初始化条件对收敛有一定影响，在本项中，cotangent权重要优于uniform权重，circle边界要由于square边界。
+
+\pagebreak
+\section{总结}
+本次实验难度不小，主要是过程复杂调试困难，需要耐心和细心，由于前期过多时间花在构建ASAP方程组，导致一部分功能未能很好实现。
+
+\bibliographystyle{unsrt}
+\bibliography{bibfile}
+
+\end{document}

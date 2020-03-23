@@ -445,7 +445,7 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 		mst->Run();
 		});
 
-	grid->AddButton("Paramaterize ASAP", [mesh, pOGLW = attr->pOGLW]() {
+	grid->AddButton("Paramaterize ASAP (unavailable)", [mesh, pOGLW = attr->pOGLW]() {
 		Paramaterize_Basic* paramaterize = NULL;
 		paramaterize = new Parameterize_ASAP(mesh);
 
@@ -456,7 +456,7 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 		delete paramaterize;
 	});
 
-	grid->AddButton("Paramaterize ARAP", [mesh, pOGLW = attr->pOGLW]() {
+	grid->AddButton("Paramaterize ARAP 1 ", [mesh, pOGLW = attr->pOGLW]() {
 		Paramaterize_Basic* paramaterize = NULL;
 		paramaterize = new Parameterize_ARAP(mesh);
 
@@ -467,7 +467,7 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 		delete paramaterize;
 	});
 
-	grid->AddButton("Paramaterize ARAP display", [mesh, pOGLW = attr->pOGLW]() {
+	grid->AddButton("Paramaterize ARAP display 1 ", [mesh, pOGLW = attr->pOGLW]() {
 		Paramaterize_Basic* paramaterize = NULL;
 		paramaterize = new Parameterize_ARAP(mesh);
 		paramaterize->Set_Display();
@@ -547,7 +547,30 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 		delete paramaterize;
 	});
 
-	grid->AddButton("Paramaterize ARAP GL", [mesh, pOGLW = attr->pOGLW]() {
+	grid->AddButton("Paramaterize ARAP 100", [mesh, pOGLW = attr->pOGLW]() {
+		Paramaterize_Basic* paramaterize = NULL;
+		paramaterize = new Parameterize_ARAP(mesh);
+		paramaterize->Set_Iteration(100);
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+
+		delete paramaterize;
+	});
+
+	grid->AddButton("Paramaterize ARAP 100 display", [mesh, pOGLW = attr->pOGLW]() {
+		Paramaterize_Basic* paramaterize = NULL;
+		paramaterize = new Parameterize_ARAP(mesh);
+		paramaterize->Set_Iteration(100);
+		paramaterize->Set_Display();
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+
+		delete paramaterize;
+	});
+
+	grid->AddButton("Paramaterize ASAP GL 1", [mesh, pOGLW = attr->pOGLW]() {
 		Paramaterize_Basic* paramaterize = NULL;
 		paramaterize = new Parameterize_ASAP_GL(mesh);
 
@@ -558,9 +581,55 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 		delete paramaterize;
 	});
 
-	grid->AddButton("Paramaterize ARAP GL display", [mesh, pOGLW = attr->pOGLW]() {
+	grid->AddButton("Paramaterize ASAP GL 1 display", [mesh, pOGLW = attr->pOGLW]() {
 		Paramaterize_Basic* paramaterize = NULL;
 		paramaterize = new Parameterize_ASAP_GL(mesh);
+		paramaterize->Set_Display();
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+
+		delete paramaterize;
+	});
+
+	grid->AddButton("Paramaterize ASAP GL 10", [mesh, pOGLW = attr->pOGLW]() {
+		Paramaterize_Basic* paramaterize = NULL;
+		paramaterize = new Parameterize_ASAP_GL(mesh);
+		paramaterize->Set_Iteration(10);
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+
+		delete paramaterize;
+	});
+
+	grid->AddButton("Paramaterize ASAP GL 10 display", [mesh, pOGLW = attr->pOGLW]() {
+		Paramaterize_Basic* paramaterize = NULL;
+		paramaterize = new Parameterize_ASAP_GL(mesh);
+		paramaterize->Set_Iteration(10);
+		paramaterize->Set_Display();
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+
+		delete paramaterize;
+	});
+
+	grid->AddButton("Paramaterize ASAP GL 100", [mesh, pOGLW = attr->pOGLW]() {
+		Paramaterize_Basic* paramaterize = NULL;
+		paramaterize = new Parameterize_ASAP_GL(mesh);
+		paramaterize->Set_Iteration(100);
+		if (paramaterize->Run())
+			printf("Paramaterize done\n");
+		pOGLW->DirtyVAO(mesh);
+
+		delete paramaterize;
+	});
+
+	grid->AddButton("Paramaterize ASAP GL  100 display", [mesh, pOGLW = attr->pOGLW]() {
+		Paramaterize_Basic* paramaterize = NULL;
+		paramaterize = new Parameterize_ASAP_GL(mesh);
+		paramaterize->Set_Iteration(100);
 		paramaterize->Set_Display();
 		if (paramaterize->Run())
 			printf("Paramaterize done\n");
