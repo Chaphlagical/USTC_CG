@@ -162,6 +162,16 @@ void Paramaterize::Set_Cotangent_Method()
 	barycentric_type = kCotangent;
 }
 
+void Paramaterize::Set_Boundary(Boundary_Type boundary)
+{
+	boundary_type = boundary;
+}
+
+void Paramaterize::Set_Method(Barycentric_Type barycentric)
+{
+	barycentric_type = barycentric;
+}
+
 void Paramaterize::Init_Matrix_Uniform()
 {
 

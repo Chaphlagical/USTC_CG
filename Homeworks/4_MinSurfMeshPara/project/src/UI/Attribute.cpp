@@ -369,88 +369,6 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 		pOGLW->DirtyVAO(mesh);
 	});
 
-	grid->AddButton("Minimize Surface", [mesh, pOGLW = attr->pOGLW]() {
-		auto minSurf = MinSurf::New(mesh);
-		minSurf->Run();
-		pOGLW->DirtyVAO(mesh);
-	});
-	
-	grid->AddButton("Paramaterize Circle-Uniform", [mesh, pOGLW = attr->pOGLW]() {
-		auto paramaterize = Paramaterize::New(mesh);
-		paramaterize->Set_Uniform_Method();
-		paramaterize->Set_Boundary_Circle();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-	});
-
-	grid->AddButton("Paramaterize Circle-Uniform-Display", [mesh, pOGLW = attr->pOGLW]() {
-		auto paramaterize = Paramaterize::New(mesh);
-		paramaterize->Set_Uniform_Method();
-		paramaterize->Set_Boundary_Circle();
-		paramaterize->Set_Display();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-	});
-
-	grid->AddButton("Paramaterize Square-Uniform", [mesh, pOGLW = attr->pOGLW]() {
-		auto paramaterize = Paramaterize::New(mesh);
-		paramaterize->Set_Uniform_Method();
-		paramaterize->Set_Boundary_Square();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-	});
-
-	grid->AddButton("Paramaterize Square-Uniform-Display", [mesh, pOGLW = attr->pOGLW]() {
-		auto paramaterize = Paramaterize::New(mesh);
-		paramaterize->Set_Uniform_Method();
-		paramaterize->Set_Boundary_Square();
-		paramaterize->Set_Display();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-	});
-
-	grid->AddButton("Paramaterize Circle-Cotangent", [mesh, pOGLW = attr->pOGLW]() {
-		auto paramaterize = Paramaterize::New(mesh);
-		paramaterize->Set_Cotangent_Method();
-		paramaterize->Set_Boundary_Circle();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-	});
-
-	grid->AddButton("Paramaterize Circle-Cotangent-Display", [mesh, pOGLW = attr->pOGLW]() {
-		auto paramaterize = Paramaterize::New(mesh);
-		paramaterize->Set_Cotangent_Method();
-		paramaterize->Set_Boundary_Circle();
-		paramaterize->Set_Display();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-	});
-
-	grid->AddButton("Paramaterize Square-Cotangent", [mesh, pOGLW = attr->pOGLW]() {
-		auto paramaterize = Paramaterize::New(mesh);
-		paramaterize->Set_Cotangent_Method();
-		paramaterize->Set_Boundary_Square();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-	});
-
-	grid->AddButton("Paramaterize Square-Cotangent-Display", [mesh, pOGLW = attr->pOGLW]() {
-		auto paramaterize = Paramaterize::New(mesh);
-		paramaterize->Set_Cotangent_Method();
-		paramaterize->Set_Boundary_Square();
-		paramaterize->Set_Display();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-	});
-
 	grid->AddButton("Shortest Path", [this]() {
 		auto sp = ShortestPath::New(sobj);
 		sp->Run();
@@ -461,199 +379,107 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<TriMesh> mesh) {
 		mst->Run();
 		});
 
-	grid->AddButton("Paramaterize ASAP (unavailable)", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ASAP(mesh);
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
+	grid->AddButton("Minimize Surface", [mesh, pOGLW = attr->pOGLW]() {
+		auto minSurf = MinSurf::New(mesh);
+		minSurf->Run();
 		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
 	});
 
-	grid->AddButton("Paramaterize ARAP 1 ", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ARAP(mesh);
-
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
+	std::vector<std::string> parameterizingWMethodStrs = { "Uniform", "Cotangent" };
+	Ptr<Paramaterize::Barycentric_Type> pWeightMethod = std::make_shared<Paramaterize::Barycentric_Type>();
+	*pWeightMethod = Paramaterize::Barycentric_Type::kUniform;
+	grid->AddComboBox("Weight Method", parameterizingWMethodStrs, [pWeightMethod](const std::string& str)
+	{
+		if (str == "Uniform")
+			*pWeightMethod = Paramaterize::Barycentric_Type::kUniform;
+		else if (str == "Cotangent")
+			*pWeightMethod = Paramaterize::Barycentric_Type::kCotangent;
 	});
 
-	grid->AddButton("Paramaterize ARAP display 1 ", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ARAP(mesh);
+	std::vector<std::string> parameterizingBMethodStrs = { "Circle", "Square" };
+	Ptr<Paramaterize::Boundary_Type> pBoundaryMethod = std::make_shared<Paramaterize::Boundary_Type>();
+	*pBoundaryMethod = Paramaterize::Boundary_Type::kCircle;
+	grid->AddComboBox("Boundary Method", parameterizingBMethodStrs, [pBoundaryMethod](const std::string& str)
+	{
+		if (str == "Circle")
+			*pBoundaryMethod = Paramaterize::Boundary_Type::kCircle;
+		else if (str == "Square")
+			*pBoundaryMethod = Paramaterize::Boundary_Type::kSquare;
+	});
+
+	grid->AddButton("Fix Boundary Parameterize", [mesh, pOGLW = attr->pOGLW, pWeightMethod, pBoundaryMethod]() {
+		auto paramaterize = Paramaterize::New(mesh);
+		paramaterize->Set_Boundary(*pBoundaryMethod);
+		paramaterize->Set_Method(*pWeightMethod);
+		if (paramaterize->Run())
+			printf("Parameterize done\n");
+		pOGLW->DirtyVAO(mesh);
+	});
+
+	grid->AddButton("Fix Boundary Parameterize mesh", [mesh, pOGLW = attr->pOGLW, pWeightMethod, pBoundaryMethod]() {
+		auto paramaterize = Paramaterize::New(mesh);
+		paramaterize->Set_Boundary(*pBoundaryMethod);
+		paramaterize->Set_Method(*pWeightMethod);
 		paramaterize->Set_Display();
 		if (paramaterize->Run())
-			printf("Paramaterize done\n");
+			printf("Parameterize done\n");
 		pOGLW->DirtyVAO(mesh);
+	});
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		delete paramaterize;
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	std::vector<std::string> parameterizingMMethodStrs = { "ARAP", "ASAP" };
+	Ptr<Paramaterize_Basic::Para_Method> pMethod = std::make_shared<Paramaterize_Basic::Para_Method>();
+	*pMethod = Paramaterize_Basic::Para_Method::kARAP;
+	grid->AddComboBox("Method", parameterizingMMethodStrs, [pMethod](const std::string& str)
+	{
+		if (str == "ARAP")
+			*pMethod = Paramaterize_Basic::Para_Method::kARAP;
+		else if (str == "ASAP")
+			*pMethod = Paramaterize_Basic::Para_Method::kASAP;
 	});
 
-	grid->AddButton("Paramaterize ARAP 2", [mesh, pOGLW = attr->pOGLW]() {
+	Ptr<float> iteration=std::make_shared<float>();
+	*iteration = 0;
+	grid->AddEditVal({ "Iteration times" }, *iteration, 1.0f, [=](const float& val) {
+		*iteration = val;
+	});
+
+	grid->AddButton("Unfix Boundary Parameterize", [mesh, pOGLW = attr->pOGLW, pMethod, pWeightMethod, pBoundaryMethod, iteration]() {
 		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ARAP(mesh);
-		paramaterize->Set_Iteration(2);
+		if (*pMethod == Paramaterize_Basic::Para_Method::kASAP)
+			paramaterize = new Parameterize_ASAP(mesh);
+		else if (*pMethod == Paramaterize_Basic::Para_Method::kARAP)
+			paramaterize = new Parameterize_ARAP(mesh);
+		paramaterize->Set_Iteration(*iteration);
+		paramaterize->paramaterize = Paramaterize::New(mesh);
+		paramaterize->paramaterize->Set_Boundary(*pBoundaryMethod);
+		paramaterize->paramaterize->Set_Method(*pWeightMethod);
+		//paramaterize->Set_Display();
 		if (paramaterize->Run())
-			printf("Paramaterize done\n");
+			printf("Parameterize done\n");
 		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
 	});
 
-	grid->AddButton("Paramaterize ARAP 2 display", [mesh, pOGLW = attr->pOGLW]() {
+	grid->AddButton("Unfix Boundary Parameterize mesh", [mesh, pOGLW = attr->pOGLW, pMethod, pWeightMethod, pBoundaryMethod, iteration]() {
 		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ARAP(mesh);
-		paramaterize->Set_Iteration(2);
+		if (*pMethod == Paramaterize_Basic::Para_Method::kASAP)
+			paramaterize = new Parameterize_ASAP(mesh);
+		else if (*pMethod == Paramaterize_Basic::Para_Method::kARAP)
+			paramaterize = new Parameterize_ARAP(mesh);
+		paramaterize->Set_Iteration(*iteration);
+		paramaterize->paramaterize = Paramaterize::New(mesh);
+		paramaterize->paramaterize->Set_Boundary(*pBoundaryMethod);
+		paramaterize->paramaterize->Set_Method(*pWeightMethod);
 		paramaterize->Set_Display();
 		if (paramaterize->Run())
-			printf("Paramaterize done\n");
+			printf("Parameterize done\n");
 		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
 	});
-
-	grid->AddButton("Paramaterize ARAP 3", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ARAP(mesh);
-		paramaterize->Set_Iteration(3);
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
-	});
-
-	grid->AddButton("Paramaterize ARAP 3 display", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ARAP(mesh);
-		paramaterize->Set_Iteration(3);
-		paramaterize->Set_Display();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
-	});
-
-	grid->AddButton("Paramaterize ARAP 10", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ARAP(mesh);
-		paramaterize->Set_Iteration(10);
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
-	});
-
-	grid->AddButton("Paramaterize ARAP 10 display", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ARAP(mesh);
-		paramaterize->Set_Iteration(10);
-		paramaterize->Set_Display();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
-	});
-
-	grid->AddButton("Paramaterize ARAP 100", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ARAP(mesh);
-		paramaterize->Set_Iteration(100);
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
-	});
-
-	grid->AddButton("Paramaterize ARAP 100 display", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ARAP(mesh);
-		paramaterize->Set_Iteration(100);
-		paramaterize->Set_Display();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
-	});
-
-	grid->AddButton("Paramaterize ASAP GL 1", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ASAP_GL(mesh);
-
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
-	});
-
-	grid->AddButton("Paramaterize ASAP GL 1 display", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ASAP_GL(mesh);
-		paramaterize->Set_Display();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
-	});
-
-	grid->AddButton("Paramaterize ASAP GL 10", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ASAP_GL(mesh);
-		paramaterize->Set_Iteration(10);
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
-	});
-
-	grid->AddButton("Paramaterize ASAP GL 10 display", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ASAP_GL(mesh);
-		paramaterize->Set_Iteration(10);
-		paramaterize->Set_Display();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
-	});
-
-	grid->AddButton("Paramaterize ASAP GL 100", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ASAP_GL(mesh);
-		paramaterize->Set_Iteration(100);
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
-	});
-
-	grid->AddButton("Paramaterize ASAP GL  100 display", [mesh, pOGLW = attr->pOGLW]() {
-		Paramaterize_Basic* paramaterize = NULL;
-		paramaterize = new Parameterize_ASAP_GL(mesh);
-		paramaterize->Set_Iteration(100);
-		paramaterize->Set_Display();
-		if (paramaterize->Run())
-			printf("Paramaterize done\n");
-		pOGLW->DirtyVAO(mesh);
-
-		delete paramaterize;
-	});
-
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 void Attribute::ComponentVisitor::ImplVisit(Ptr<Capsule> capsule) {

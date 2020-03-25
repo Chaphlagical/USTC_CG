@@ -4,6 +4,7 @@
 #include <Basic/HeapObj.h>
 #include<Eigen/Sparse>
 #include<Eigen/Dense>
+#include <Engine/MeshEdit//Paramaterize.h>
 
 namespace Ubpa {
 	class TriMesh;
@@ -19,7 +20,7 @@ namespace Ubpa {
 	public:
 		Paramaterize_Basic(Ptr<TriMesh> triMesh);
 		void Set_Display();
-		void Set_Iteration(size_t t);
+		void Set_Iteration(float t);
 		virtual ~Paramaterize_Basic();
 
 	public:
@@ -41,6 +42,12 @@ namespace Ubpa {
 		virtual void  Parameterization()=0;
 		virtual void Local_Phase() {};
 		
+	public:
+		enum Para_Method
+		{
+			kASAP,
+			kARAP
+		};
 
 	protected:
 		class V;
@@ -57,6 +64,7 @@ namespace Ubpa {
 		Ptr<TriMesh> triMesh;
 		Ptr<HEMesh<V>> heMesh;
 		std::vector<pointf2>texcoords;
+
 		size_t nP, nV;
 		std::vector<std::vector<pointf2>> vertices_list;
 		std::vector<index_map> vertices_index_polygon;
@@ -76,5 +84,8 @@ namespace Ubpa {
 		std::vector<Eigen::Matrix2d> L_matrix_list;
 		Eigen::MatrixXd B;
 		Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
+
+	public:
+		Ptr<Paramaterize>paramaterize;
 	};
 }

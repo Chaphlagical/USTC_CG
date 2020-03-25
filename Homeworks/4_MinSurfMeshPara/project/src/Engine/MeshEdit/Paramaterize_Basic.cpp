@@ -67,9 +67,9 @@ bool Paramaterize_Basic::Init(Ptr<TriMesh> triMesh)
 	return true;
 }
 
-void Paramaterize_Basic::Set_Iteration(size_t t)
+void Paramaterize_Basic::Set_Iteration(float t)
 {
-	iteration_times = t;
+	iteration_times = (size_t)t;
 }
 
 
@@ -163,9 +163,9 @@ void Paramaterize_Basic::Param_Init()
 	nV = heMesh->NumVertices();
 	Local_Flatten();
 
-	auto paramaterize = Paramaterize::New(triMesh);
-	paramaterize->Set_Cotangent_Method();
-	paramaterize->Set_Boundary_Circle();
+	//paramaterize = Paramaterize::New(triMesh);
+	//paramaterize->Set_Cotangent_Method();
+	//paramaterize->Set_Boundary_Circle();
 	paramaterize->Paramaterization();
 	u_list = paramaterize->Get_texcoord();
 

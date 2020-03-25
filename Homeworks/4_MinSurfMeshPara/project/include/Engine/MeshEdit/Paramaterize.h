@@ -31,7 +31,7 @@ namespace Ubpa {
 
 		void Set_Uniform_Method();
 		void Set_Cotangent_Method();
-		
+	
 		void Paramaterization();
 		bool Run();
 
@@ -55,6 +55,9 @@ namespace Ubpa {
 			koff,
 			kon
 		}display_status;
+
+		void Set_Method(Barycentric_Type barycentric);
+		void Set_Boundary(Boundary_Type boundary);
 
 	private:
 		
