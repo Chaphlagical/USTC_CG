@@ -3,6 +3,8 @@
 #include <Basic/HeapObj.h>
 //#include <Engine/Primitive/MassSpring.h>
 #include <UGM/UGM>
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
 
 namespace Ubpa {
 	class Simulate : public HeapObj {
@@ -47,25 +49,91 @@ namespace Ubpa {
 		//void SetVelocity(const std::vector<pointf3>& v) { velocity = v; };
 
 		void SetLeftFix();
+		void SetUpFix();
+		void SetDownFix();
+		
+		const vecf3& GetFext() const { return fext[fext_index]; }
+		const size_t& GetIndex()const { return fext_index; }
+		const size_t& GetMaxIndex()const { return fext.size()-1; }
+		void SetFext(const pointf3& f) {
+			std::cout << fext_index << std::endl;
+			fext[fext_index] = vecf3(f[0], f[1] - gravity, f[2]);
+		}
+		void SetFext_all(const pointf3& f) {
+			for (size_t index = 0; index < fext.size(); index++)
+				fext[index] = vecf3(f[0], f[1] - gravity, f[2]);
+		}
 
+		void SetIndex(const size_t& index)
+		{
+			if (index < fext.size() - 1)
+				fext_index = index;
+			else
+				fext_index = fext.size() - 1;
+		}
 
 	private:
 		// kernel part of the algorithm
 		void SimulateOnce();
+		void Step_Update();
+		void Init_y_list();
+		void Init_Iteration();
+		void IterationOnce();
+		void Speed_Update();
 
 	private:
-		float h = 0.03f;  //步长
-		float stiff;
-		std::vector<unsigned> fixed_id;  //fixed point id
+		Eigen::MatrixXf Kronecker_product(Eigen::MatrixXf A, Eigen::MatrixXf B);
+		void removeRow(Eigen::MatrixXf& matrix, unsigned int rowToRemove);
+		
+	//	optimize method
+	private:
+		void Init_Matrix_optimize();
+		void Update_d();
+		void IterationOnce_optimize();
 
+	//	optimize method
+	private:
+		Eigen::MatrixXf L_mat;
+		Eigen::MatrixXf J_mat;
+		Eigen::MatrixXf d_vec;
+
+		Eigen::MatrixXf A_optim_mat;
+		Eigen::MatrixXf y_mat;
+
+		Eigen::SimplicialLDLT<Eigen::SparseMatrix<float>> solver;
+
+	private:
+		float h = 0.005f;  //步长
+		float stiff =300.00f;
+		float mass;
+		float err;
+		std::vector<unsigned> fixed_id;  //fixed point id
+		std::vector<pointf3> fixed_coords;	//fixed point coordinate
+
+
+		//	force
+		float gravity=9.8;
+		std::vector<vecf3> fext;
+		size_t fext_index = 0;
+
+
+
+		// gradient matrix
+		std::vector<Eigen::Vector3f> step_list;
+
+		// auxiliary 
+		std::vector<pointf3> y_list;
+		
 
 		//mesh data
 		std::vector<unsigned> edgelist;
+		std::vector<float> original_length_list;
 
 
 		//simulation data
 		std::vector<pointf3> positions;
 		std::vector<pointf3> velocity;
+
 		
 	};
 }
