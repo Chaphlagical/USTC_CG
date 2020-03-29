@@ -41,7 +41,7 @@ bool Simulate::Init() {
 	}
 	//Init_Matrix_optimize();
 	//cout << "original_length_list:" << endl << original_length_list[0] << endl << original_length_list[1] << endl << original_length_list[2] << endl<<endl;
-
+	Init_Matrix_optimize();
 	return true;
 }
 
@@ -54,6 +54,27 @@ bool Simulate::Run() {
 	// half-edge structure -> triangle mesh
 
 	return true;
+}
+
+void Ubpa::Simulate::ClearFix()
+{
+	fixed_id.clear();
+	fixed_coords.clear();
+	Init();
+}
+
+void Ubpa::Simulate::AddFix()
+{
+	for (int i = 0; i < fixed_id.size(); i++)
+	{
+		if (fixed_id[i] == select_index)
+		{
+			return;
+		}
+	}
+	fixed_id.push_back(select_index);
+	fixed_coords.push_back(positions[select_index]);
+	Init();
 }
 
 void Ubpa::Simulate::SetLeftFix()
@@ -102,6 +123,7 @@ void Ubpa::Simulate::SetUpFix()
 		{
 			fixed_id.push_back(i);
 			fixed_coords.push_back(positions[i]);
+			cout <<i<<" "<< positions[i] << endl;
 		}
 	}
 
@@ -124,7 +146,7 @@ void Ubpa::Simulate::SetDownFix()
 
 	for (int i = 0; i < positions.size(); i++)
 	{
-		if (abs(positions[i][1] - y) < 1e-2)
+		if (abs(positions[i][1] - y) < 1e-5)
 		{
 			fixed_id.push_back(i);
 			fixed_coords.push_back(positions[i]);
@@ -144,26 +166,19 @@ void Simulate::SimulateOnce() {
 	while (abs(err) > 1e-3)
 	{
 		IterationOnce();
-		//cout << err << endl;
 	}*/
-	//cout << err << endl;
-	//cout << "------------------------------------------------" << endl;
 	
-	Init_Matrix_optimize();
+
+	Init_b_optim();
 	err = 10000;
-	while (abs(err) > 1e-3)
+	size_t count_ = 0;
+	while (abs(err) > 1e-4)
 	{
+		count_++;
 		IterationOnce_optimize();
-		//cout << err << endl;
 	}
 
 	Speed_Update();
-	cout << "-----------------------------------------------------" << endl;
-
-	for (size_t i = 0; i < fixed_id.size(); i++)
-	{
-		velocity[fixed_id[i]] = pointf3(0, 0, 0);
-	}
 
 
 }
@@ -219,15 +234,6 @@ void Simulate::Step_Update()
 		gradiant_force[index_i] += temp_grad;
 		gradiant_force[index_j] -= temp_grad;
 	}
-
-	//cout << "fint:" << endl << fint_list[0] << endl << fint_list[1] << endl << fint_list[2] << endl << endl;
-
-	//cout << "gradiant_force:" << endl << gradiant_force[0] << endl << gradiant_force[1] << endl << gradiant_force[2] << endl << endl;
-	//for (size_t i = 0; i < positions.size(); i++)
-	//{
-		////cout << i << endl << gradiant_force[i] << endl << endl;
-		////cout << edgelist[i/2] << endl;
-	//}
 	
 	step_list.clear();
 	for (int i = 0; i < positions.size(); i++)
@@ -248,10 +254,7 @@ void Simulate::Step_Update()
 		step = gradiant_g.inverse() * g;
 
 		step_list.push_back(step);
-		////cout << step << endl << endl;
 	}
-	//cout << "step_list:" << endl << step_list[0] << endl << step_list[1] << endl << step_list[2] << endl << endl;
-	////cout << "----------------------------------------------------------------------" << endl;
 }
 
 void Simulate::Init_y_list()
@@ -262,13 +265,11 @@ void Simulate::Init_y_list()
 		vecf3 v(velocity[i][0], velocity[i][1], velocity[i][2]);
 		y_list[i] = positions[i] + h * v + h * h * fext[i] / mass;
 		velocity[i] = pointf3(positions[i][0], positions[i][1], positions[i][2]);
-		////cout << y_list[i] << endl << endl;
 	}
 	for (size_t i = 0; i < fixed_id.size(); i++)
 	{
 		y_list[fixed_id[i]] = fixed_coords[i];
 	}
-	//cout << "y: " << y_list[0] << endl << y_list[1] << endl << y_list[2] << endl << endl;
 }
 
 void Simulate::Init_Iteration()
@@ -292,14 +293,12 @@ void Simulate::IterationOnce()
 		x_vec -= step_list[i];
 		err += abs(step_list[i][0]) + abs(step_list[i][1]) + abs(step_list[i][2]);
 		positions[i] = pointf3(x_vec[0], x_vec[1], x_vec[2]);
-		////cout << i<<endl<<step_list[i]<<endl<<positions[i]<<endl<<step_list[i]<<endl<<endl;
 	}
 	err /= positions.size();
 	for (size_t i = 0; i < fixed_coords.size(); i++)
 	{
 		positions[fixed_id[i]] = fixed_coords[i];
 	}
-	////cout << "*********************************************************************";
 }
 
 void Simulate::Speed_Update()
@@ -310,6 +309,10 @@ void Simulate::Speed_Update()
 		vecf3 old_p(velocity[i][0], velocity[i][1], velocity[i][2]);
 		vecf3 v = (new_p - old_p) / h;
 		velocity[i] = pointf3(v[0], v[1], v[2]);
+	}
+	for (size_t i = 0; i < fixed_id.size(); i++)
+	{
+		velocity[fixed_id[i]] = pointf3(0, 0, 0);
 	}
 }
 
@@ -387,29 +390,28 @@ void Simulate::Init_Matrix_optimize()
 
 	for (size_t i = 0; i < fixed_id.size(); i++)
 	{
-		removeRow(K_mat, fixed_id[i]);
+		removeRow(K_mat, fixed_id[i]-i);
 	}
 
 	identity_mat.resize(L_mat.rows(), L_mat.cols());
+	identity_mat.setIdentity();
 
 	A_optim_mat = mass * identity_mat + h * h * L_mat;
-	//cout << A_optim_mat << endl<<endl;
-	//cout << K_mat << endl << endl;
-	//cout << (mass * identity_mat + h * h * L_mat) << endl << endl;
-
 	solver.compute((K_mat * A_optim_mat * K_mat.transpose()).sparseView().pruned());
+
+}
+
+void Simulate::Init_b_optim()
+{
 	Init_y_list();
 	y_mat.resize(L_mat.rows(), 3);
-
 	for (size_t i = 0; i < L_mat.rows(); i++)
 	{
 		y_mat(i, 0) = y_list[i][0];
 		y_mat(i, 1) = y_list[i][1];
 		y_mat(i, 2) = y_list[i][2];
 	}
-
-	
-
+	b_optim_mat = mass * y_mat;
 }
 
 void Simulate::Update_d()
@@ -434,13 +436,12 @@ void Simulate::IterationOnce_optimize()
 	Update_d();
 
 	Eigen::MatrixXf B;
-	
 	Eigen::MatrixXf K_mat(positions.size(), positions.size());
 	K_mat.setIdentity();
 	
 	for (size_t i = 0; i < fixed_id.size(); i++)
 	{
-		removeRow(K_mat, fixed_id[i]);
+		removeRow(K_mat, fixed_id[i]-i);
 	}
 
 	Eigen::MatrixXf X(positions.size(), 3);
@@ -453,51 +454,18 @@ void Simulate::IterationOnce_optimize()
 	}
 
 	Eigen::MatrixXf bb = X - K_mat.transpose() * K_mat * X;
-
-	B = K_mat * (h * h * J_mat * d_vec + mass * y_mat - MatrixXf(A_optim_mat)*bb);
-
+	B = K_mat * (h * h * J_mat * d_vec + mass * y_mat - A_optim_mat*bb);
 	X = solver.solve(B);
-	cout << X << endl << endl << endl;
+	X = K_mat.transpose() * X +bb;
 	err = 0;
-	
-	for (size_t i = 0; i < 3; i++)
+	for (size_t i = 0; i < positions.size(); i++)
 	{
-		cout << i << " " << positions[i] << endl;
-	}
-	cout << endl;
-	for (size_t i = 0; i < K_mat.rows(); i++)
-	{
-		float err_temp = 0;
-		cout << i  <<" "<<  X(i, 0) << " " << X(i, 1) << " " << X(i, 2) << endl;
-		
-		MatrixXf::Index index;
-		K_mat.row(i).maxCoeff(&index);
 		for (size_t j = 0; j < 3; j++)
 		{
-			err += abs(X(i, j) - positions[index][j]);
-			err_temp+= abs(X(i, j) - positions[index][j]);
-			
+			err += abs(X(i, j) - positions[i][j]);
 		}
-		positions[index] = pointf3(X(i, 0), X(i, 1), X(i, 2));
-		
-	}
-	cout << endl;
-	for (size_t i = 0; i < 3; i++)
-	{
-		cout << i << " " << positions[i] << endl;
+		positions[i] = pointf3(X(i, 0), X(i, 1), X(i, 2));
+
 	}
 	err /= positions.size();
-	cout << endl;
-	cout << "err: " << err << endl;
-	cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl << endl;
-	
-	/*for (size_t i = 0; i < fixed_coords.size(); i++)
-	{
-		positions[fixed_id[i]] = fixed_coords[i];
-	}*/
-	//cout << err << endl;
-	//cout << "J:" << endl << J_mat << endl << endl;
-	//cout << "d:" << endl << d_vec << endl << endl;
-	//cout << "y:" << endl << y_mat << endl << endl;
-	//cout << "**************************************************" << endl;
 }

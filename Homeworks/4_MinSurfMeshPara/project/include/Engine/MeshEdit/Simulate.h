@@ -51,25 +51,27 @@ namespace Ubpa {
 		void SetLeftFix();
 		void SetUpFix();
 		void SetDownFix();
+		void AddFix();
+		void ClearFix();
 		
-		const vecf3& GetFext() const { return fext[fext_index]; }
-		const size_t& GetIndex()const { return fext_index; }
+		const vecf3& GetFext() const { return fext[select_index]; }
+		const size_t& GetIndex()const { return select_index; }
 		const size_t& GetMaxIndex()const { return fext.size()-1; }
 		void SetFext(const pointf3& f) {
-			std::cout << fext_index << std::endl;
-			fext[fext_index] = vecf3(f[0], f[1] - gravity, f[2]);
+			std::cout << select_index << std::endl;
+			fext[select_index] = vecf3(f[0], f[1] - gravity, f[2]);
 		}
 		void SetFext_all(const pointf3& f) {
 			for (size_t index = 0; index < fext.size(); index++)
-				fext[index] = vecf3(f[0], f[1] - gravity, f[2]);
+				fext[index] = vecf3(f[0], f[1], f[2]);
 		}
 
 		void SetIndex(const size_t& index)
 		{
 			if (index < fext.size() - 1)
-				fext_index = index;
+				select_index = index;
 			else
-				fext_index = fext.size() - 1;
+				select_index = fext.size() - 1;
 		}
 
 	private:
@@ -89,6 +91,7 @@ namespace Ubpa {
 	private:
 		void Init_Matrix_optimize();
 		void Update_d();
+		void Init_b_optim();
 		void IterationOnce_optimize();
 
 	//	optimize method
@@ -99,22 +102,24 @@ namespace Ubpa {
 
 		Eigen::MatrixXf A_optim_mat;
 		Eigen::MatrixXf y_mat;
+		Eigen::MatrixXf b_optim_mat;
 
 		Eigen::SimplicialLDLT<Eigen::SparseMatrix<float>> solver;
 
 	private:
-		float h = 0.005f;  //步长
-		float stiff =300.00f;
+		float h = 0.03f;  //步长
+		float stiff =10000.00f;
 		float mass;
 		float err;
 		std::vector<unsigned> fixed_id;  //fixed point id
+
 		std::vector<pointf3> fixed_coords;	//fixed point coordinate
 
 
 		//	force
 		float gravity=9.8;
 		std::vector<vecf3> fext;
-		size_t fext_index = 0;
+		size_t select_index = 0;
 
 
 

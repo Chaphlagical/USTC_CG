@@ -45,6 +45,8 @@ namespace Ubpa {
 		void SetLeftFix() {CastTo<MassSpring>(primitive)->GetSimu()->SetLeftFix();};
 		void SetUpFix() { CastTo<MassSpring>(primitive)->GetSimu()->SetUpFix(); };
 		void SetDownFix() { CastTo<MassSpring>(primitive)->GetSimu()->SetDownFix(); };
+		void AddFix() { CastTo<MassSpring>(primitive)->GetSimu()->AddFix(); };
+		void ClearFix() { CastTo<MassSpring>(primitive)->GetSimu()->ClearFix(); };
 		void SetIndex(size_t index) { CastTo<MassSpring>(primitive)->GetSimu()->SetIndex(index); };
 		const vecf3& GetFext() const { return CastTo<MassSpring>(primitive)->GetSimu()->GetFext(); }
 		void SetFext(const pointf3& f) { CastTo<MassSpring>(primitive)->GetSimu()->SetFext(f); }

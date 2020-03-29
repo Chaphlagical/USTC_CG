@@ -210,19 +210,30 @@ void Attribute::ComponentVisitor::ImplVisit(Ptr<CmptSimulate> simulate) {
 	grid->AddButton("set y min fix", [simulate]() {
 		simulate->SetDownFix();
 	});
-	grid->AddText("- index choose");
-	grid->AddEditVal({ "index" }, simulate->GetIndex(), 0,simulate->GetMaxIndex(), simulate->GetMaxIndex(), [=](const size_t& val) {
-		simulate->SetIndex(val);
-	});
-	grid->AddText("- Fext for one");
-	grid->AddEditVal({ "x","y","z" }, simulate->GetFext().cast_to<Ubpa::valf3>(), Ubpa::valf3(0.1f), [=](const Ubpa::valf3& val) {
-		simulate->SetFext(val.cast_to<Ubpa::pointf3>());
+	grid->AddButton("clear all fix", [simulate]() {
+		simulate->ClearFix();
 	});
 
 	grid->AddText("- Fext for all");
 	grid->AddEditVal({ "x","y","z" }, simulate->GetFext().cast_to<Ubpa::valf3>(), Ubpa::valf3(0.1f), [=](const Ubpa::valf3& val) {
 		simulate->SetFextAll(val.cast_to<Ubpa::pointf3>());
 	});
+
+	grid->AddText("- index choose");
+	grid->AddEditVal({ "index" }, simulate->GetIndex(), 0,simulate->GetMaxIndex(), simulate->GetMaxIndex(), [=](const size_t& val) {
+		simulate->SetIndex(val);
+	});
+
+	grid->AddButton("set select point fix", [simulate]() {
+		simulate->AddFix();
+	});
+
+	grid->AddText("- Fext for one");
+	grid->AddEditVal({ "x","y","z" }, simulate->GetFext().cast_to<Ubpa::valf3>(), Ubpa::valf3(0.1f), [=](const Ubpa::valf3& val) {
+		simulate->SetFext(val.cast_to<Ubpa::pointf3>());
+	});
+
+
 }
 
 // -------------- Camera --------------
