@@ -305,7 +305,7 @@ int main() {
   //add_object_circle(Vec(0.10, 0.45), 0.05, 0xFAFAFA, 1000, Vec(20, 10), 2);
   //add_object_circle(Vec(0.90, 0.45), 0.05, 0xFAFAFA, 1000, Vec(-20, 10), 2);
   //add_object_horse(Vec(0.20, 0.04), 0xFAFAFA);
-  add_object_rectangle(Vec(0.05, 0.04), Vec(0.95, 0.34), 0xFCFCFC, 500, Vec(0.0,0.0), 0);
+  add_object_rectangle(Vec(0.05, 0.04), Vec(0.95, 0.34), 0xFAFAFA, 500000, Vec(0.0,0.0), 2);
   //add_object_rectangle(Vec(0.80, 0.04), Vec(0.90, 0.14), 0xFCFCFC, 5000, Vec(-10.0, 0.0), 1);
   //add_object(Vec(0.45,0.15), 0xF2B134, 1);
   //add_object(Vec(0.55,0.85), 0x068587, 1);
@@ -345,7 +345,7 @@ int main() {
       // Update image
       gui.update();
 
-      //canvas.img.write_as_image(fmt::format("bullet_jelly_very_dense_500000/{:05d}.png", frame++));
+      canvas.img.write_as_image(fmt::format("bullet_snow_very_dense_500000/{:05d}.png", frame++));
       /////////////////////////////////////////////////////////////////////////////////
     }
   }
