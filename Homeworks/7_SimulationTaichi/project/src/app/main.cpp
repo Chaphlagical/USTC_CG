@@ -29,7 +29,7 @@ const auto vol = 1.0_f;        // Particle Volume
 //const auto hardening = 10.0_f; // Snow hardening factor
 const auto hardening = 10.0_f;
 //const auto E = 1e4_f;          // Young's Modulus
-const auto E = 1e4_f;   // 1e_3f 1e4_f 3e_4f
+const auto E = 4e4_f;   // 1e_3f 1e4_f 3e_4f
 //const auto nu = 0.2_f;         // Poisson ratio
 const auto nu = 0.2_f;         // Poisson ratio
 const bool plastic = true;
@@ -40,7 +40,7 @@ const real lambda_0 = E * nu / ((1+nu) * (1 - 2 * nu));
 
 struct Particle {
   // Position and velocity
-  Vec x, v;
+    Vec x, v;
   // Deformation gradient
   Mat F;
   // Affine momentum from APIC
@@ -51,15 +51,18 @@ struct Particle {
   int c;
   // 0: fluid 1: jelly 2: snow 
   int ptype;
+  // tag
+  int tag;
 
-  Particle(Vec x, int c, Vec v=Vec(0), int ptype=2) :
+  Particle(Vec x, int c, Vec v=Vec(0), int ptype=2, int tag=0) :
     x(x),
     v(v),
     F(1),
     C(0),
     Jp(1),
     c(c),
-    ptype(ptype){}
+    ptype(ptype),
+    tag(tag){}
 };
 
 std::vector<Particle> particles;
@@ -93,7 +96,6 @@ void advance(real dt) {
     if (p.ptype == 1)e = 0.3;
     auto mu = mu_0 * e, lambda = lambda_0 * e;
     if (p.ptype == 0)mu = 0;
-
 
     // Current volume
     real J = determinant(p.F);
@@ -228,7 +230,7 @@ void add_object(Vec center, int c, int ptype=2) {
   }
 }
 /**************************************************************************************/
-void add_object_rectangle(Vec v1, Vec v2, int c, int num = 500, Vec velocity = Vec(0.0_f), int ptype = 0)
+void add_object_rectangle(Vec v1, Vec v2, int c, int num = 1000, Vec velocity = Vec(0.0_f), int ptype = 0)
 {
     Vec box_min(min(v1.x, v2.x), min(v1.y, v2.y)), box_max(max(v1.x, v2.x), max(v1.y, v2.y));
     int i = 0;
@@ -242,15 +244,15 @@ void add_object_rectangle(Vec v1, Vec v2, int c, int num = 500, Vec velocity = V
 }
 
 //  jelly horse
-void add_object_horse(Vec v, int c, int num=2000, Vec velocity = Vec(10.0, 0), int ptype = 1)
+void add_object_horse(Vec v, int c, int num=500, Vec velocity = Vec(0.0, 0.0), int ptype = 1)
 {
     int i = 0;
     while (i < num / 5)
     {
         auto pos = Vec::rand();
-        if (pos.x > v.x&& pos.x < v.x + 0.05 && pos.y>0.04 && pos.y < 0.09)
+        if (pos.x > v.x&& pos.x < v.x + 0.05 && pos.y>v.y && pos.y < v.y+0.05)
         {
-            particles.push_back(Particle(pos, c, Vec(0,0), ptype));
+             particles.push_back(Particle(pos, 0x1E90FF, velocity, ptype, 1));
             i++;
         }
     }
@@ -258,19 +260,18 @@ void add_object_horse(Vec v, int c, int num=2000, Vec velocity = Vec(10.0, 0), i
     while (i < num / 5)
     {
         auto pos = Vec::rand();
-        if (pos.x > v.x+0.1&& pos.x < v.x + 0.15 && pos.y>0.04 && pos.y < 0.09)
+        if (pos.x > v.x+0.1&& pos.x < v.x + 0.15 && pos.y>v.y && pos.y < v.y + 0.05)
         {
-            particles.push_back(Particle(pos, c, velocity, ptype));
-            i++;
+            particles.push_back(Particle(pos, 0xFF0000, velocity, ptype, 2));
         }
     }
     i = 0;
     while (i < num*3 / 5)
     {
         auto pos = Vec::rand();
-        if (pos.x > v.x && pos.x < v.x + 0.15 && pos.y>0.09 && pos.y < 0.14)
+        if (pos.x > v.x && pos.x < v.x + 0.15 && pos.y> v.y + 0.05 && pos.y < v.y + 0.1)
         {
-            particles.push_back(Particle(pos, c, Vec(0,0), ptype));
+            particles.push_back(Particle(pos, c, Vec(0.0, 0.0), ptype));
             i++;
         }
     }
@@ -305,16 +306,12 @@ void add_object_triangle(Vec v1, Vec v2, int c, int num = 500, Vec velocity = Ve
                     i++;
                 }
             }
-
-
-
         }
     }
 }
 
 void add_jet(Vec v1, Vec v2, int c, Vec vel, int ptype) {
     add_object_rectangle(v1, v2, c, 10, vel, ptype);
-    //add_object_rectangle(Vec(0.5, 0.5), Vec(0.51, 0.51), 0x87CEFA, 10, Vec(0.0, -10.0));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -325,9 +322,9 @@ int main() {
 
   //add_object_circle(Vec(0.50, 0.90), 0.02, 0x00FF00, 1000, Vec(0.0, -20.0), 1);
   //add_object_triangle(Vec(0.45,0.85), Vec(0.55,0.95), 0x00FF00,1000, Vec(0,-20));
-  add_object_rectangle(Vec(0.40, 0.88), Vec(0.60, 0.92), 0x00FF00, 1000, Vec(0.0, -20.0), 1);
-  //add_object_horse(Vec(0.20, 0.04), 0xFAFAFA);
-  add_object_rectangle(Vec(0.05, 0.04), Vec(0.95, 0.54), 0x1E90FF, 50000, Vec(0.0,0.0), 0);
+  add_object_rectangle(Vec(0.45, 0.82), Vec(0.55, 0.92), 0x00FF00, 1000, Vec(0.0, -20.0), 1);
+  //add_object_horse(Vec(0.20, 0.04), 0x00FF00);
+  //add_object_rectangle(Vec(0.05, 0.04), Vec(0.95, 0.54), 0x1E90FF, 50000, Vec(0.0,0.0), 0);
 
 
   int frame = 0;
@@ -358,8 +355,7 @@ int main() {
       }*/
       // Update image
       gui.update();
-
-      canvas.img.write_as_image(fmt::format("flat_shoot/{:05d}.png", frame++));
+      canvas.img.write_as_image(fmt::format("Jelly_E_4e4/{:05d}.png", frame++));
       /////////////////////////////////////////////////////////////////////////////////
     }
   }

@@ -19,39 +19,60 @@
 \HyPL@Entry{0<</S/D>>}
 \babel@aux{english}{}
 \@writefile{toc}{\contentsline {section}{\numberline {1}实验要求}{1}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2}开发环境}{1}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3}界面描述}{2}{section.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces 界面描述\relax }}{2}{figure.caption.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4}算法原理}{3}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}弹簧质点模型}{3}{subsection.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}隐式欧拉方法}{3}{subsection.4.2}\protected@file@percent }
-\citation{Fast}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}弹力求导问题}{4}{subsection.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}加速方法\cite  {Fast}}{4}{subsection.4.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}位移约束的处理}{5}{subsection.4.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}设计难点与解决}{6}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}隐式欧拉收敛性问题}{6}{subsection.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}使用带约束的加速方法时设置固定点与实际固定点不符}{6}{subsection.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}收敛条件}{6}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}矩阵预分解}{6}{subsection.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}实验效果}{7}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}布料仿真效果}{7}{subsection.6.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.1}{\ignorespaces 稠密布料\relax }}{7}{figure.caption.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.2}{\ignorespaces 稀疏布料\relax }}{7}{figure.caption.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}固体质量块仿真效果}{8}{subsection.6.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.3}{\ignorespaces cube\relax }}{8}{figure.caption.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.4}{\ignorespaces 劲度系数较小时的变形\relax }}{8}{figure.caption.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}“布脸”}{9}{subsection.6.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.5}{\ignorespaces 初态\relax }}{9}{figure.caption.6}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.6}{\ignorespaces 末态\relax }}{9}{figure.caption.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}“变形怪”}{10}{subsection.6.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.7}{\ignorespaces 初态\relax }}{10}{figure.caption.8}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.8}{\ignorespaces 变形\relax }}{10}{figure.caption.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}劲度系数测试}{11}{subsection.6.5}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.9}{\ignorespaces stiff\relax }}{11}{figure.caption.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}对某一点施加外力}{11}{subsection.6.6}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.10}{\ignorespaces Fext\relax }}{11}{figure.caption.11}\protected@file@percent }
+\citation{hu2018mlsmpmcpic}
+\@writefile{toc}{\contentsline {section}{\numberline {2}开发环境}{2}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}算法原理}{2}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}MLS-MPM算法流程\cite  {hu2018mlsmpmcpic}}{2}{subsection.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces 算法流程\relax }}{2}{figure.caption.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}从粒子插值到格点}{3}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}更新格点信息}{4}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}从格点插值到粒子}{4}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}更新粒子信息}{4}{subsection.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}仿真结果与分析}{5}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}模拟场景的构建}{5}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.1}喷泉}{5}{subsubsection.4.1.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces 喷泉\relax }}{5}{figure.caption.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.2}三彩喷泉}{6}{subsubsection.4.1.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces 开始不久\relax }}{6}{figure.caption.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces 一段时间后\relax }}{6}{figure.caption.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.3}不同材料的喷泉}{7}{subsubsection.4.1.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.4}{\ignorespaces 开始不久\relax }}{7}{figure.caption.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.5}{\ignorespaces 一段时间后\relax }}{7}{figure.caption.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.4}喷泉冲击弹性物体}{8}{subsubsection.4.1.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.6}{\ignorespaces 开始不久\relax }}{8}{figure.caption.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.7}{\ignorespaces 一段时间后\relax }}{8}{figure.caption.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.5}弹性马}{9}{subsubsection.4.1.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.8}{\ignorespaces demo\relax }}{9}{figure.caption.6}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.9}{\ignorespaces 自己实现的\relax }}{9}{figure.caption.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}探索参数空间}{10}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.1}杨氏模量E对弹性体碰撞性质的影响}{10}{subsubsection.4.2.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.10}{\ignorespaces 初始状态\relax }}{10}{figure.caption.8}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.11}{\ignorespaces 接触瞬间\relax }}{10}{figure.caption.8}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.12}{\ignorespaces 弹起后\relax }}{10}{figure.caption.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.2}杨氏模量E对雪块碰撞性质的影响}{11}{subsubsection.4.2.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.13}{\ignorespaces 初始状态\relax }}{11}{figure.caption.9}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.14}{\ignorespaces 末状态\relax }}{11}{figure.caption.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.3}粒子数对不同材料物体仿真的影响}{12}{subsubsection.4.2.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.15}{\ignorespaces 射入后某个时间点\relax }}{12}{figure.caption.10}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.16}{\ignorespaces 弹起后\relax }}{13}{figure.caption.11}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.17}{\ignorespaces 射入后某个时间点\relax }}{14}{figure.caption.12}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.18}{\ignorespaces 弹起后\relax }}{15}{figure.caption.13}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.19}{\ignorespaces 射入后某个时间点\relax }}{16}{figure.caption.14}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.20}{\ignorespaces 末态\relax }}{17}{figure.caption.15}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.21}{\ignorespaces 现实情况\relax }}{17}{figure.caption.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}物理场景模拟}{18}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.1}不同材质的球相互碰撞}{18}{subsubsection.4.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.22}{\ignorespaces 开始时\relax }}{18}{figure.caption.17}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.23}{\ignorespaces 第一次碰撞后\relax }}{18}{figure.caption.17}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.24}{\ignorespaces 一段时间后\relax }}{18}{figure.caption.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.2}弹性小球撞击三种材质物体}{19}{subsubsection.4.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.25}{\ignorespaces 开始时\relax }}{19}{figure.caption.18}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.26}{\ignorespaces 第一次碰撞后\relax }}{19}{figure.caption.18}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.27}{\ignorespaces 一段时间后\relax }}{19}{figure.caption.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.3}不同形状的弹性体射入流体中}{20}{subsubsection.4.3.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.28}{\ignorespaces 开始时\relax }}{20}{figure.caption.19}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.29}{\ignorespaces 第一次碰撞后\relax }}{21}{figure.caption.20}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.30}{\ignorespaces 一段时间后\relax }}{22}{figure.caption.21}\protected@file@percent }
 \bibstyle{unsrt}
 \bibdata{bibfile}
-\bibcite{Fast}{1}
-\@writefile{toc}{\contentsline {section}{\numberline {7}总结}{12}{section.7}\protected@file@percent }
+\bibcite{hu2018mlsmpmcpic}{1}

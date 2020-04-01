@@ -3,38 +3,36 @@ Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: main.aux
 The style file: unsrt.bst
 Database file #1: bibfile.bib
-Warning--empty author in Fast
-Warning--empty year in Fast
 You've used 1 entry,
             1791 wiz_defined-function locations,
-            452 strings with 3593 characters,
-and the built_in function-call counts, 177 in all, are:
-= -- 13
-> -- 1
+            454 strings with 3794 characters,
+and the built_in function-call counts, 276 in all, are:
+= -- 16
+> -- 23
 < -- 0
-+ -- 1
-- -- 0
-* -- 19
-:= -- 27
-add.period$ -- 2
++ -- 8
+- -- 7
+* -- 27
+:= -- 56
+add.period$ -- 3
 call.type$ -- 1
 change.case$ -- 1
 chr.to.int$ -- 0
-cite$ -- 3
+cite$ -- 1
 duplicate$ -- 9
 empty$ -- 21
-format.name$ -- 0
-if$ -- 37
+format.name$ -- 7
+if$ -- 53
 int.to.chr$ -- 0
 int.to.str$ -- 1
 missing$ -- 1
-newline$ -- 7
-num.names$ -- 0
-pop$ -- 3
+newline$ -- 8
+num.names$ -- 1
+pop$ -- 1
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 4
+skip$ -- 3
 stack$ -- 0
 substring$ -- 9
 swap$ -- 1
@@ -42,8 +40,7 @@ text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
-warning$ -- 2
-while$ -- 1
+warning$ -- 0
+while$ -- 2
 width$ -- 2
-write$ -- 10
-(There were 2 warnings)
+write$ -- 13

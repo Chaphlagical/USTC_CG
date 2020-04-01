@@ -1,7 +1,10 @@
 \begin{thebibliography}{1}
 
-\bibitem{Fast}
-Fast simulation of mass-spring systems.
-\newblock {\em Acm Transactions on Graphics}, 32(6):1--7.
+\bibitem{hu2018mlsmpmcpic}
+Yuanming Hu, Yu~Fang, Ziheng Ge, Ziyin Qu, Yixin Zhu, Andre Pradhana, and
+  Chenfanfu Jiang.
+\newblock A moving least squares material point method with displacement
+  discontinuity and two-way rigid body coupling.
+\newblock {\em ACM Transactions on Graphics (TOG)}, 37(4):150, 2018.
 
 \end{thebibliography}

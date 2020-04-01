@@ -32,7 +32,7 @@
 	%\vspace{25pt} % Whitespace
 	\rule{\linewidth}{0.5pt}\\ % Thin top horizontal rule
 	\vspace{20pt} % Whitespace
-	{\huge 实验六	Mass Spring}\\ % The assignment title
+	{\huge 实验七	Simulation Taichi}\\ % The assignment title
 	\vspace{12pt} % Whitespace
 	\rule{\linewidth}{2pt}\\ % Thick bottom horizontal rule
 	\vspace{12pt} % Whitespace
@@ -59,12 +59,23 @@
 %\end{figure}
 
 \begin{itemize}
-	\item[*] 在给定的网格框架上完成作业，实现
+	\item [*] 构建不同的模拟场景★
 	\begin{itemize}
-		\item 质点弹簧仿真模型的欧拉隐式方法
-		\item 质点弹簧仿真模型的加速模拟方法
+		\item 使用 `add\_objec` 函数设计自己的模拟场景（可以改变模拟物体的形状、粒子数目、初始位置、初始速度等等）
 	\end{itemize}
-	\item[*] 学习使用 Tetgen 库生成四面体剖分
+	\item [*] 探究参数空间：通过调整不同的参数设置体会不同参数对仿真结果的影响★★
+	\begin{itemize}
+		\item 比如：探究杨氏模量E对雪模拟的影响，结合其背后的物理原理进行比较分析
+	\end{itemize}
+	\item [*] 探究其他算法和模型：通过改变物理模型、改变模拟算法实现新的模拟结果★★★
+	\begin{itemize}
+		\item 比如：水冲击弹性物体的模拟
+	\end{itemize}
+	\item [*] 渲染与绘制（可选 ★★★★★）
+	\begin{itemize}
+		\item 学习使用商业软件（如Houdini、Blender等）对结果进行渲染
+		\item 【注：3D粒子更合适光照渲染，因此此处不作要求】
+	\end{itemize}
 \end{itemize}
 
 %------------------------------------------------
@@ -73,237 +84,323 @@
 
 \textbf{IDE}：Microsoft Visual Studio 2019 community\\
 \textbf{CMake}：3.16.3\\
-\textbf{Qt}：5.14.1\\
-\textbf{Eigen}：3.3.7\\
-\textbf{Assimp}：5.0.1\\
-\textbf{tinyxml2}：8.0.0\\
+\textbf{TaiChi} \\
 \textbf{Others}
-
-\section{界面描述}
-\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
-	\centering
-	\includegraphics[width=1.1\columnwidth]{menu.png} % Example image
-	\caption{界面描述}
-\end{figure}
 
 %----------------------------------------------------------------------------------------
 %	TEXT EXAMPLE
 %----------------------------------------------------------------------------------------
-\pagebreak
 \section{算法原理}
 
-\subsection{弹簧质点模型}
-一个弹簧质点系统就是由节点及节点之间的边所构成的图，也就是网格。网格图的每个顶点看为一个质点，每条边看为一根弹簧。网格可以是二维网格，用于模拟布料、纸张等物体；也可以是三维体网格，用于模拟体物体。
-
-\subsection{隐式欧拉方法}
-已知前$n$帧的信息，设位移为$\boldsymbol x$，速度为$\boldsymbol v$，时间步长为$h$，现计算第$n+1$帧信息\\
-
-第$n+1$帧信息与第$n$帧信息满足以下关系：
-\begin{equation}
-\begin{aligned}
-\boldsymbol x_{n+1}&=\boldsymbol x_n+h\boldsymbol  v_{n+1}\\
-\boldsymbol v_{n+1}&=\boldsymbol v_n+h\boldsymbol M^{-1}(\boldsymbol f_{int}(t_{n+1})+\boldsymbol f_{ext})
-\end{aligned}
-\end{equation}
-
-记
-\begin{equation}
-\boldsymbol y=\boldsymbol x_n+h\boldsymbol v_n+h^2\boldsymbol M^{-1}\boldsymbol f_{ext}
-\end{equation}
-
-原问题转化为求解关于$\boldsymbol x$的方程：
-
-\begin{equation}
-\boldsymbol g(\boldsymbol x)=\boldsymbol M(\boldsymbol x-\boldsymbol y)-h^2\boldsymbol f_{int}(\boldsymbol x)=0
-\end{equation}
-
-利用牛顿法求解该方程，主要迭代步骤：
-\begin{equation}
-\boldsymbol x^{(k+1)}=\boldsymbol x^{(k)}-(\nabla \boldsymbol g(\boldsymbol x^{(k)}))^{-1}\boldsymbol g(\boldsymbol x^{(k)})
-\end{equation}
-
-迭代初值可选$\boldsymbol x^{(0)}=\boldsymbol y$\\
-迭代得到位移$\boldsymbol x$后更新速度：$\boldsymbol v_{n+1}=(\boldsymbol x_{n+1}-\boldsymbol x_n)/h$
-
+\subsection{MLS-MPM算法流程\cite{hu2018mlsmpmcpic}}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.5\columnwidth]{process.png} % Example image
+	\caption{算法流程}
+\end{figure}
 \pagebreak
-\subsection{弹力求导问题}
-对于单个弹簧（端点为$\boldsymbol  x_1$，$\boldsymbol  x_2$），劲度系数为$k$，原长为$l$，有：
-\begin{equation}
-\begin{aligned}
-\boldsymbol f_1(\boldsymbol x_1,\boldsymbol x_2)&=k(||\boldsymbol x_1-\boldsymbol x_2||-l)\frac{\boldsymbol x_2-\boldsymbol x_1}{||\boldsymbol x_1-\boldsymbol x_2||}\\
-\boldsymbol f_2(\boldsymbol x_1,\boldsymbol x_2)&=-\boldsymbol f_1(\boldsymbol x_1,\boldsymbol x_2)
-\end{aligned}
-\end{equation}
-
-对
-\begin{equation}
-\boldsymbol h(\boldsymbol x)=k(||\boldsymbol x||-l)\frac{-\boldsymbol x}{||\boldsymbol x||}
-\end{equation}
-
-求导有
-\begin{equation}
-\frac{ d  \boldsymbol h}{d \boldsymbol x} = k(\frac{l}{||\boldsymbol x||}-1)\boldsymbol I-kl||\boldsymbol x||^{-3}\boldsymbol x \boldsymbol x^T
-\end{equation}
-
-代入弹力公式得：
-\begin{equation}
-\frac{\partial  \boldsymbol f_1}{\partial \boldsymbol x_1} =\frac{\partial  \boldsymbol h(\boldsymbol x_1-\boldsymbol x_2)}{\partial \boldsymbol x_1}=k(\frac{l}{||\boldsymbol r||}-1)\boldsymbol I-kl||\boldsymbol r||^{-3}\boldsymbol r \boldsymbol r^T
-\end{equation}
-\begin{equation}
-\frac{\partial  \boldsymbol f_1}{\partial \boldsymbol x_2}=-\frac{\partial  \boldsymbol f_1}{\partial \boldsymbol x_1},
-\frac{\partial  \boldsymbol f_2}{\partial \boldsymbol x_1}=-\frac{\partial  \boldsymbol f_1}{\partial \boldsymbol x_1},
-\frac{\partial  \boldsymbol f_2}{\partial \boldsymbol x_2}=\frac{\partial  \boldsymbol f_1}{\partial \boldsymbol x_1}
-\end{equation}
-其中，$\boldsymbol r=\boldsymbol  x_1-\boldsymbol x_2$，$\boldsymbol I$为单位阵\\
-
-\subsection{加速方法\cite{Fast}}
-对于弹簧的弹性势能可以描述为一个最小化问题：
-\begin{equation}
-\frac{1}{2}k(\|\boldsymbol  p_1-\boldsymbol p_2\|-r)^2=\frac{1}{2}k\min\limits_{\|\boldsymbol d\|=r}\|\boldsymbol p_1-\boldsymbol p_2-\boldsymbol  d\|^2
-\end{equation}
-原问题转化为：
-\begin{equation}
-\boldsymbol x_{n+1}=\min\limits_{x,\boldsymbol d\in \boldsymbol U}\frac{1}{2} \boldsymbol x^T(\boldsymbol M+h^2\boldsymbol L)\boldsymbol x-h^2\boldsymbol x^T\boldsymbol J\boldsymbol d-\boldsymbol x^T\boldsymbol M\boldsymbol y
-\end{equation}
-
-其中，$\boldsymbol U=\{\boldsymbol d=(\boldsymbol d_1,\boldsymbol d_2,\cdots,\boldsymbol d_s),\boldsymbol d_s\in R^3,\|\boldsymbol d_i\|=l_i\}$（$l_i$为第$i$个弹簧的原长）\\
-
-矩阵$\boldsymbol L\in R^{3m\times 3m}$，$\boldsymbol J\in R^{3m\times 3s}$定义为：
-\begin{equation}
-\begin{aligned}
-\boldsymbol L=\left(\sum\limits_{i=1}^sk_i\boldsymbol A_i\boldsymbol A_i^T\right)\otimes\boldsymbol I_3,
-\boldsymbol J=\left(\sum\limits_{i=1}^sk_i\boldsymbol A_i\boldsymbol S_i^T\right)\otimes \boldsymbol I_3
-\end{aligned}
-\end{equation}
-
-其中$\boldsymbol A_i$为第$i$根弹簧的关联向量（如第$i$根弹簧端点序号为$i_1$和$i_2$，则$\boldsymbol A_{i,i_1}=1$，$\boldsymbol A_{i,i_2}=-1$，其余元素为0），$\boldsymbol S_i$为第$i$条弹簧的指示矩阵，$S_{i,j}=\delta_{i,j}$\\
-
-从而可以对 $\boldsymbol x$，$\boldsymbol d$ 迭代优化求得该优化问题的解：
+\subsection{从粒子插值到格点}
+\textbf{插值函数：}
 
 \begin{equation}
-\begin{aligned}
-&\mathrm{optimize}\ \boldsymbol x:(\boldsymbol M+h^2\boldsymbol L)\boldsymbol x=h^2\boldsymbol J\boldsymbol d+\boldsymbol M\boldsymbol y\\
-&\mathrm{optimize}\ \boldsymbol d:\boldsymbol d_i=l_i\frac{\boldsymbol p_{i_1}-\boldsymbol p_{i_2}}{\|\boldsymbol p_{i_1}-\boldsymbol p_{i_2}\|}
-\end{aligned}
-\end{equation}
-重复迭代直至收敛
+N(x)=\begin{cases}
+\frac{1}{2}|x|^3-x^2+\frac{2}{3}&0\leq |x|<1\\
+-\frac{1}{6}|x|^3+x^2-2|x|+\frac{4}{3}&1\leq |x|<2\\
+0&2\leq |x|
 
-\subsection{位移约束的处理}
-将所有n个质点的坐标列为列向量 $x\in R^{3n}$，将所有 m 个自由质点坐标（无约束坐标）列为列向量 $x_f\in R^{3m}$,则两者关系：
-\begin{equation}
-\begin{aligned}
-\boldsymbol x_f&=\boldsymbol K\boldsymbol x,\\  \boldsymbol x&=\boldsymbol K^T\boldsymbol x_f+\boldsymbol b\
-\end{aligned}
+\end{cases}
 \end{equation}
 
-其中 $\boldsymbol K\in R^{3m\times 3n}$ 为单位阵删去约束坐标序号对应行所得的稀疏矩阵，$\boldsymbol b$ 为与约束位移有关的向量，计算为 $\boldsymbol b=\boldsymbol x-\boldsymbol K^T\boldsymbol K\boldsymbol x$, 若约束为固定质点则 $\boldsymbol b$ 为常量。由此我们将原本的关于 $\boldsymbol x$ 的优化问题转化为对 $\boldsymbol x_f$ 的优化问题：欧拉隐式方法中求解方程为：
+\textbf{B样条函数性质：}
 \begin{equation}
-\begin{aligned}
-\boldsymbol g_1(\boldsymbol x_f) &= \boldsymbol K(\boldsymbol M(\boldsymbol x-\boldsymbol y) -h^2\boldsymbol f_{int}(\boldsymbol x)) = 0,\\
-\nabla_{\boldsymbol x_f} \boldsymbol g_1(\boldsymbol x_f) &= \boldsymbol K\nabla_{\boldsymbol x} \boldsymbol g(\boldsymbol x)\boldsymbol K^T,\\
-\end{aligned}
+\sum\limits_i w_{ip}=1
 \end{equation}
-加速方法中优化问题中 $\boldsymbol x$ 迭代步骤转化为求解关于 $x_f$ 的方程：
 \begin{equation}
-\boldsymbol K(\boldsymbol M+h^2\boldsymbol L)\boldsymbol K^T\boldsymbol x_f=\boldsymbol K(h^2\boldsymbol J \boldsymbol d+ \boldsymbol M \boldsymbol y-(\boldsymbol M+h^2\boldsymbol L)\boldsymbol b)
+\sum\limits_i w_{ip}\boldsymbol x_i=\boldsymbol x_p
 \end{equation}
 
+\textbf{格点质量计算：}\\
+质量插值：
+\begin{equation}
+m_i^n=\sum\limits_p w_{ip}^nm_p^0
+\end{equation}
+质量守恒：
+\begin{equation}
+\sum\limits_i m_i^n=\sum\limits_i\sum\limits_p w_{ip}^nm_p^0=\sum\limits_p\left(\sum\limits_i w_{ip}^n\right)m_p^0=\sum\limits_p m_p^0
+\end{equation}
+\textbf{格点速度计算：}\\
+动量插值：
+\begin{equation}
+m_i^n \boldsymbol v_i^n=\sum\limits_p w_{ip}^nm_p^0(\boldsymbol v_p^n+\boldsymbol C_p^{n+1}(x_i^n-x_i^p))
+\end{equation}
+\begin{equation}
+\boldsymbol C_p=\boldsymbol B_p(\boldsymbol D_p)^{-1}
+\end{equation}
+\begin{equation}
+\boldsymbol B_p=\sum\limits_iw_{ip}\boldsymbol v_i(x_i-x_p)^T
+\end{equation}
+\begin{equation}
+\boldsymbol D_p=\sum\limits_i w_{ip}\boldsymbol v_i(x_i-x_p)(x_i-x_p)^T
+\end{equation}
+计算格点速度：
+\begin{equation}
+\boldsymbol v_i^n=\frac{m_i^n\boldsymbol v_i^n}{m_i^n}
+\end{equation}
+\pagebreak
+\subsection{更新格点信息}
+\textbf{格点受力计算}
+\begin{equation}
+\boldsymbol f_i^n=-\frac{\partial \Psi^n}{\partial \boldsymbol x_i^n}=-\sum\limits_p N_i(x_p^n)V_p^0M_p^{-1}\frac{\partial \psi_p^n(F_p^n)}{\partial \boldsymbol x_i^n}(x_i^n-x_i^p)
+\end{equation}
+\textbf{格点速度更新}
+\begin{equation}
+v_i^{n+1}=v_i^n+\frac{\boldsymbol f_i^n+\boldsymbol f^n_{iext}}{m_i^n}\Delta t
+\end{equation}
+
+\textbf{碰撞处理}
+仅对在边界附近的格点进行处理
+
+\subsection{从格点插值到粒子}
+\textbf{粒子速度}
+速度插值：
+\begin{equation}
+\boldsymbol v_p^{n+1}=\sum\limits_iw_{ip}^n\boldsymbol v_i^{n+1}
+\end{equation}
+
+\subsection{更新粒子信息}
+\textbf{粒子位置更新}
+\begin{equation}
+\boldsymbol x_p^{n+1}=\boldsymbol x_p^n+\boldsymbol v_p^{n+1}\Delta t
+\end{equation}
+\textbf{形变梯度更新}
+\begin{equation}
+F_p^{n+1}=(I+\Delta t\boldsymbol C_p^{n+1})F_p^n
+\end{equation}
 %------------------------------------------------
 \pagebreak
-\section{设计难点与解决}
+\section{仿真结果与分析}
+由于仿真视频数量较多占空间较大，所有视频可以在网页\url{http://home.ustc.edu.cn/~chaf/material/CG/demo/CG_Demo.html}上查看，或是通过百度云链接\url{https://pan.baidu.com/s/1Nzll2CPjqrpdODclYtoV8w}进行下载（提取码：6ens）
+\subsection{模拟场景的构建}
+\subsubsection{喷泉}
+利用Sample中的喷水demo，修改喷水口大小和位置即可得到竖直向上的传统喷泉
 
-\subsection{隐式欧拉收敛性问题}
-使用普通隐式欧拉方法时，当stiff设置比较大时容易发生顶点的大幅度偏移直至无法复原，检查每次迭代的增量发现计算并没有往最优解方向收敛，之后尝试将时间步长h调小，可以一定程度上缓解，而使用加速方法进行迭代则没有这种情况发生。
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.9\columnwidth]{fountain.png} % Example image
+	\caption{喷泉}
+\end{figure}
+\pagebreak
+\subsubsection{三彩喷泉}
+添加三种不同颜色的喷泉，观察不同液体之间的交互过程
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.55\columnwidth]{3_fountain.png} % Example image
+	\caption{开始不久}
+	
+	\centering
+	\includegraphics[width=0.55\columnwidth]{3_fountain_1.png} % Example image
+	\caption{一段时间后}
+\end{figure}
+\pagebreak
+\subsubsection{不同材料的喷泉}
+将喷泉材料设置为：液体、弹性物质、雪的材质
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.55\columnwidth]{material.png} % Example image
+	\caption{开始不久}
+	
+	\centering
+	\includegraphics[width=0.55\columnwidth]{material1.png} % Example image
+	\caption{一段时间后}
+\end{figure}
 
-\subsection{使用带约束的加速方法时设置固定点与实际固定点不符}
-进行位移约束时需要构造一个单位阵删去约束坐标序号对应行所得的稀疏矩阵，由于采用循环删除，循环过程中矩阵行数发生变化而删除索引未作相应改变导致出错。
+酷似水，绳子和牙膏
 
-\subsection{收敛条件}
-计算每次迭代所有点增量的平均值，当平均增量小于1e-4时认为收敛，停止迭代，更新速度和位移。
+\pagebreak
+\subsubsection{喷泉冲击弹性物体}
+用四个喷泉从四个方向喷击方形弹性物体，观察不同物质之间的交互过程
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.55\columnwidth]{fountain_cube.png} % Example image
+	\caption{开始不久}
+	
+	\centering
+	\includegraphics[width=0.55\columnwidth]{fountain_cube_1.png} % Example image
+	\caption{一段时间后}
+\end{figure}
 
-\subsection{矩阵预分解}
-使用Eigen库的LDLT稀疏矩阵分解
+\pagebreak
+\subsubsection{弹性马}
+本来想实现PPT提供的Demo中的弹性马：
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=1\columnwidth]{horse.png} % Example image
+	\caption{demo}
+\end{figure}
+
+未成功，做了个高仿的：
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=1\columnwidth]{horse_1.png} % Example image
+	\caption{自己实现的}
+\end{figure}
+
+\pagebreak
+\subsection{探索参数空间}
+\subsubsection{杨氏模量E对弹性体碰撞性质的影响}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\columnwidth]{Jelly_E.png} % Example image
+	\caption{初始状态}
+	
+	\centering
+	\includegraphics[width=0.9\columnwidth]{Jelly_E1.png} % Example image
+	\caption{接触瞬间}
+	
+	\centering
+	\includegraphics[width=0.9\columnwidth]{jelly_E2.png} % Example image
+	\caption{弹起后}
+\end{figure}
+
+杨氏模量的公式为：$E=\sigma/\varepsilon$，其中，$E$表示杨氏模量，$\sigma$表示正向应力，$\varepsilon$表示正向应变。杨氏模量越大，在受到相同应力情况下，材料形变越小。从仿真结果可看出，在杨氏模量很小的情况下，弹性块直接被压扁了无法复原。在接触地面时，杨氏模量大的物块形变量小，更早的弹起.
+
+
+\pagebreak
+\subsubsection{杨氏模量E对雪块碰撞性质的影响}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=1\columnwidth]{E1.png} % Example image
+	\caption{初始状态}
+	
+	\centering
+	\includegraphics[width=1\columnwidth]{E2.png} % Example image
+	\caption{末状态}
+\end{figure}
+
+雪块碰撞地面不会发生弹起，当杨氏模量较小时，内部弹力很小，直接被压扁。当杨氏模量稍大时，雪块会碎开。继续增大杨氏模量，当雪块与地面发生撞击时会发生爆炸，这可能与仿真采样时间使得各粒子某时刻相聚过近导致应力急剧增大所致。
+
+\pagebreak
+\subsubsection{粒子数对不同材料物体仿真的影响}
+
+实验使用同一个弹性小球以较大速度向下射击几块具有相同的较大体积、由不同材质、不同粒子数量构成的物体\\
+
+\textbf{弹性材料}
+\begin{figure}[h]
+		\centering
+	\includegraphics[width=0.9\columnwidth]{jelly_num2.png} % Example image
+	\caption{射入后某个时间点}
+\end{figure}
+
+可以看出粒子数量越多，相同时间内可射入深度越小，当粒子数目为$5\times 10^5$时甚至接近无形变即刚体了。
+
+\pagebreak
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\columnwidth]{jelly_num3.png} % Example image
+	\caption{弹起后}
+\end{figure}
+
+当粒子数目为$5\times 10^2$和$5\times 10^3$时小球因速度过大在与地面接触后压扁，粒子数目为$5\times 10^4$时小球与物体粘连起来，这可能是接触瞬间速度过快导致瞬时粒子之间距离过小导致边界模糊，而当粒子数目为$5\times10^5$时，粒子重新弹起。当粒子能够重新弹起时，大体积物块会获得一部分能量导致振动等现象，因此小球能量会损耗
 
 \pagebreak
 
-\section{实验效果}
-
-\subsection{布料仿真效果}
-\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+\textbf{雪质材料}
+\begin{figure}[h]
 	\centering
-	\includegraphics[width=0.5\columnwidth]{dense1.png} % Example image
-	\caption{稠密布料}
-\end{figure}
-\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
-	\centering
-	\includegraphics[width=0.5\columnwidth]{sparse.png} % Example image
-	\caption{稀疏布料}
+	\includegraphics[width=0.9\columnwidth]{snow_num1.png} % Example image
+	\caption{射入后某个时间点}
 \end{figure}
 
-详见demo1.gif和demo7.gif
-\pagebreak
-\subsection{固体质量块仿真效果}
-\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
-	\centering
-	\includegraphics[width=0.5\columnwidth]{cube.png} % Example image
-	\caption{cube}
-\end{figure}
-\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
-	\centering
-	\includegraphics[width=0.5\columnwidth]{cube1.png} % Example image
-	\caption{劲度系数较小时的变形}
-\end{figure}
-详见demo2.gif和demo6.gif
+当粒子数量多时，雪同样不易变形，对于粒子数少的情况，小球可以很容易地射到底部，而对于粒子数量很多的情况下已经开始有上升趋势
 
 \pagebreak
-\subsection{“布脸”}
-\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+\begin{figure}[h]
 	\centering
-	\includegraphics[width=0.5\columnwidth]{face1.png} % Example image
-	\caption{初态}
+	\includegraphics[width=0.9\columnwidth]{snow_num2.png} % Example image
+	\caption{弹起后}
 \end{figure}
-\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+
+粒子数少的情况下，小球轻易地射穿并重新弹起；粒子数量为$5\times 10^4$时，小球动能完全被吸收，转化为雪非弹性形变获得的内能（粒子微观动能）；而当粒子数量为$5\times 10^5$时，雪的形变很少，小球内能损耗减少，故依旧可以重新弹起，此时雪和之前的弹性体一样，趋于刚体
+
+\pagebreak
+\textbf{流体材料}
+\begin{figure}[h]
 	\centering
-	\includegraphics[width=0.5\columnwidth]{face2.png} % Example image
+	\includegraphics[width=0.9\columnwidth]{fluid_num1.png} % Example image
+	\caption{射入后某个时间点}
+\end{figure}
+
+该时间点下，粒子数量$5\times 10^2$情况下小球以较大速度撞击地面压扁，粒子数$5\times10^3$时已重新弹起。结合后两种情况可以看出粒子数量越大，小球在流体中运动的能量损失越大，这是由于粒子数量越大，在流体与小球接触面内与小球接触的流体粒子数越多，小球与粒子相互碰撞能量交换更加频繁，能量损失越多
+
+\pagebreak
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.9\columnwidth]{fluid_num2.png} % Example image
 	\caption{末态}
 \end{figure}
-详见demo3.gifh
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.2\columnwidth]{water.png} % Example image
+	\caption{现实情况}
+\end{figure}
 
 \pagebreak
-\subsection{“变形怪”}
-\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+\subsection{物理场景模拟}
+
+\subsubsection{不同材质的球相互碰撞}
+\begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.5\columnwidth]{dito.png} % Example image
-	\caption{初态}
+	\includegraphics[width=1\columnwidth]{ball1.png} % Example image
+	\caption{开始时}
+		\centering
+	\includegraphics[width=1\columnwidth]{ball2.png} % Example image
+	\caption{第一次碰撞后}
+		\centering
+	\includegraphics[width=1\columnwidth]{ball3.png} % Example image
+	\caption{一段时间后}
 \end{figure}
-\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
-	\centering
-	\includegraphics[width=0.5\columnwidth]{dito1.png} % Example image
-	\caption{变形}
-\end{figure}
-详见demo4.gif
 
 \pagebreak
-\subsection{劲度系数测试}
-\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+\subsubsection{弹性小球撞击三种材质物体}
+\begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.5\columnwidth]{stiff.png} % Example image
-	\caption{stiff}
-\end{figure}
-详见demo5.gif
-
-\subsection{对某一点施加外力}
-
-\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\includegraphics[width=1\columnwidth]{hit1.png} % Example image
+	\caption{开始时}
 	\centering
-	\includegraphics[width=0.5\columnwidth]{fext.png} % Example image
-	\caption{Fext}
+	\includegraphics[width=1\columnwidth]{hit2.png} % Example image
+	\caption{第一次碰撞后}
+	\centering
+	\includegraphics[width=1\columnwidth]{hit3.png} % Example image
+	\caption{一段时间后}
 \end{figure}
-详见demo8.gif
 
 \pagebreak
-\section{总结}
-本次实验提供的资料比较全面，实现起来不会有很多疑惑，实验效果也比较直观生动，也希望今后能有机会做更多有趣的、有挑战性的仿真工作
+\subsubsection{不同形状的弹性体射入流体中}
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=1.1\columnwidth]{shape1.png} % Example image
+	\caption{开始时}
+	
+\end{figure}
+\pagebreak
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=1.1\columnwidth]{shape2.png} % Example image
+	\caption{接触后}
+\end{figure}
+\pagebreak
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=1.1\columnwidth]{shape3.png} % Example image
+	\caption{一段时间后}
+\end{figure}
+
+可见物体与流体的接触面积越大，所受作用力越大，原本想用三角形代替一下“流线型”，然而事实上接触面更大了，随着角度的逐渐倾斜，阻力也越来越大，最终效果不如球和矩形
+
+\pagebreak
 
 \bibliographystyle{unsrt}
 \bibliography{bibfile}
