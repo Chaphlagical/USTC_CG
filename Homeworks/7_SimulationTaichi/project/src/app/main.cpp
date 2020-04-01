@@ -241,6 +241,7 @@ void add_object_rectangle(Vec v1, Vec v2, int c, int num = 500, Vec velocity = V
     }
 }
 
+//  jelly horse
 void add_object_horse(Vec v, int c, int num=2000, Vec velocity = Vec(10.0, 0), int ptype = 1)
 {
     int i = 0;
@@ -288,6 +289,29 @@ void add_object_circle(Vec v, real r, int c, int num = 1000, Vec velocity = Vec(
     }
 }
 
+void add_object_triangle(Vec v1, Vec v2, int c, int num = 500, Vec velocity = Vec(0.0_f), int ptype = 2)
+{
+    Vec box_min(min(v1.x, v2.x), min(v1.y, v2.y)), box_max(max(v1.x, v2.x), max(v1.y, v2.y));
+    int i = 0;
+    while (i < num) {
+        auto pos = Vec::rand();
+        if (pos.x > box_min.x&& pos.y > box_min.y&& pos.x < box_max.x && pos.y < box_max.y) {
+            real mid_x = (box_min.x + box_max.x) / 2;
+            if ((pos.y - box_max.y) * (mid_x - box_min.x) - (box_min.y - box_max.y) * (pos.x - box_min.x) > 0)
+            {
+                if ((pos.y - box_max.y) * (mid_x - box_max.x) - (box_min.y - box_max.y) * (pos.x - box_max.x) < 0)
+                {
+                    particles.push_back(Particle(pos, c, velocity, ptype));
+                    i++;
+                }
+            }
+
+
+
+        }
+    }
+}
+
 void add_jet(Vec v1, Vec v2, int c, Vec vel, int ptype) {
     add_object_rectangle(v1, v2, c, 10, vel, ptype);
     //add_object_rectangle(Vec(0.5, 0.5), Vec(0.51, 0.51), 0x87CEFA, 10, Vec(0.0, -10.0));
@@ -299,19 +323,14 @@ int main() {
   GUI gui("Real-time 2D MLS-MPM", window_size, window_size);
   auto &canvas = gui.get_canvas();
 
-  //add_object_circle(Vec(0.50,0.80), 0.02, 0x00FF00, 1000, Vec(0,-10), 1);
-  add_object_circle(Vec(0.50, 0.90), 0.02, 0x00FF00, 1000, Vec(0.0, -70.0), 1);
-  //add_object_circle(Vec(0.90, 0.90), 0.05, 0xFAFAFA, 1000, Vec(-20, -10), 2);
-  //add_object_circle(Vec(0.10, 0.45), 0.05, 0xFAFAFA, 1000, Vec(20, 10), 2);
-  //add_object_circle(Vec(0.90, 0.45), 0.05, 0xFAFAFA, 1000, Vec(-20, 10), 2);
+  //add_object_circle(Vec(0.50, 0.90), 0.02, 0x00FF00, 1000, Vec(0.0, -20.0), 1);
+  //add_object_triangle(Vec(0.45,0.85), Vec(0.55,0.95), 0x00FF00,1000, Vec(0,-20));
+  add_object_rectangle(Vec(0.40, 0.88), Vec(0.60, 0.92), 0x00FF00, 1000, Vec(0.0, -20.0), 1);
   //add_object_horse(Vec(0.20, 0.04), 0xFAFAFA);
-  add_object_rectangle(Vec(0.05, 0.04), Vec(0.95, 0.34), 0xFAFAFA, 500000, Vec(0.0,0.0), 2);
-  //add_object_rectangle(Vec(0.80, 0.04), Vec(0.90, 0.14), 0xFCFCFC, 5000, Vec(-10.0, 0.0), 1);
-  //add_object(Vec(0.45,0.15), 0xF2B134, 1);
-  //add_object(Vec(0.55,0.85), 0x068587, 1);
+  add_object_rectangle(Vec(0.05, 0.04), Vec(0.95, 0.54), 0x1E90FF, 50000, Vec(0.0,0.0), 0);
+
 
   int frame = 0;
-  Sleep(2000);
   // Main Loop
   for (int step = 0;; step++) {
     // Advance simulation
@@ -336,16 +355,11 @@ int main() {
       /*if (step < 2e3)
       {
           add_jet(Vec(0.05, 0.14), Vec(0.06, 0.15), 0x87CEFA, Vec(40.0, 0.0), 0);
-          //cout << "aaaaaaaaaaaaa" << endl;
-          //add_jet(Vec(0.05, 0.48), Vec(0.06, 0.52), 0xED553B, Vec(30.0, 0.0), 0);
-          //add_jet(Vec(0.48, 0.04), Vec(0.52, 0.05), 0x87CEFA, Vec(0.0, 40.0), 0);
-          //add_jet(Vec(0.48, 0.90), Vec(0.52, 0.91), 0xB23AEE, Vec(0.0, -10.0), 0);
-          //add_jet(Vec(0.90, 0.48), Vec(0.91, 0.52), 0x7FFF00, Vec(-30.0, 0.0), 0);
       }*/
       // Update image
       gui.update();
 
-      canvas.img.write_as_image(fmt::format("bullet_snow_very_dense_500000/{:05d}.png", frame++));
+      canvas.img.write_as_image(fmt::format("flat_shoot/{:05d}.png", frame++));
       /////////////////////////////////////////////////////////////////////////////////
     }
   }
