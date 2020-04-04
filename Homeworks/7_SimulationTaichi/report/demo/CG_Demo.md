@@ -2,6 +2,10 @@
 
 <p align="right">——by 58 陈文博</p>
 
+<audio id="audio" controls="" preload="none" autoplay="autoplay">
+      <source id="mp3" src="bg.mp3">
+      </audio>
+
 ## Scene Design
 
 ### Water Fountain
