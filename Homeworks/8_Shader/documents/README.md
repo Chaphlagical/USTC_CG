@@ -14,7 +14,7 @@
 
 典型使用方式如下
 
-![normal_map_usage](https://cdn.jsdelivr.net/gh/Ubpa/USTC_CG_Data@master/Homeworks/08_Shader/normal_map_usage.jpg)
+![normal_map_usage](../report/Figures/normal_map_usage.jpg)
 
 其中法线贴图在渲染中用于改变原法向，从而影响着色效果。
 
@@ -30,7 +30,7 @@
 
 典型使用方式如下
 
-![displacement_map_usage](https://cdn.jsdelivr.net/gh/Ubpa/USTC_CG_Data@master/Homeworks/08_Shader/displacement_map_usage.jpg)
+![displacement_map_usage](../report/Figures/displacement_map_usage.jpg)
 
 其中置换贴图用于改变顶点的位置，0 （黑色）表示不动，1（白色）表示沿着法向偏移。
 

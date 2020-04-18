@@ -10,6 +10,9 @@
 #include "../../tool/SimpleLoader.h"
 
 #include <iostream>
+#include <map>
+#include <vector>
+#include "ANN/ANN.h"
 
 using namespace Ubpa;
 
@@ -200,7 +203,25 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(Camera::Movement::DOWN, deltaTime);
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        have_denoise = !have_denoise;
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        {
+            have_denoise = !have_denoise;
+            std::cout << have_denoise << std::endl;
+        }
+
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+        if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+        {
+            displacement_lambda += 0.01;
+            std::cout << displacement_lambda << std::endl;
+        }
+         
+    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+        if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+        {
+            displacement_lambda -= 0.01;
+            std::cout << displacement_lambda << std::endl;
+        }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -276,12 +297,139 @@ gl::Texture2D loadTexture(char const* path)
 }
 
 gl::Texture2D genDisplacementmap(const SimpleLoader::OGLResources* resources) {
-    const float* displacementData = new float[1024 * 1024];
+    float* displacementData = new float[1024 * 1024];
     // TODO: HW8 - 1_denoise | genDisplacementmap
     // 1. set displacementData with resources's positions, indices, normals, ...
     // 2. change global variable: displacement_bias, displacement_scale, displacement_lambda
-
     // ...
+    std::map<size_t, std::vector<size_t>>fix_map;
+
+    for (size_t i = 0; i < resources->positions.size(); i++)
+    {
+        for (size_t j = 0; j < resources->positions.size(); j++)
+        {
+            if (resources->positions[i].distance(resources->positions[j])<1e-5&&i!=j)
+            {
+                if (!fix_map.count(i))
+                {
+                    fix_map[i] = std::vector<size_t>();
+                }
+                fix_map[i].push_back(j);
+            }
+        }
+    }
+    std::cout << "finfish fix map" << std::endl;
+
+    std::vector<pointf3> sum_list(resources->positions.size()); 
+    std::vector<float> N_list(resources->positions.size());
+    std::vector<vecf3> delta_list(resources->positions.size());
+    std::map<int, std::map<int, pointf3>> connect_map;
+    std::map<pointi2, float> data_map;
+
+    for (size_t i = 0; i < resources->positions.size(); i++)
+    {
+        sum_list[i] = pointf3(0, 0, 0);
+        N_list[i] = 0;
+    }
+    
+    for (size_t k = 0; k < resources->indices.size(); k += 3)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+
+            int point_idx = resources->indices[k + i];
+            
+            if (!connect_map.count(point_idx))
+                connect_map[point_idx] = std::map<int, pointf3>();
+            for (int j = 0; j < 3; j++)
+            {
+                int temp_idx = resources->indices[k + j];
+                connect_map[point_idx][temp_idx] = resources->positions[temp_idx];    
+            }            
+        }
+    }
+
+    for (auto i : connect_map)
+    {
+        for (auto j : i.second)
+        {
+            sum_list[i.first] = (sum_list[i.first].cast_to<vecf3>() + connect_map[i.first][j.first].cast_to<vecf3>()).cast_to<pointf3>();
+            N_list[i.first]++;
+        }
+    }
+
+    float max_val = -INFINITY;
+    float min_val = INFINITY;
+
+    for (size_t i = 0; i < delta_list.size(); i++)
+    {
+        delta_list[i] = resources->positions[i].cast_to<vecf3>() - 1 / N_list[i] * sum_list[i].cast_to<vecf3>();
+        float val = delta_list[i].dot(resources->normals[i].cast_to<vecf3>());
+        if(fix_map.count(i))
+        {
+            for (auto x : fix_map[i])
+            {
+                delta_list[x] = resources->positions[x].cast_to<vecf3>() - 1 / N_list[x] * sum_list[x].cast_to<vecf3>();
+                val += delta_list[x].dot(resources->normals[x].cast_to<vecf3>());
+            }
+            val /= fix_map.size()+1;
+        }
+       
+        pointf2 texcoord = resources->texcoords[i];
+        if (texcoord[0] >= 0 && texcoord[1] >= 0)
+        {
+            displacementData[long(texcoord[0] * 1024) * 1024 + long(texcoord[1] * 1024)]=val;
+        }
+        data_map[pointi2(int(texcoord[0] * 1024), int(texcoord[1] * 1024))]=val;
+
+        max_val = max_val < val ? val : max_val;
+        min_val = min_val > val ? val : min_val;
+    }
+    
+    //  Set parameter
+    displacement_scale = max_val - min_val;
+    displacement_bias = min_val;
+    displacement_lambda = 0.75;
+
+
+    // Fill the map data
+    int count = 1;
+    int threshold = 100;
+    ANNpointArray dataPts = annAllocPts(1024*1024, 2);
+    int nPts = 0;
+    for (auto i : data_map)
+    {
+        dataPts[nPts][0] = i.first[0];
+        dataPts[nPts][1] = i.first[1];
+        nPts++;
+    }
+    ANNkd_tree* kdtree = new ANNkd_tree(dataPts, nPts, 2);
+    for (int i = 0; i < 1024; i++)
+    {
+        for (int j = 0; j < 1024; j++)
+        {
+            float vals = 0;
+            ANNpoint pt = annAllocPt(2);
+            ANNidxArray index = new ANNidx[count];
+            ANNdistArray dist = new ANNdist[count];
+            pt[0] = i;
+            pt[1] = j;
+            kdtree->annkSearch(pt, count, index, dist, 0);
+
+            for (int m = 0; m < count; m++)
+            {
+                int x = dataPts[index[m]][0];
+                int y = dataPts[index[m]][1];
+                float val = data_map[pointi2(x,y)];
+                 vals += val;
+            }
+            displacementData[1024 * j + i] = (vals/count - displacement_bias) / displacement_scale;
+
+            delete[] index;
+            delete[] dist;
+        }
+    }
+    delete kdtree;
 
     gl::Texture2D displacementmap;
     displacementmap.SetImage(0, gl::PixelDataInternalFormat::Red, 1024, 1024, gl::PixelDataFormat::Red, gl::PixelDataType::Float, displacementData);

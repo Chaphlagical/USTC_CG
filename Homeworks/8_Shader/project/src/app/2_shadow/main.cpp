@@ -10,6 +10,9 @@
 #include "../../tool/SimpleLoader.h"
 
 #include <iostream>
+#include <vector>
+
+using std::vector;
 
 using namespace Ubpa;
 
@@ -90,11 +93,57 @@ int main()
     rgbf ambient{ 0.2f,0.2f,0.2f };
     light_shadow_program.SetTex("albedo_texture", 0);
     light_shadow_program.SetTex("shadowmap", 1);
-    light_shadow_program.SetVecf3("point_light_pos", { 0,5,0 });
+    light_shadow_program.SetVecf3("point_light_pos", { -2.0f, 4.0f, -1.0f });
     light_shadow_program.SetVecf3("point_light_radiance", { 100,100,100 });
     light_shadow_program.SetVecf3("ambient_irradiance", ambient);
     light_shadow_program.SetFloat("roughness", 0.5f );
     light_shadow_program.SetFloat("metalness", 0.f);
+
+    // plane
+    // ------------------------------------------------------------------
+    vector<pointf3> positions;
+    vector<pointf2> texcoords;
+    vector<normalf> normals;
+    vector<vecf3> tangents;
+    vector<GLuint> indices;
+    constexpr size_t N = 200;
+    const pointf3 LBCorner{ -200,0,200 };
+    const vecf3 right{ 400,0,0 };
+    const vecf3 up{ 0,0,-400 };
+    for (size_t j = 0; j <= N; j++) {
+        float v = j / static_cast<float>(N);
+        for (size_t i = 0; i <= N; i++) {
+            float u = i / static_cast<float>(N);
+            positions.push_back(LBCorner + u * right + v * up);
+            texcoords.emplace_back(u, v);
+            normals.emplace_back(0, 1, 0);
+            tangents.emplace_back(1, 0, 0);
+        }
+    }
+    for (size_t j = 0; j < N; j++) {
+        for (size_t i = 0; i < N; i++) {
+            size_t two_tri[6] = {
+                j * (N + 1) + i, j * (N + 1) + i + 1, (j + 1) * (N + 1) + i,
+                (j + 1) * (N + 1) + i + 1,(j + 1) * (N + 1) + i,j * (N + 1) + i + 1
+            };
+            for (auto idx : two_tri)
+                indices.push_back(static_cast<GLuint>(idx));
+        }
+    }
+    gl::VertexBuffer vb_pos(positions.size() * sizeof(pointf3), positions[0].data());
+    gl::VertexBuffer vb_uv(texcoords.size() * sizeof(pointf2), texcoords[0].data());
+    gl::VertexBuffer vb_n(normals.size() * sizeof(normalf), normals[0].data());
+    gl::VertexBuffer vb_t(tangents.size() * sizeof(vecf3), tangents[0].data());
+    gl::ElementBuffer eb(gl::BasicPrimitiveType::Triangles, indices.size() / 3, indices.data());
+
+    gl::VertexArray::Format format;
+    format.attrptrs.push_back(vb_pos.AttrPtr(3, gl::DataType::Float, false, sizeof(pointf3)));
+    format.attrptrs.push_back(vb_uv.AttrPtr(2, gl::DataType::Float, false, sizeof(pointf2)));
+    format.attrptrs.push_back(vb_n.AttrPtr(3, gl::DataType::Float, false, sizeof(normalf)));
+    format.attrptrs.push_back(vb_t.AttrPtr(3, gl::DataType::Float, false, sizeof(vecf3)));
+    format.eb = &eb;
+    gl::VertexArray plane({ 0,1,2,3 }, format);
+
 
     // load model
     // ------------------------------------------------------------------
@@ -177,7 +226,7 @@ int main()
         light_shadow_program.Active(1, &shadowmap);
 
         // pass projection matrix to shader (note that in this case it could change every frame)
-        transformf projection = transformf::perspective(to_radian(camera.Zoom), (float)scr_width / (float)scr_height, 0.1f, 100.f);
+        transformf projection = transformf::perspective(to_radian(camera.Zoom), (float)scr_width / (float)scr_height, 0.1f, 100.0f);
         light_shadow_program.SetMatf4("projection", projection);
 
         // camera/view transformation
@@ -186,6 +235,12 @@ int main()
         // TODO: HW8 - 2_Shadow | set uniforms about shadow
         light_shadow_program.SetBool("have_shadow", have_shadow);
         // near plane, far plane, projection, ...
+        GLfloat near_plane = 1.0f, far_plane = 7.5f;
+        transformf lightProjection = transformf::orthographic(20.0f, 20.0f, near_plane, far_plane);
+        transformf lightView = transformf::look_at(pointf3(-2.0f, 4.0f, -1.0f), pointf3(0.0f, 0.0f, 0.0f), vecf3(0.0f, 1.0f, 0.0f));
+        transformf lightSpaceMatrix = lightProjection * lightView;
+
+        light_shadow_program.SetMatf4("lightSpaceMatrix", lightSpaceMatrix);
 
         for (unsigned int i = 0; i < 10; i++)
         {
@@ -195,6 +250,10 @@ int main()
             light_shadow_program.SetMatf4("model", model);
             spot->va->Draw(&light_shadow_program);
         }
+
+        transformf model(pointf3(0.0f, -4.0f, 0.0f), quatf{ vecf3(1.0f, 0.3f, 0.5f), to_radian(10.f) });
+        light_shadow_program.SetMatf4("model", model);
+        plane.Draw(&light_shadow_program);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

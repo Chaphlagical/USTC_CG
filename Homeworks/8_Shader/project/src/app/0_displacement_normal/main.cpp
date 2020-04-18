@@ -23,6 +23,7 @@ gl::Texture2D loadTexture(char const* path);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+bool havedisplacement = false;
 
 // camera
 Camera camera(pointf3(0.0f, 0.0f, 3.0f));
@@ -85,7 +86,7 @@ int main()
     program.SetTex("albedo_texture", 0);
     program.SetTex("normalmap", 1);
     program.SetTex("displacementmap", 2);
-    program.SetFloat("displacement_coefficient", 0.2f);
+    program.SetFloat("displacement_coefficient", 0.05f);
     program.SetVecf3("point_light_pos", { 0,10,0 });
     program.SetVecf3("point_light_radiance", { 200,200,200 });
     program.SetVecf3("ambient_irradiance", ambient);
@@ -154,9 +155,9 @@ int main()
 
     // load and create a texture 
     // -------------------------
-    gl::Texture2D checkerboard = loadTexture("../data/textures/checkerboard.png");
-    gl::Texture2D normalmap = loadTexture("../data/textures/cg_normalmap.jpg");
-    gl::Texture2D displacementmap = loadTexture("../data/textures/cg_displacementmap.jpg");
+    gl::Texture2D checkerboard = loadTexture("../data/textures/ustc.png");
+    gl::Texture2D normalmap = loadTexture("../data/textures/ustc_normalmap.jpg");
+    gl::Texture2D displacementmap = loadTexture("../data/textures/ustc_displacementmap.jpg");
 
     // render loop
     // -----------
@@ -191,6 +192,8 @@ int main()
         // camera/view transformation
         program.SetMatf4("view", camera.GetViewMatrix());
 
+        program.SetBool("havedisplacement", havedisplacement);
+
         // render boxes
         for (size_t i = 0; i < 10; i++)
         {
@@ -200,6 +203,9 @@ int main()
             program.SetMatf4("model", model);
             plane.Draw(&program);
         }
+
+        float angle = 10.f * (float)glfwGetTime();
+        program.SetFloat("angle", sin(angle));
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -235,6 +241,8 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(Camera::Movement::UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
         camera.ProcessKeyboard(Camera::Movement::DOWN, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        havedisplacement = !havedisplacement;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

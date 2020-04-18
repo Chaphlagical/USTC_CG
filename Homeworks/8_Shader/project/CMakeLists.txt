@@ -60,7 +60,15 @@ if(TARGET glfw)
 	message(STATUS "glfw3_DIR: ${glfw3_DIR}")
 endif()
 
+
 include_directories(${PROJECT_SOURCE_DIR}/include/_deps/)
+
+link_directories (
+	${PROJECT_SOURCE_DIR}/lib
+	# $ENV{XXX_LIB_PATH}
+	# ...
+)
+link_libraries(ANN.lib)
 
 Ubpa_AddDep(UGL 0.1.3)
 
