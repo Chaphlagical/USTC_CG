@@ -147,6 +147,7 @@ namespace Ubpa::detail::GenScene_ {
         mat_wall_up->SetMaterial(new stdBRDF{ rgbf{0.8f} });
         mat_wall_down->SetMaterial(new stdBRDF{ rgbf{0.8f} });
         mat_wall_back->SetMaterial(new stdBRDF{ rgbf{0.8f} });
+        //mat_wall_back->SetMaterial(new stdBRDF{ rgbf{0.8f},nullptr,0.f });
 
         wall_left->Get<Cmpt::Position>()->value = { -1,0,0 };
         wall_left->Get<Cmpt::Rotation>()->value = { vecf3{0,0,1},to_radian(-90.f) };

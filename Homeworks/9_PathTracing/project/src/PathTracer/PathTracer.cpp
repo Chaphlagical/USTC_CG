@@ -38,6 +38,7 @@ void PathTracer::Run() {
 				rayf3 r = cam->GenRay(u, v, ccs);
 				rgbf Lo = Shade(intersectors, intersectors.clostest.Visit(&bvh, r), -r.dir, true);
 				img->At<rgbf>(i, j) += Lo / spp;
+				//cout << i << " " << j << " " << endl;
 			}
 		}
 		float progress = (j + 1) / float(img->height);
@@ -70,12 +71,14 @@ rgbf PathTracer::Shade(const Intersectors& intersectors, const IntersectorCloses
 	constexpr rgbf todo_color = rgbf{ 0.f,1.f,0.f };
 	constexpr rgbf zero_color = rgbf{ 0.f,0.f,0.f };
 
+
+
+	//rgbf todo_color = rgbf{ 1.f,1.f,1.f };
+
 	if (!intersection.IsIntersected()) {
 		if (last_bounce_specular && env_light != nullptr) {
 			// TODO: environment light
-			
-
-			return todo_color;
+			return env_light->Radiance(-wo);
 		}
 		else
 			return zero_color;
@@ -91,7 +94,8 @@ rgbf PathTracer::Shade(const Intersectors& intersectors, const IntersectorCloses
 
 			// TODO: area light (!last_bounce_specular)
 
-			return todo_color;
+
+			return area_light->color;
 		}else
 			return zero_color;
 	}
@@ -106,20 +110,38 @@ rgbf PathTracer::Shade(const Intersectors& intersectors, const IntersectorCloses
 			// TODO: L_dir of environment light
 			// - only use SampleLightResult::L, n, pd
 			// - SampleLightResult::x is useless
+			float cos_theta = sample_light_rst.n.cast_to<vecf3>().dot(wo) / (sample_light_rst.n.cast_to<vecf3>().norm() * wo.norm());
+
+			L_dir += sample_light_rst.L / sample_light_rst.pd*cos_theta;
 		}
 		else {
 			// TODO: L_dir of area light
+			float cos_theta = sample_light_rst.n.cast_to<vecf3>().dot(wo) / (sample_light_rst.n.cast_to<vecf3>().norm() * wo.norm());
+
+			L_dir += sample_light_rst.L * sample_light_rst.pd * cos_theta;
 		}
 	});
 
 	// TODO: Russian Roulette
 	// - rand01<float>() : random in [0, 1)
+	float pdf_RR = rand01<float>();
+	float pdf_hemi = 1 / (2 * PI<float>);
 
 	// TODO: recursion
 	// - use PathTracer::SampleBRDF to get wi and pd (probability density)
 	// - use PathTracer::BRDF to get BRDF value
+	std::tuple<vecf3, float> t_ = PathTracer::SampleBRDF(intersection, wo);
+	auto wi = std::get<0>(t_);
+	auto pd = std::get<1>(t_);
+	rgbf f_r = PathTracer::BRDF(intersection, wi, wo);
+	rayf3 r(intersection.pos,wi);
+	float cos_theta = intersection.n.cast_to<vecf3>().dot(wo) / (intersection.n.cast_to<vecf3>().norm() * wo.norm());
 
-	return todo_color; // TODO: combine L_dir and L_indir
+
+	L_indir = Shade(intersectors, intersectors.clostest.Visit(&bvh, r), -wi, last_bounce_specular)/pdf_RR/pdf_hemi;
+
+	//return env_light->color;
+	return L_dir+L_indir; // TODO: combine L_dir and L_indir
 }
 
 PathTracer::SampleLightResult PathTracer::SampleLight(const Cmpt::Light* light, const Cmpt::L2W* l2w, const Cmpt::SObjPtr* ptr) {
