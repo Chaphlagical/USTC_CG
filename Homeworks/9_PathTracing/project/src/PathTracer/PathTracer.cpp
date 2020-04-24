@@ -73,6 +73,7 @@ rgbf PathTracer::Shade(const Intersectors& intersectors, const IntersectorCloses
 	if (!intersection.IsIntersected()) {
 		if (last_bounce_specular && env_light != nullptr) {
 			// TODO: environment light
+			
 
 			return todo_color;
 		}

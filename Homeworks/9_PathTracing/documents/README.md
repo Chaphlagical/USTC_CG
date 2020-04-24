@@ -58,7 +58,7 @@ $$
 将
 
 - $\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_e(\pmb{p}^\prime,-\pmb{\omega}_i)$ 称为**直接光**，记作 $L_{\text{dir}}(\pmb{p},\pmb{\omega}_o)$ 
-- $\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_r(\pmb{p}^\prime,-\pmb{\omega}_i)$ 称为**间接光**，记作 $L_{\text{indir}}(\pmb{p},\pmb{\omega}_o)$ 
+- $\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_r(\pmb{p}^\prime,-\pmb{\omega}_i)$ 称为**间接光**，记作 $L_{\text{indir}}(\pmb{p},\pmb{\omega}_o)$  
 
 ### 1.2 直接光
 
