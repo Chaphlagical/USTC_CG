@@ -176,7 +176,37 @@ $L_{\text{dir}}$ 在各光源区域采样
 
 代码中的函数 `PathTracer::Shade` 即为上文中的 $L_r$ 
 
-### 2.2 搭建场景并渲染
+### 2.2 环境光贴图重要性采样
+
+![is_em.jpg](https://cdn.jsdelivr.net/gh/Ubpa/USTC_CG_Data@master/Homeworks/09_PathTracing/is_em.jpg)
+
+参考：[wiki | Alias_method](https://en.wikipedia.org/wiki/Alias_method) 
+
+优点是采样时间复杂度为 $O(1)$ 
+
+生成别名表后，可采用离散的像素，相关概率关系如下
+$$
+\begin{aligned}
+\int_{I}p_{\text{img}}(i,j)\mathbb{d}i\mathbb{d}j
+&=\int_{\Theta\Phi}p_{\text{texture}}(\theta,\phi)\left|\frac{\part(i,j)}{\part(\theta,\phi)}\right|\mathbb{d}\theta\mathbb{d}\phi\\
+&=\int_{A}p_{\text{area}}(A)\left|J_{\theta\phi}A\right|\left|\frac{\part(i,j)}{\part(\theta,\phi)}\right|\mathbb{d}A\\
+&=\int_{\Omega}p(\pmb{\omega}_i)\left|\frac{\mathrm{d}\pmb{\omega}_i}{\mathrm{d}A}\right|\left|J_{\theta\phi}A\right|\left|\frac{\part(i,j)}{\part(\theta,\phi)}\right|\mathbb{d}\pmb{\omega}_i\\
+\end{aligned}
+$$
+其中
+
+![dwi_dA.jpg](https://cdn.jsdelivr.net/gh/Ubpa/USTC_CG_Data@master/Homeworks/09_PathTracing/dwi_dA.jpg)
+$$
+\left|\frac{\mathrm{d}\pmb{\omega}_i}{\mathrm{d}A}\right|=\frac{|\cos\theta_o|}{\|\pmb{x}-\pmb{y}\|^2}=1\\
+\left|J_{\theta\phi}A\right|=\sin\theta\\
+\left|\frac{\part(i,j)}{\part(\theta,\phi)}\right|=\frac{wh}{2\pi^2}
+$$
+则
+$$
+p(\pmb{\omega}_i)=\frac{2\pi^2}{wh\sin\theta}p_{\text{img}}(i,j)
+$$
+
+### 2.3 搭建场景并渲染
 
 TODO
 
