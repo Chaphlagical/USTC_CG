@@ -28,7 +28,7 @@ struct Rotater : Component {
 
 class ImGUIExample : Component {
 public:
-    bool show_demo_window = true;
+    bool show_demo_window = false;
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -126,7 +126,8 @@ namespace Ubpa::detail::GenScene_ {
         auto [wall_down, geo_wall_down, mat_wall_down] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("wall_down", cornellbox);
         auto [wall_back, geo_wall_back, mat_wall_back] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("wall_back", cornellbox);
         auto [rectlight_obj, geo_rectlight, rectlight] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Light>("rectlight");
-        //scene->CreateSObj<ImGUIExample>("imguiExample");
+        scene->CreateSObj<ImGUIExample>("imguiExample");
+
         auto [env_obj, env_light] = scene->CreateSObj<Cmpt::Light>("env light");
         auto env_texture = new Texture2D{ "../data/textures/newport_loft.hdr" };
         env_texture->inv_v = true;
@@ -134,7 +135,7 @@ namespace Ubpa::detail::GenScene_ {
 
 
         camera_obj->Get<Cmpt::Position>()->value = { 0,0,0 };
-
+         
         // wall
         geo_wall_left->SetPrimitive(new Square);
         geo_wall_right->SetPrimitive(new Square);
@@ -147,7 +148,7 @@ namespace Ubpa::detail::GenScene_ {
         mat_wall_up->SetMaterial(new stdBRDF{ rgbf{0.8f} });
         mat_wall_down->SetMaterial(new stdBRDF{ rgbf{0.8f} });
         mat_wall_back->SetMaterial(new stdBRDF{ rgbf{0.8f} });
-        //mat_wall_back->SetMaterial(new stdBRDF{ rgbf{0.8f},nullptr,0.f });
+        //mat_wall_back->SetMaterial(new stdBRDF{ rgbf{0.8f},nullptr,0.3f });
 
         wall_left->Get<Cmpt::Position>()->value = { -1,0,0 };
         wall_left->Get<Cmpt::Rotation>()->value = { vecf3{0,0,1},to_radian(-90.f) };
