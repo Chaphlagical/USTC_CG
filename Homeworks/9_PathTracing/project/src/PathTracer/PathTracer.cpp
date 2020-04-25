@@ -118,7 +118,6 @@ rgbf PathTracer::Shade(const Intersectors& intersectors, const IntersectorCloses
 			if (!area_light) return error_color;
 
 			// TODO: area light
-
 			return area_light->Radiance(intersection.uv);
 		}else
 			return zero_color;
@@ -137,13 +136,12 @@ rgbf PathTracer::Shade(const Intersectors& intersectors, const IntersectorCloses
 			// - only use SampleLightResult::L, n, pd
 			// - SampleLightResult::x is useless
 
-			vecf3 wi = sample_light_rst.n.cast_to<vecf3>();
+			vecf3 wi = - sample_light_rst.n.cast_to<vecf3>();
 			float cos_theta = intersection.n.cast_to<vecf3>().dot(wi);
-			rgbf f_r = PathTracer::BRDF(intersection, wi, wo.normalize());
-			rayf3 r(intersection.pos, -wi);
+			rgbf f_r = PathTracer::BRDF(intersection, wi.normalize(), wo.normalize());
+			rayf3 r(intersection.pos, wi, EPSILON<float>);
 			bool visibility = intersectors.visibility.Visit(&bvh, r);
-			//cout << visibility << " " << cos_theta << " " << endl;
-			//L_dir += sample_light_rst.L * f_r * visibility * cos_theta / sample_light_rst.pd;
+			L_dir += sample_light_rst.L * f_r * visibility * abs(cos_theta) / sample_light_rst.pd;
 		}
 		else {
 			// TODO: L_dir of area light
@@ -155,43 +153,42 @@ rgbf PathTracer::Shade(const Intersectors& intersectors, const IntersectorCloses
 			//   - tmin = EPSILON<float>
 			//   - tmax = distance to light - EPSILON<float>
 
-
-			//vecf3 wi = sample_light_rst.x - intersection.pos;
-			vecf3 wi = intersection.pos - sample_light_rst.x;
-			float cos_theta_yx = wi.dot(sample_light_rst.n.cast_to<vecf3>()) / (wi.norm()* sample_light_rst.n.cast_to<vecf3>().norm());
-			float cos_theta_xy = -wi.dot(intersection.n.cast_to<vecf3>()) / (wi.norm()* intersection.n.cast_to<vecf3>().norm());
-			rgbf f_r = PathTracer::BRDF(intersection, -wi.normalize(), wo.normalize());
-			rayf3 r(sample_light_rst.x, wi);
+			vecf3 wi = sample_light_rst.x - intersection.pos;
+			//vecf3 wi = intersection.pos - sample_light_rst.x;
+			float cos_theta_yx = wi.dot(sample_light_rst.n.cast_to<vecf3>() / (wi.norm()));
+			float cos_theta_xy = (-wi).dot(intersection.n.cast_to<vecf3>() / (wi.norm()));
+			rgbf f_r = PathTracer::BRDF(intersection, wi.normalize(), wo.normalize());
+			rayf3 r(sample_light_rst.x, -wi, EPSILON<float>,1 - EPSILON<float>);
 			bool visibility = intersectors.visibility.Visit(&bvh, r);
-			visibility = 1;
-			float G = cos_theta_xy * cos_theta_yx / wi.norm2();
-			//cout << (wi.normalize() + wo.normalize()).normalize() <<" | "<< intersection.n.cast_to<vecf3>() << endl;
-			//cout << f_r << "| " << G << " " << cos_theta_yx <<" "<< cos_theta_yx<<" "<< visibility << endl;
-			L_dir += sample_light_rst.L * f_r * G * visibility / sample_light_rst.pd;
-
+			float G = abs(cos_theta_xy * cos_theta_yx) / wi.norm2();
+			if(cos_theta_yx<0)
+				L_dir += sample_light_rst.L * f_r * G * visibility / sample_light_rst.pd;
+			
 		}
 	});
 
 	// TODO: Russian Roulette
 	// - rand01<float>() : random in [0, 1)
-
+	if (rand01<float>()>0.8)
+		return zero_color;
 	// TODO: recursion
 	// - use PathTracer::SampleBRDF to get wi and pd (probability density)
 	// wi may be **under** the surface
 	// - use PathTracer::BRDF to get BRDF value
 
-	std::tuple<vecf3, float> t_ = PathTracer::SampleBRDF(intersection, wo.normalize());
+	std::tuple<vecf3, float> t_ = PathTracer::SampleBRDF(intersection, wo);
 	auto wi = std::get<0>(t_);
 	auto pd = std::get<1>(t_);
 	rgbf f_r = PathTracer::BRDF(intersection, wi.normalize(), wo.normalize());
-	rayf3 r(intersection.pos, -wi);
-	float cos_theta = intersection.n.cast_to<vecf3>().dot(-wi) / wo.norm();
+	rayf3 r(intersection.pos, wi, EPSILON<float>);
+	float cos_theta = intersection.n.cast_to<vecf3>().dot(wi) / wi.norm();
 
-
-	//L_indir = Shade(intersectors, intersectors.clostest.Visit(&bvh, r), -r.dir, last_bounce_specular)*f_r*cos_theta/pd;
+	//cout << "pd: "<<pd << endl;
+	L_indir = Shade(intersectors, intersectors.clostest.Visit(&bvh, r), -wi, false) * f_r * abs(cos_theta) / pd;
 
 	// TODO: combine L_dir and L_indir
-
+	if (isnan(L_indir[0]) && L_indir[1] && L_indir[2])
+		L_indir = zero_color;
 	return L_dir+L_indir; // you should commemt this line
 }
 
