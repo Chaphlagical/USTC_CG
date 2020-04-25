@@ -28,8 +28,8 @@ PathTracer::PathTracer(const Scene* scene, const SObj* cam_obj, Image* img)
 void PathTracer::Run() {
 	img->SetAll(0.f);
 
-	const size_t spp = 128; // samples per pixel
-
+	const size_t spp = 20; // samples per pixel
+/*
 #ifdef NDEBUG
 	const size_t core_num = std::thread::hardware_concurrency();
 	auto work = [this, core_num, spp](size_t id) {
@@ -53,7 +53,7 @@ void PathTracer::Run() {
 		workers.emplace_back(work, i);
 	for (auto& worker : workers)
 		worker.join();
-#else
+#else*/
 	Intersectors intersectors;
 
 	for (size_t j = 0; j < img->height; j++) {
@@ -64,13 +64,13 @@ void PathTracer::Run() {
 				rayf3 r = cam->GenRay(u, v, ccs);
 				rgbf Lo = Shade(intersectors, intersectors.clostest.Visit(&bvh, r), -r.dir, true);
 				img->At<rgbf>(i, j) += Lo / spp;
+				//cout << i << " " << j << " " << endl;
 			}
 		}
 		float progress = (j + 1) / float(img->height);
 		cout << progress << endl;
 	}
-#endif
-	cout << "Finish!" << endl;
+//#endif
 }
 
 rgbf PathTracer::Shade(const Intersectors& intersectors, const IntersectorClosest::Rst& intersection, const vecf3& wo, bool last_bounce_specular) {
@@ -99,10 +99,13 @@ rgbf PathTracer::Shade(const Intersectors& intersectors, const IntersectorCloses
 	constexpr rgbf todo_color = rgbf{ 0.f,1.f,0.f };
 	constexpr rgbf zero_color = rgbf{ 0.f,0.f,0.f };
 
+
+
+	//rgbf todo_color = rgbf{ 1.f,1.f,1.f };
+
 	if (!intersection.IsIntersected()) {
 		if (last_bounce_specular && env_light != nullptr) {
 			// TODO: environment light
-
 			return env_light->Radiance(-wo);
 		}
 		else
@@ -118,8 +121,9 @@ rgbf PathTracer::Shade(const Intersectors& intersectors, const IntersectorCloses
 			if (!area_light) return error_color;
 
 			// TODO: area light
-
+			
 			return area_light->Radiance(intersection.uv);
+			//return todo_color;
 		}else
 			return zero_color;
 	}
@@ -136,14 +140,16 @@ rgbf PathTracer::Shade(const Intersectors& intersectors, const IntersectorCloses
 			// TODO: L_dir of environment light
 			// - only use SampleLightResult::L, n, pd
 			// - SampleLightResult::x is useless
-
+			//float cos_theta = sample_light_rst.n.cast_to<vecf3>().dot(wo) / (sample_light_rst.n.cast_to<vecf3>().norm() * wo.norm());
+			
 			vecf3 wi = sample_light_rst.n.cast_to<vecf3>();
 			float cos_theta = intersection.n.cast_to<vecf3>().dot(wi);
-			rgbf f_r = PathTracer::BRDF(intersection, wi, wo.normalize());
-			rayf3 r(intersection.pos, -wi);
+			rgbf f_r = PathTracer::BRDF(intersection, wi, wo);
+			rayf3 r(intersection.pos, -wi, 0);
 			bool visibility = intersectors.visibility.Visit(&bvh, r);
+			visibility = 1;
 			//cout << visibility << " " << cos_theta << " " << endl;
-			//L_dir += sample_light_rst.L * f_r * visibility * cos_theta / sample_light_rst.pd;
+			//L_dir += sample_light_rst.L * f_r * visibility * abs(cos_theta) / sample_light_rst.pd;
 		}
 		else {
 			// TODO: L_dir of area light
@@ -151,48 +157,44 @@ rgbf PathTracer::Shade(const Intersectors& intersectors, const IntersectorCloses
 			//intersection.n: n(x)
 			//sample_light_rst.n: n(y)
 			//sample_light_rst.x: y
-			// - Intersectors::visibility.Visit(&bvh, <rayf3>)
-			//   - tmin = EPSILON<float>
-			//   - tmax = distance to light - EPSILON<float>
 
-
+			vecf3 wi = sample_light_rst.x- intersection.pos;
 			//vecf3 wi = sample_light_rst.x - intersection.pos;
-			vecf3 wi = intersection.pos - sample_light_rst.x;
-			float cos_theta_yx = wi.dot(sample_light_rst.n.cast_to<vecf3>()) / (wi.norm()* sample_light_rst.n.cast_to<vecf3>().norm());
-			float cos_theta_xy = -wi.dot(intersection.n.cast_to<vecf3>()) / (wi.norm()* intersection.n.cast_to<vecf3>().norm());
-			rgbf f_r = PathTracer::BRDF(intersection, -wi.normalize(), wo.normalize());
-			rayf3 r(sample_light_rst.x, wi);
+			float cos_theta_yx = wi.dot(sample_light_rst.n.cast_to<vecf3>()) / (wi.norm());
+			float cos_theta_xy = -wi.dot(intersection.n.cast_to<vecf3>()) / (wi.norm());
+			rgbf f_r = PathTracer::BRDF(intersection, wi, wo);
+			rayf3 r(intersection.pos, -wi);
 			bool visibility = intersectors.visibility.Visit(&bvh, r);
+			float G = abs(cos_theta_xy) * abs(cos_theta_yx) / wi.norm2();
 			visibility = 1;
-			float G = cos_theta_xy * cos_theta_yx / wi.norm2();
 			//cout << (wi.normalize() + wo.normalize()).normalize() <<" | "<< intersection.n.cast_to<vecf3>() << endl;
 			//cout << f_r << "| " << G << " " << cos_theta_yx <<" "<< cos_theta_yx<<" "<< visibility << endl;
 			L_dir += sample_light_rst.L * f_r * G * visibility / sample_light_rst.pd;
-
 		}
 	});
 
 	// TODO: Russian Roulette
 	// - rand01<float>() : random in [0, 1)
+	float pdf_RR = rand01<float>();
+	float pdf_hemi = 1 / (2 * PI<float>);
 
 	// TODO: recursion
 	// - use PathTracer::SampleBRDF to get wi and pd (probability density)
 	// wi may be **under** the surface
 	// - use PathTracer::BRDF to get BRDF value
-
-	std::tuple<vecf3, float> t_ = PathTracer::SampleBRDF(intersection, wo.normalize());
+	std::tuple<vecf3, float> t_ = PathTracer::SampleBRDF(intersection, wo);
 	auto wi = std::get<0>(t_);
 	auto pd = std::get<1>(t_);
-	rgbf f_r = PathTracer::BRDF(intersection, wi.normalize(), wo.normalize());
-	rayf3 r(intersection.pos, -wi);
+	rgbf f_r = PathTracer::BRDF(intersection, wi, wo);
+	rayf3 r(intersection.pos,-wi, 0);
 	float cos_theta = intersection.n.cast_to<vecf3>().dot(-wi) / wo.norm();
 
 
-	//L_indir = Shade(intersectors, intersectors.clostest.Visit(&bvh, r), -r.dir, last_bounce_specular)*f_r*cos_theta/pd;
+	//L_indir = Shade(intersectors, intersectors.clostest.Visit(&bvh, r), wi, last_bounce_specular)*f_r*cos_theta/pd;
 
-	// TODO: combine L_dir and L_indir
 
-	return L_dir+L_indir; // you should commemt this line
+	return L_dir+L_indir; // TODO: combine L_dir and L_indir
+
 }
 
 PathTracer::SampleLightResult PathTracer::SampleLight(IntersectorClosest::Rst intersection, const vecf3& wo, const Cmpt::Light* light, const Cmpt::L2W* l2w, const Cmpt::SObjPtr* ptr) {
