@@ -183,7 +183,7 @@ namespace Ubpa::detail::GenScene_ {
         auto plastic = new stdBRDF;
         plastic->albedo_factor = { 0.9f, 0.9f, 0.9f };
         plastic->roughness_factor = 0.6f;
-        plastic->metalness_factor = 0.f;
+        plastic->metalness_factor = 0.1f;
         plastic_ball_mat->SetMaterial(plastic);
 
         rectlight->SetLight(new AreaLight{ 50.f, {1,1,1} });
@@ -202,80 +202,63 @@ namespace Ubpa::detail::GenScene_ {
 
         auto [camera_obj, camera, agency] = scene->CreateSObj<Cmpt::Camera, Cmpt::PathTracerAgency>("camera_obj");
         auto [cornellbox] = scene->CreateSObj<>("cornellbox");
-        auto [wall_left, geo_wall_left, mat_wall_left] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("wall_left", cornellbox);
-        auto [wall_right, geo_wall_right, mat_wall_right] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("wall_right", cornellbox);
-        auto [wall_up, geo_wall_up, mat_wall_up] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("wall_up", cornellbox);
+        //auto [wall_left, geo_wall_left, mat_wall_left] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("wall_left", cornellbox);
+        //auto [wall_right, geo_wall_right, mat_wall_right] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("wall_right", cornellbox);
+        //auto [wall_up, geo_wall_up, mat_wall_up] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("wall_up", cornellbox);
         auto [wall_down, geo_wall_down, mat_wall_down] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("wall_down", cornellbox);
-        auto [wall_back, geo_wall_back, mat_wall_back] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("wall_back", cornellbox);
-        auto [rectlight_obj, geo_rectlight, rectlight] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Light>("rectlight");
+        //auto [wall_front, geo_wall_front, mat_wall_front] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("wall_front", cornellbox);
+        //auto [wall_back, geo_wall_back, mat_wall_back] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("wall_back", cornellbox);
+        //auto [rectlight_obj, geo_rectlight, rectlight] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Light>("rectlight");
         scene->CreateSObj<ImGUIExample>("imguiExample");
 
         auto [env_obj, env_light] = scene->CreateSObj<Cmpt::Light>("env light");
-        auto env_texture = new Texture2D{ "../data/textures/newport_loft.hdr" };
+        auto env_texture = new Texture2D{ "../data/textures/circus_arena_4k.hdr" };
         env_texture->inv_v = true;
         env_light->SetLight(new EnvLight(1.f, rgbf{ 1.f }, env_texture));
 
 
         camera_obj->Get<Cmpt::Position>()->value = { 0,0,0 };
 
-        // wall
-        geo_wall_left->SetPrimitive(new Square);
-        geo_wall_right->SetPrimitive(new Square);
-        geo_wall_up->SetPrimitive(new Square);
         geo_wall_down->SetPrimitive(new Square);
-        geo_wall_back->SetPrimitive(new Square);
-
-        mat_wall_left->SetMaterial(new stdBRDF{ rgbf{0.8,0.2,0.2} });
-        mat_wall_right->SetMaterial(new stdBRDF{ rgbf{0.2,0.2,0.8} });
-        mat_wall_up->SetMaterial(new stdBRDF{ rgbf{0.8f} });
-        mat_wall_down->SetMaterial(new stdBRDF{ rgbf{0.8f} });
-        mat_wall_back->SetMaterial(new stdBRDF{ rgbf{0.8f} });
-        //mat_wall_back->SetMaterial(new stdBRDF{ rgbf{0.8f},nullptr,0.3f });
-
-        wall_left->Get<Cmpt::Position>()->value = { -1,0,0 };
-        wall_left->Get<Cmpt::Rotation>()->value = { vecf3{0,0,1},to_radian(-90.f) };
-
-        wall_right->Get<Cmpt::Position>()->value = { 1,0,0 };
-        wall_right->Get<Cmpt::Rotation>()->value = { vecf3{0,0,1},to_radian(90.f) };
-
-        wall_up->Get<Cmpt::Position>()->value = { 0,1,0 };
-        wall_up->Get<Cmpt::Rotation>()->value = { vecf3{0,0,1},to_radian(180.f) };
-
+        auto texture = new Texture2D{ "../data/textures/ustc.png" };
+        auto normal_texture = new Texture2D{ "../data/textures/ustc_normalmap.png" };
+        mat_wall_down->SetMaterial(new stdBRDF{ rgbf{0.8f},texture,0,texture,1,texture,normal_texture });
         wall_down->Get<Cmpt::Position>()->value = { 0,-1,0 };
-
-        wall_back->Get<Cmpt::Position>()->value = { 0,0,-1 };
-        wall_back->Get<Cmpt::Rotation>()->value = { vecf3{1,0,0},to_radian(90.f) };
+        wall_down->Get<Cmpt::Scale>()->value = 3.f;
 
         cornellbox->Get<Cmpt::Position>()->value = { 0,0,-6 };
         cornellbox->Get<Cmpt::Scale>()->value = { 2,2,2 };
 
         auto [metal_ball, metal_ball_geo, metal_ball_mat] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("metal_ball", cornellbox);
         metal_ball_geo->SetPrimitive(new Sphere);
-        metal_ball->Get<Cmpt::Scale>()->value = 0.4f;
-        metal_ball->Get<Cmpt::Position>()->value = { -0.5f,-0.6f,-0.2f };
+        metal_ball->Get<Cmpt::Scale>()->value = 0.6f;
+        metal_ball->Get<Cmpt::Position>()->value = { 0.f,-0.4f,-0.2f };
         auto metal = new stdBRDF;
-        metal->albedo_factor = { 1.f, 0.8f, 0.2f };
+        metal->albedo_factor = { 1.f, 1.f, 1.f };
         metal->roughness_factor = 0.1f;
+        metal->metalness_factor = 1.f;
         metal_ball_mat->SetMaterial(metal);
 
-        auto [plastic_ball, plastic_ball_geo, plastic_ball_mat] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("plastic_ball", cornellbox);
-        plastic_ball_geo->SetPrimitive(new Sphere);
-        plastic_ball->Get<Cmpt::Scale>()->value = 0.4f;
-        plastic_ball->Get<Cmpt::Position>()->value = { 0.5f,-0.6f,0.2f };
-        auto plastic = new stdBRDF;
-        plastic->albedo_factor = { 0.9f, 0.9f, 0.9f };
-        plastic->roughness_factor = 0.6f;
-        plastic->metalness_factor = 0.1f;
-        plastic_ball_mat->SetMaterial(plastic);
+        auto [ball, ball_geo, ball_mat] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("crystal_ball", cornellbox);
+        ball_geo->SetPrimitive(new Sphere);
+        ball->Get<Cmpt::Scale>()->value = 0.6f;
+        ball->Get<Cmpt::Position>()->value = { 1.4f,-0.4f,-0.2f };
+        auto crystal = new stdBRDF;
+        crystal->albedo_factor = { 0.1f, 1.f, 1.f };
+        crystal->roughness_factor = 0.1f;
+        ball_mat->SetMaterial(crystal);
 
-        rectlight->SetLight(new AreaLight{ 50.f, {1,1,1} });
-        geo_rectlight->SetPrimitive(new Square);
-        rectlight_obj->Get<Cmpt::Position>()->value = { 0,1.9f,-6 };
-        rectlight_obj->Get<Cmpt::Scale>()->value = { 0.5f,0.5f,0.5f };
-        rectlight_obj->Get<Cmpt::Rotation>()->value = quatf{ vecf3{1,0,0}, to_radian(180.f) };
+        auto [ball_, ball__geo, ball__mat] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("crystal_ball", cornellbox);
+        ball__geo->SetPrimitive(new Sphere);
+        ball_->Get<Cmpt::Scale>()->value = 0.6f;
+        ball_->Get<Cmpt::Position>()->value = { -1.4f,-0.4f,-0.2f };
+        auto crystal_ = new stdBRDF;
+        crystal_->albedo_factor = { 1.f, 0.1f, 1.f };
+        crystal_->roughness_factor = 0.1f;
+        ball__mat->SetMaterial(crystal_);
 
         return scene;
-    }
+	}
 }
 
 Scene* Ubpa::GenScene(size_t n) {
@@ -283,7 +266,7 @@ Scene* Ubpa::GenScene(size_t n) {
 
 	using Func = Scene *();
 	Func* funcs[] = {
-		&detail::GenScene_::GenScene_0
+		&detail::GenScene_::GenScene_1
 	};
 
 	return funcs[n]();

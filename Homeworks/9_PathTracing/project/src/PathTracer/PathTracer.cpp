@@ -30,7 +30,7 @@ PathTracer::PathTracer(const Scene* scene, const SObj* cam_obj, Image* img)
 void PathTracer::Run() {
 	img->SetAll(0.f);
 
-	const size_t spp = 128; // samples per pixel
+	const size_t spp = 1024; // samples per pixel
 
 #ifdef NDEBUG
 	const size_t core_num = std::thread::hardware_concurrency();
