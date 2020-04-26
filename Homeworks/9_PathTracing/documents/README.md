@@ -88,7 +88,7 @@ $$
 
 其中 $\pmb{p}$， $\pmb{\omega}_o$ 和 $\pmb{\omega}_i$ 可用三点确定，如下图所示
 
-![xyz.jpg](https://cdn.jsdelivr.net/gh/Ubpa/USTC_CG_Data@master/Homeworks/09_PathTracing/xyz.jpg)
+![xyz.jpg](../report/Figures/xyz.jpg)
 
 > 图中 $\pmb{x}$ 即为 $\pmb{p}$，$\pmb{y}$ 即为 $\pmb{p}^\prime$ 
 
@@ -178,7 +178,7 @@ $L_{\text{dir}}$ 在各光源区域采样
 
 ### 2.2 环境光贴图重要性采样
 
-![is_em.jpg](https://cdn.jsdelivr.net/gh/Ubpa/USTC_CG_Data@master/Homeworks/09_PathTracing/is_em.jpg)
+![is_em.jpg](../report/Figures/is_em.jpg)
 
 参考：[wiki | Alias_method](https://en.wikipedia.org/wiki/Alias_method) 
 

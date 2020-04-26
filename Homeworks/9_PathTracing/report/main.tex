@@ -1,0 +1,401 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Wenneker Assignment
+% LaTeX Template
+% Version 2.0 (12/1/2019)
+%
+% This template originates from:
+% http://www.LaTeXTemplates.com
+%
+% Authors:
+% Vel (vel@LaTeXTemplates.com)
+% Frits Wenneker
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[14pt]{scrartcl} % Font size
+
+\input{structure.tex} % Include the file specifying the document structure and custom commands
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{	
+	\normalfont\normalsize
+	%\vspace{25pt} % Whitespace
+	\rule{\linewidth}{0.5pt}\\ % Thin top horizontal rule
+	\vspace{20pt} % Whitespace
+	{\huge 实验九	Path Tracing}\\ % The assignment title
+	\vspace{12pt} % Whitespace
+	\rule{\linewidth}{2pt}\\ % Thick bottom horizontal rule
+	\vspace{12pt} % Whitespace
+}
+
+\author{\LARGE ID: 58		陈文博} % Your name
+
+\date{\normalsize\today} % Today's date (\today) or a custom date
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	FIGURE EXAMPLE
+%----------------------------------------------------------------------------------------
+
+\section{实验要求}
+
+%\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+%	\centering
+%	\includegraphics[width=0.5\columnwidth]{swallow.jpg} % Example image
+%	\caption{European swallow.}
+%\end{figure}
+
+\begin{itemize}
+	\item[*] 实现路径追踪算法
+	\item[*] 搭建场景并渲染
+\end{itemize}
+
+%------------------------------------------------
+
+\section{开发环境}
+
+\textbf{IDE}：Microsoft Visual Studio 2019 community\\
+\textbf{CMake}：3.16.3\\
+\textbf{Others}
+
+%----------------------------------------------------------------------------------------
+%	TEXT EXAMPLE
+%----------------------------------------------------------------------------------------
+\pagebreak
+\section{算法原理}
+
+\subsection{渲染方程}
+\begin{equation}
+L_o(\pmb{p},\pmb{\omega}_o)=L_e(\pmb{p},\pmb{\pmb{\omega}_o})+\int_{\mathcal{H}^2(\pmb{n}(\pmb{p}))} f_r(\pmb{p},\pmb{\omega}_i,\pmb{\omega}_o)L_i(\pmb{p},\pmb{\omega}_i)\cos\theta_{\pmb{\omega}_i,\pmb{n}(\pmb{p})}\mathbb{d}\pmb{\omega}_i
+\end{equation}
+
+参数释义：
+\begin{itemize}
+	\item $L_o$ 是出射 radiance
+	\item $\pmb{p}$ 是渲染点
+	\item $\pmb{\omega}_i$ 是入射光方向
+	\item $\pmb{\omega}_o$ 是出射光方向
+	\item $L_e$ 是发光 radiance
+	\item $\pmb{n}(\pmb{p})$ 
+	\item ${\mathcal{H}^2(\pmb{n}(\pmb{p}))} $ 是法向 $\pmb{n}(\pmb{p})$ 所在半球
+	\item $f_r$ 是双向散射分布函数（BRDF）
+	\item $L_i$ 是入射 radiance
+	\item $\theta_{\pmb{\omega}_i,\pmb{n}(\pmb{p})}$ 是 $\pmb{\omega}_i$ 与 $\pmb{n}(\pmb{p})$ 的夹角
+\end{itemize}
+记
+\begin{equation}
+\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L=\int_{\mathcal{H}^2(\pmb{n}(\pmb{p}))} f_r(\pmb{p},\pmb{\omega}_i,\pmb{\omega}_o)L\cos\theta_{\pmb{\omega}_i,\pmb{n}(\pmb{p})}\mathbb{d}\pmb{\omega}_i.
+\end{equation}
+
+则
+
+\begin{equation}
+L_o(\pmb{p},\pmb{\omega}_o)=L_e(\pmb{p},\pmb{\pmb{\omega}_o})+\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_i(\pmb{p},\pmb{\omega}_i)
+\end{equation}
+
+反射方程为
+
+\begin{equation}
+L_r(\pmb{p},\pmb{\omega}_o)=\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_i(\pmb{p},\pmb{\omega}_i)
+\end{equation}
+
+对于 $L_i$ 有关系式
+
+\begin{equation}
+L_i(\pmb{p},\pmb{\omega}_i)=L_o(\mathop{raytrace}(\pmb{p},\pmb{\omega_i}),-\pmb{\omega_i})
+\end{equation}
+
+其中，$raytrace$为射线与场景的相交函数
+
+\pagebreak
+
+记 $\mathop{raytrace}(\pmb{p},\pmb{\omega}_i)$ 为 $\pmb{p}^\prime$，则有
+
+\begin{equation}
+L_i(\pmb{p},\pmb{\omega}_i)=L_o(\pmb{p}^\prime,-\pmb{\omega_i})
+\end{equation}
+
+
+如此形成递归
+\begin{equation}
+L_o(\pmb{p},\pmb{\omega}_o)=L_e(\pmb{p},\pmb{\pmb{\omega}_o})+\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_o(\pmb{p}^\prime,-\pmb{\omega_i})
+\end{equation}
+
+将 $L_r$ 展开一次
+\begin{equation}
+\begin{aligned}
+L_r(\pmb{p},\pmb{\omega}_o)
+&=\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}\left(L_e(\pmb{p}^\prime,-\pmb{\omega}_i)+L_r(\pmb{p}^\prime,-\pmb{\omega}_i)\right)\\
+&=\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_e(\pmb{p}^\prime,-\pmb{\omega}_i)
++\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_r(\pmb{p}^\prime,-\pmb{\omega}_i)
+\end{aligned}
+\end{equation}
+
+记：
+\begin{itemize}
+	\item 直接光  $L_{\text{dir}}(\pmb{p},\pmb{\omega}_o)$：$\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_e(\pmb{p}^\prime,-\pmb{\omega}_i)$
+	
+	\item 间接光 $L_{\text{indir}}(\pmb{p},\pmb{\omega}_o)$  ：$\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_r(\pmb{p}^\prime,-\pmb{\omega}_i)$
+\end{itemize}
+\subsection{直接光}
+\begin{equation}
+L_{\text{dir}}(\pmb{p},\pmb{\omega}_o)=\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_e(\pmb{p}^\prime,-\pmb{\omega}_i)
+\end{equation}
+
+积分中，对于大部分方向 $\pmb{\omega}_i$，$L_e(\pmb{p}^\prime,-\pmb{\omega}_i)=0$（非光源），所以我们直接在光源所在方向上积分
+
+其中 $\pmb{p}$， $\pmb{\omega}_o$ 和 $\pmb{\omega}_i$ 可用三点确定，如下图所示
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.3\columnwidth]{xyz.jpg} % Example image
+	\caption{直接光反射图示}
+\end{figure}
+
+图中 $\pmb{x}$ 即为 $\pmb{p}$，$\pmb{y}$ 即为 $\pmb{p}^\prime$ 
+
+\pagebreak
+
+由几何关系可知
+
+\begin{equation}
+\mathbb{d}\pmb{\omega}_i=\frac{|\cos\theta_{\pmb{y},\pmb{x}}|}{\|\pmb{x}-\pmb{y}\|^2}\mathbb{d}A(\pmb{y})
+\end{equation}
+
+其中 $\theta_{\pmb{y},\pmb{x}}$ 是方向 $\pmb{x}-\pmb{y}$ 与 $\pmb{n}(\pmb{y})$ 的夹角
+
+引入几何传输项（两点间的“传输效率”）
+\begin{equation}
+G(\pmb{x}\leftrightarrow\pmb{y})=V(\pmb{x}\leftrightarrow\pmb{y})\frac{|\cos\theta_{\pmb{x},\pmb{y}}||\cos\theta_{\pmb{y},\pmb{x}}|}{\|\pmb{x}-\pmb{y}\|^2}
+\end{equation}
+
+其中 $V(\pmb{x}\leftrightarrow\pmb{y})$ 是可见性函数，当 $\pmb{x}$ 和 $\pmb{y}$ 之间无阻隔时为 $1$，否则为 $0$ 
+
+$G$ 是对称函数，即$G(\pmb{x}\leftrightarrow\pmb{y})=G(\pmb{y}\leftrightarrow\pmb{x})$ 
+
+故有
+
+$$
+L_{\text{dir}}(\pmb{x}\to\pmb{z})=\int_A f_r(\pmb{y}\to \pmb{x}\to\pmb{z})L_e(\pmb{y}\to\pmb{x})G(\pmb{x}\leftrightarrow\pmb{y})\mathbb{d}A(\pmb{y})
+$$
+
+其中积分域 $A$ 为场景中所有的面积，但只有光源处 $L_e(\pmb{y}\to\pmb{x})\neq 0$ 
+
+记光源数 $N_e$，场景中的光源集为 $\{L_{e_i}\}_{i=1}^{N_e}$ ，对应的区域集为 $\{A(L_{e_i})\}_{i=1}^{N_e}$，则可写为
+
+$$
+L_{\text{dir}}(\pmb{x}\to\pmb{z})=\sum_{i=1}^{N_e}\int_{A(L_{e_i})} f_r(\pmb{y}\to\pmb{x}\to\pmb{z})L_e(\pmb{y}\to\pmb{x})G(\pmb{x}\to\pmb{y})\mathbb{d}A(\pmb{y})
+$$
+
+\subsection{间接光}
+
+递归求解：
+
+\begin{equation}
+L_r(\pmb{p},\pmb{\omega}_o)=\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_e(\pmb{p}^\prime,-\pmb{\omega}_i)
++\int_{\pmb{p},\pmb{\omega}_o,\pmb{\omega}_i}L_r(\pmb{p}^\prime,-\pmb{\omega}_i)
+\end{equation}
+
+\subsection{蒙特卡洛积分与重要性采样}
+
+用采样的方法计算积分，方差与积分域$D$的维度无关
+
+$X$为连续随机变量，$F$为随机变量函数：$F=g(X),X\sim p(x)$
+
+$F$的期望：$E[F]=\int_Dg(x)p(x)dx$
+
+$F$的估计：$F_N=\frac{1}{N}\sum\limits_{i=1}^Ng(x_i)\xrightarrow[]{N}E[Y]$
+
+$f$与$g$的关系：$g(x)=\frac{f(x)}{g(x)}$
+
+代入$F$的估计式：$\frac{1}{N}\sum\limits_{i=1}^N\frac{f(x_i)}{p(x_i)}\xrightarrow[]{N}\int_D f(x)dx$
+
+方差：$V[F_N]=\frac{1}{N}V\Big[\frac{f(x)}{p(x)}\Big]\sim O(\frac{1}{N})$
+
+为了缩小误差，除了增加样本数量，还可以缩小$V[\frac{f(x)}{p(x)}]$
+
+\textbf{重要性采样}
+
+若$p(x)=\frac{f(x)}{\int_D f(x)dx}$，则
+
+\begin{equation}
+V\Big[\frac{f(x)}{p(x)}\Big]=V\Big[\frac{1}{\int_D f(x)dx}\Big]
+\end{equation}
+
+只要$p(x)$和$f(x)$的形状接近，那么方差就会比较小，比如$f(x)=g(x)h(x)$，$h(x)\approx c$，而$g(x)$积分可求，则可取$p(x)=\frac{g(x)}{\int_D g(x)dx}$
+
+
+\subsection{计算渲染方程}
+
+我们要计算的是如下积分
+
+\begin{equation}
+L_r(\pmb{p},\pmb{\omega}_o)=L_{\text{dir}}+L_{\text{indir}}
+\end{equation}
+
+右侧积分式需要递归
+
+利用蒙特卡洛积分可将积分转成采样
+
+\begin{equation}
+\begin{aligned}
+L_{\text{dir}}(\pmb{x}\to\pmb{z})
+&\approx\sum_{i=1}^{N_e}\sum_{j=1}^{N_i}\frac{f_r(\pmb{y}_i^{(j)}\to\pmb{x}\to\pmb{z})L_e(\pmb{y}_i^{(j)}\to\pmb{x})G(\pmb{x}\to\pmb{y}_i^{(j)})}{p(\pmb{y}_i^{(j)})}\\
+L_{\text{indir}}(\pmb{p},\pmb{\omega}_o)
+&\approx\sum_{k=1}^{N}\frac{f_r(\pmb{p},\pmb{\omega}_i^{(k)},\pmb{\omega}_o)L_r(\pmb{p}^{\prime(k)},-\pmb{\omega})\cos\theta_{\pmb{\omega}_i,\pmb{n}(\pmb{p})}}{p(\pmb{\omega}_i^{(k)})}
+\end{aligned}
+\end{equation}
+
+$L_{\text{dir}}$ 在各光源区域采样
+
+对于 $L_{\text{indir}}$ 则半球采样
+
+采样个数皆为 1（$N_i=1\quad(i=1,\dots,N_e)$，$N=1$） 
+
+\pagebreak
+
+\subsection{环境光贴图重要性采样}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{is_em.jpg} % Example image
+\end{figure}
+
+\subsubsection{Alias Method}
+
+\textbf{Operation}
+
+算法利用一个概率表$U_i$和一个别名表$K_i$(for $1\leq i\leq n$)，进行以下操作：
+
+\begin{enumerate}
+	\item 生成一个$[0,1)$的随机数$x$
+	\item 设$i=\lfloor x \rfloor+1$和$y=nx+1-i$，使得$i\in \{1,2,\cdots,n\}$和$y\in[0,1)$
+	\item 如果$y<U_i$，返回$i$
+	\item 否则，返回$K_i$
+\end{enumerate}
+
+\textbf{Table Generation}
+为了生成别名表，先初始化$U_i=np_i$
+
+%------------------------------------------------
+\pagebreak
+\section{设计难点与解决}
+
+\subsection{计算BRDF时入射光未正则化出现计算出错}
+
+出错图像：
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.7\columnwidth]{error.png} % Example image
+	\caption{无正则化}
+\end{figure}
+
+\subsection{未考虑光源出射光方向}
+
+面光源只朝一个方向出射光线，需要判断法向与返回光源的光线夹角排除从背部返回的光线，出错图像：
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.7\columnwidth]{blur.png} % Example image
+	\caption{算进从背部射入的光线会在光源附近产生一片亮区域}
+\end{figure}
+
+\pagebreak
+
+\section{实验效果}
+
+\subsection{标准场景测试}
+
+\subsubsection{直接环境光}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{env_dir.png} % Example image
+\end{figure}
+
+\subsubsection{直接+间接环境光}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{env_indir.png} % Example image
+\end{figure}
+
+\pagebreak
+
+\subsubsection{直接面光源}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{area_dir.png} % Example image
+\end{figure}
+
+\subsubsection{直接+间接面光源}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{area_indir.png} % Example image
+\end{figure}
+
+\pagebreak
+
+\subsubsection{最终渲染结果128spp}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{128spp.png} % Example image
+\end{figure}
+
+\subsubsection{最终渲染结果1024spp}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{1024spp.png} % Example image
+\end{figure}
+
+\pagebreak
+
+\subsection{其他渲染结果}
+
+\subsubsection{室内}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{ball.png} % Example image
+\end{figure}
+
+\subsubsection{戏剧院}
+Square添加HW8中的校徽纹理贴图和法向贴图
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{ryg.png} % Example image
+\end{figure}
+
+\pagebreak
+
+\subsubsection{海滨小镇}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{sea.png} % Example image
+\end{figure}
+
+\subsubsection{雪地}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{snow.png} % Example image
+\end{figure}
+
+\end{document}

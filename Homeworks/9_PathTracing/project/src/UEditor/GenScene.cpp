@@ -266,7 +266,7 @@ Scene* Ubpa::GenScene(size_t n) {
 
 	using Func = Scene *();
 	Func* funcs[] = {
-		&detail::GenScene_::GenScene_1
+		&detail::GenScene_::GenScene_0
 	};
 
 	return funcs[n]();
