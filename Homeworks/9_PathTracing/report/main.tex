@@ -273,9 +273,9 @@ $L_{\text{dir}}$ 在各光源区域采样
 	\includegraphics[width=1.0\columnwidth]{is_em.jpg} % Example image
 \end{figure}
 
-\subsubsection{Alias Method}
+\textbf{Alias Method}
 
-\textbf{Operation}
+\textit{Operation}
 
 算法利用一个概率表$U_i$和一个别名表$K_i$(for $1\leq i\leq n$)，进行以下操作：
 
@@ -286,8 +286,55 @@ $L_{\text{dir}}$ 在各光源区域采样
 	\item 否则，返回$K_i$
 \end{enumerate}
 
-\textbf{Table Generation}
-为了生成别名表，先初始化$U_i=np_i$
+\textit{Table Generation}
+为了生成别名表，先初始化$U_i=np_i$，与此同时，将表条目分为三类：
+\begin{itemize}
+	\item overfull：$U_i>1$
+	\item under full: $U_i<1$且$K_i$未初始化
+	\item exactly full：$U_i=1$或$K_i$已初始化
+\end{itemize}
+
+如果$U_i=1$，则永远不会参考相应的值$K_i$，它并不重要，但$K_i=i$的值是合理的
+只要表条目未达到exactly full，重复以下步骤：
+\begin{enumerate}
+	\item 任意选择一个overfull条目$U_i>1$和一个underfull条目$U_j<1$（若其中一个存在，另外一个则必然存在）
+	\item 通过设定$K_j=i$，将条目$j$中未使用的空间分配给结果$i$
+	\item 通过更改$U_i=U_i-(1-U_j)=U_i+U_j-1$，从条目$i$中删除分配的空间
+	\item 条目$j$当前达到exactly full
+	\item 根据$U_i$的新值将条目$i$分配给适当的类别
+\end{enumerate}
+
+生成别名表后，可采用离散的像素，相关概率关系如下
+
+\begin{equation}
+\begin{aligned}
+\int_{I}p_{\text{img}}(i,j)\mathbb{d}i\mathbb{d}j
+&=\int_{\Theta}p_{\text{img}}(\theta,\phi)\left|\frac{\partial(i,j)}{\partial(\theta,\phi)}\right|\mathbb{d}\theta\mathbb{d}\phi\\
+&=\int_{A}p_{\text{img}}(A)\left|\det J_A\Theta\right|\left|\frac{\partial(i,j)}{\partial(\theta,\phi)}\right|\mathbb{d}A\\
+&=\int_{\Omega}p_{\text{img}}(\pmb{\omega}_i)\left|\frac{\mathrm{d}A}{\mathrm{d}\pmb{\omega}_i}\right|\left|\det J_A{\Theta}\right|\left|\frac{\partial(i,j)}{\partial(\theta,\phi)}\right|\mathbb{d}\pmb{\omega}_i\\
+&=\int_{\Omega}p(\pmb{\omega}_i)\mathbb{d}\pmb{\omega}_i\\
+\end{aligned}
+\end{equation}
+
+其中
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=0.3\columnwidth]{dwi_dA.jpg} % Example image
+\end{figure}
+
+\begin{equation}
+\begin{aligned}
+\left|\frac{\mathrm{d}\pmb{\omega}_i}{\mathrm{d}A}\right|&=\frac{|\cos\theta_o|}{\|\pmb{x}-\pmb{y}\|^2}=\frac{1}{R^2}\\
+\left|\det J_A\Theta\right|&=\frac{1}{R^2\sin\theta}\\
+\left|\frac{\partial(i,j)}{\partial(\theta,\phi)}\right|&=\frac{wh}{2\pi^2}
+\end{aligned}
+\end{equation}
+
+则
+\begin{equation}
+p(\pmb{\omega}_i)=\frac{wh}{2\pi^2\sin\theta}p_{\text{img}}(i,j)
+\end{equation}
+
 
 %------------------------------------------------
 \pagebreak
