@@ -6,15 +6,29 @@
 
 #include <thread>
 
+#include <algorithm>
+
 using namespace Ubpa;
 using namespace std;
+
+struct prob
+{
+	float p;
+	float u;
+	int k;
+};
+std::vector<prob> table;
+
+static void Init_AliasTable(const std::vector<float>& probs);
+static float Alias_PDF(const vecf3& dir, const EnvLight* light);
+static std::tuple<rgbf, vecf3, float> Alias_Sample_L(const normalf& n, const EnvLight* light);
 
 PathTracer::PathTracer(const Scene* scene, const SObj* cam_obj, Image* img)
 	: scene{ scene },
 	bvh{ const_cast<Scene*>(scene) },
 	img{ img },
 	cam{ cam_obj->Get<Cmpt::Camera>() },
-	ccs{ cam->GenCoordinateSystem(cam_obj->Get<Cmpt::L2W>()->value) }
+	ccs{ cam->GenCoordinateSystem(cam_obj->Get<Cmpt::L2W>()->value)}
 {
 	IntersectorVisibility::Instance();
 	IntersectorClosest::Instance();
@@ -28,12 +42,114 @@ PathTracer::PathTracer(const Scene* scene, const SObj* cam_obj, Image* img)
 	});
 
 	// TODO: preprocess env_light here
+	/*int h = env_light->texture->img.get()->height;
+	int w = env_light->texture->img.get()->width;
+
+	cout << "h: " << h << endl << "w: " << w << endl;
+	
+	vector<float> probs(w* h);
+	float sum_prob = 0;
+	for (int i = 0; i < h; i++)
+	{
+		for (int j = 0; j < w; j++)
+		{
+			probs[j + w * i] = env_light->texture->img.get()->At(j, i).to_rgb().illumination();
+			sum_prob += probs[j + w * i];
+		}
+	}
+	for (auto& i : probs)
+		i /= sum_prob;
+	Init_AliasTable(probs);*/
+	
+}
+
+void Init_AliasTable(const std::vector<float>& probs)
+{
+	int num = probs.size();
+	table.clear();
+	table.resize(num);
+	
+	vector<int> overfull;
+	vector<int> underfull;
+	
+	for (int i = 0; i < num; i++)
+	{
+		table[i].k = i;
+		table[i].p = probs[i];
+		table[i].u = num * probs[i];
+
+		if (table[i].u < 1)underfull.push_back(i);
+		if (table[i].u > 1)overfull.push_back(i);
+	}
+
+	while (overfull.empty() && underfull.empty())
+	{
+		int i = overfull.back();
+		overfull.pop_back();
+
+		int j = underfull.back();
+		underfull.pop_back();
+
+		table[i].u -= 1 - table[j].u;
+		table[i].k = i;
+
+		if (table[i].u > 1)overfull.push_back(i);
+		if (table[i].u < 1)underfull.push_back(i);
+	}
+}
+
+float Alias_PDF(const vecf3& dir, const EnvLight* light)
+{
+	auto wi = dir.normalize().cast_to<normalf>();
+	int h = light->texture->img.get()->height;
+	int w = light->texture->img.get()->width;
+
+	float phi = std::atan2(-wi[0], -wi[2]) + PI<float>;
+	float theta = acos(wi[1]);
+
+	auto u = phi / (2.f * PI<float>);
+	auto v = theta / PI<float>;
+	auto texcoord = pointf2(u, v);
+
+	auto x = (size_t)std::round(w * u - 0.5);
+	auto y = (size_t)std::round(h * v - 0.5);
+
+	float p_img = table[x + w * y].p;
+
+	return p_img / (2.f * PI<float> * PI<float> * sin(theta));
+}
+
+tuple<rgbf, vecf3, float> Alias_Sample_L(const normalf& n, const EnvLight* light)
+{
+	int h = light->texture->img.get()->height;
+	int w = light->texture->img.get()->width;
+
+	float nx = rand01<float>() * (float)(h * w);
+	int i_ = floor(nx) + 1;
+	float y_ = nx + 1 - i_;
+	int p_idx = y_ < table[i_].u ? i_ : table[i_].k;
+	int x = p_idx % w;
+	int y = (int)((float)(p_idx - x) / (float)w);
+
+	float u = (x + rand01<float>()) / w;
+	float v = (y + rand01<float>())/h;
+
+	float theta = v * PI<float>;
+	float phi = u * 2.f * PI<float>;
+
+	vecf3 wi = (sin(theta) * sin(phi), cos(theta), sin(theta) * cos(phi));
+
+	float p_img = table[x + w * y].p;
+	float env_pd = p_img / (2.f * PI<float> * PI<float> * sin(theta));
+
+	return { light->Radiance(wi), wi.normalize(),env_pd };
+
 }
 
 void PathTracer::Run() {
 	img->SetAll(0.f);
 
-	const size_t spp = 128; // samples per pixel
+	const size_t spp = 1024; // samples per pixel
 
 #ifdef NDEBUG
 	const size_t core_num = std::thread::hardware_concurrency();
@@ -147,7 +263,7 @@ rgbf PathTracer::Shade(const IntersectorClosest::Rst& intersection, const vecf3&
 			float cos_theta = intersection.n.cast_to<vecf3>().dot(wi);
 			rgbf f_r = PathTracer::BRDF(intersection, wi.normalize(), wo.normalize());
 			rayf3 r(intersection.pos, wi, EPSILON<float>);
-			bool visibility = intersectors.visibility.Visit(&bvh, r);
+			bool visibility = IntersectorVisibility::Instance().Visit(&bvh, r);
 			L_dir += sample_light_rst.L * f_r * visibility * abs(cos_theta) / sample_light_rst.pd;
 		}
 		else {
@@ -166,7 +282,7 @@ rgbf PathTracer::Shade(const IntersectorClosest::Rst& intersection, const vecf3&
 			float cos_theta_xy = (-wi).dot(intersection.n.cast_to<vecf3>() / (wi.norm()));
 			rgbf f_r = PathTracer::BRDF(intersection, wi.normalize(), wo.normalize());
 			rayf3 r(sample_light_rst.x, -wi, EPSILON<float>,1 - EPSILON<float>);
-			bool visibility = intersectors.visibility.Visit(&bvh, r);
+			bool visibility = IntersectorVisibility::Instance().Visit(&bvh, r);
 			float G = abs(cos_theta_xy * cos_theta_yx) / wi.norm2();
 			if(cos_theta_yx<0)
 				L_dir += sample_light_rst.L * f_r * G * visibility / sample_light_rst.pd;
@@ -190,13 +306,12 @@ rgbf PathTracer::Shade(const IntersectorClosest::Rst& intersection, const vecf3&
 	rayf3 r(intersection.pos, wi, EPSILON<float>);
 	float cos_theta = intersection.n.cast_to<vecf3>().dot(wi) / wi.norm();
 
-	//cout << "pd: "<<pd << endl;
-	L_indir = Shade(intersectors, intersectors.clostest.Visit(&bvh, r), -wi, false) * f_r * abs(cos_theta) / pd;
+	L_indir = Shade(IntersectorClosest::Instance().Visit(&bvh, r), -wi, false) * f_r * abs(cos_theta) / pd;
 
 	// TODO: combine L_dir and L_indir
 	if (isnan(L_indir[0]) && L_indir[1] && L_indir[2])
 		L_indir = zero_color;
-	return L_dir+L_indir; // you should commemt this line
+	return L_dir+L_indir;
 }
 
 PathTracer::SampleLightResult PathTracer::SampleLight(IntersectorClosest::Rst intersection, const vecf3& wo, const Cmpt::Light* light, const Cmpt::L2W* l2w, const Cmpt::SObjPtr* ptr) {
@@ -242,9 +357,11 @@ PathTracer::SampleLightResult PathTracer::SampleLight(IntersectorClosest::Rst in
 			tie(wi, pd_mat) = SampleBRDF(intersection, wo);
 			Le = env_light->Radiance(wi);
 			pd_env = env_light->PDF(wi); // TODO: use your PDF
+			//pd_env = Alias_PDF(wi, env_light);
 		}
 		else {
 			tie(Le, wi, pd_env) = env_light->Sample(intersection.n); // TODO: use your sampling method
+			//tie(Le, wi, pd_env) = Alias_Sample_L(intersection.n, env_light);
 			matf3 surface_to_world = svecf::TBN(intersection.n.cast_to<vecf3>(), intersection.tangent);
 			matf3 world_to_surface = surface_to_world.inverse();
 			svecf s_wo = (world_to_surface * wo).cast_to<svecf>();

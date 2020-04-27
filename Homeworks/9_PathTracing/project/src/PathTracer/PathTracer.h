@@ -12,6 +12,8 @@ namespace Ubpa {
 
 		void Run();
 
+
+
 	private:
 		rgbf Shade(const IntersectorClosest::Rst& intersection, const vecf3& wo, bool last_bounce_specular = false);
 
@@ -36,5 +38,7 @@ namespace Ubpa {
 
 		const Cmpt::Camera* const cam;
 		const Cmpt::Camera::CoordinateSystem ccs;
+
+
 	};
 }

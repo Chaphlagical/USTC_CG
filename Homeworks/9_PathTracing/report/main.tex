@@ -308,11 +308,11 @@ $L_{\text{dir}}$ 在各光源区域采样
 
 \begin{equation}
 \begin{aligned}
-\int_{I}p_{\text{img}}(i,j)\mathbb{d}i\mathbb{d}j
-&=\int_{\Theta}p_{\text{img}}(\theta,\phi)\left|\frac{\partial(i,j)}{\partial(\theta,\phi)}\right|\mathbb{d}\theta\mathbb{d}\phi\\
-&=\int_{A}p_{\text{img}}(A)\left|\det J_A\Theta\right|\left|\frac{\partial(i,j)}{\partial(\theta,\phi)}\right|\mathbb{d}A\\
-&=\int_{\Omega}p_{\text{img}}(\pmb{\omega}_i)\left|\frac{\mathrm{d}A}{\mathrm{d}\pmb{\omega}_i}\right|\left|\det J_A{\Theta}\right|\left|\frac{\partial(i,j)}{\partial(\theta,\phi)}\right|\mathbb{d}\pmb{\omega}_i\\
-&=\int_{\Omega}p(\pmb{\omega}_i)\mathbb{d}\pmb{\omega}_i\\
+\int_{I}p_{\text{img}}(i,j)\mathrm{d}i\mathrm{d}j
+&=\int_{\Theta}p_{\text{img}}(\theta,\phi)\left|\frac{\partial(i,j)}{\partial(\theta,\phi)}\right|\mathrm{d}\theta\mathrm{d}\phi\\
+&=\int_{A}p_{\text{img}}(A)\left|\det J_A\Theta\right|\left|\frac{\partial(i,j)}{\partial(\theta,\phi)}\right|\mathrm{d}A\\
+&=\int_{\Omega}p_{\text{img}}(\pmb{\omega}_i)\left|\frac{\mathrm{d}A}{\mathrm{d}\pmb{\omega}_i}\right|\left|\det J_A{\Theta}\right|\left|\frac{\partial(i,j)}{\partial(\theta,\phi)}\right|\mathrm{d}\pmb{\omega}_i\\
+&=\int_{\Omega}p(\pmb{\omega}_i)\mathrm{d}\pmb{\omega}_i\\
 \end{aligned}
 \end{equation}
 
@@ -340,13 +340,13 @@ p(\pmb{\omega}_i)=\frac{wh}{2\pi^2\sin\theta}p_{\text{img}}(i,j)
 \pagebreak
 \section{设计难点与解决}
 
-\subsection{计算BRDF时入射光未正则化出现计算出错}
+\subsection{计算BRDF时入射光未归一化出现计算出错}
 
 出错图像：
 \begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
 	\centering
 	\includegraphics[width=0.7\columnwidth]{error.png} % Example image
-	\caption{无正则化}
+	\caption{无归一化}
 \end{figure}
 
 \subsection{未考虑光源出射光方向}
@@ -412,7 +412,22 @@ p(\pmb{\omega}_i)=\frac{wh}{2\pi^2\sin\theta}p_{\text{img}}(i,j)
 \end{figure}
 
 \pagebreak
+\subsection{不同环境光采样方式效果}
 
+\subsubsection{半球均匀采样64spp}
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{64_spp.png} % Example image
+\end{figure}
+
+\subsubsection{重要性采样64spp}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{64spp_alias.png} % Example image
+\end{figure}
+
+\pagebreak
 \subsection{其他渲染结果}
 
 \subsubsection{室内}
@@ -443,6 +458,30 @@ Square添加HW8中的校徽纹理贴图和法向贴图
 \begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
 	\centering
 	\includegraphics[width=1.0\columnwidth]{snow.png} % Example image
+\end{figure}
+
+\pagebreak
+\subsubsection{兔子}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{bunny.png} % Example image
+\end{figure}
+
+\subsubsection{兔子\&龙}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{bunny_dragon.png} % Example image
+\end{figure}
+
+\pagebreak
+
+\subsubsection{多物体}
+
+\begin{figure}[h] % [h] forces the figure to be output where it is defined in the code (it suppresses floating)
+	\centering
+	\includegraphics[width=1.0\columnwidth]{objects.png} % Example image
 \end{figure}
 
 \end{document}

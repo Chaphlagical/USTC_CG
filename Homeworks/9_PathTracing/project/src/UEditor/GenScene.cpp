@@ -212,12 +212,12 @@ namespace Ubpa::detail::GenScene_ {
         rectlight_obj->Get<Cmpt::Scale>()->value = { 0.5f,0.5f,0.5f };
         rectlight_obj->Get<Cmpt::Rotation>()->value = quatf{ vecf3{1,0,0}, to_radian(180.f) };
 
-        auto [cube, geo_cube, mat_cube] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("cube", cornellbox);
+        auto [cube, geo_cube, mat_cube] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("ball", cornellbox);
         auto cube_BRDF = new stdBRDF;
         cube_BRDF->albedo_factor = { 1.f, 0.8f, 0.2f };
         cube_BRDF->roughness_factor = 0.5f;
         mat_cube->SetMaterial(cube_BRDF);
-        geo_cube->SetPrimitive(new TriMesh("../data/models/cube.obj"));
+        geo_cube->SetPrimitive(new TriMesh("../data/models/ball.obj"));
         cube->Get<Cmpt::Scale>()->value = { 0.15f,0.1f,0.15f };
         cube->Get<Cmpt::Position>()->value = { -0.2f,-0.9f,0.65f };
 
@@ -289,6 +289,15 @@ namespace Ubpa::detail::GenScene_ {
         crystal_->roughness_factor = 0.1f;
         ball__mat->SetMaterial(crystal_);
 
+        auto [cube, geo_cube, mat_cube] = scene->CreateSObj<Cmpt::Geometry, Cmpt::Material>("ball", cornellbox);
+        auto cube_BRDF = new stdBRDF;
+        cube_BRDF->albedo_factor = { 1.f, 0.8f, 0.2f };
+        cube_BRDF->roughness_factor = 0.5f;
+        mat_cube->SetMaterial(cube_BRDF);
+        geo_cube->SetPrimitive(new TriMesh("../data/models/ball.obj"));
+        cube->Get<Cmpt::Scale>()->value = { 0.15f,0.1f,0.15f };
+        cube->Get<Cmpt::Position>()->value = { -0.2f,-0.9f,0.65f };
+
         return scene;
 	}
 }
@@ -298,7 +307,7 @@ Scene* SceneGenerator::GenScene(size_t n) {
 
 	using Func = Scene *();
 	Func* funcs[] = {
-		&detail::GenScene_::GenScene_0
+		&detail::GenScene_::GenScene_1
 	};
 
 	return funcs[n]();

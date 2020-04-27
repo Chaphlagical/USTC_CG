@@ -1,0 +1,161 @@
+{
+    "type":"class Ubpa::Scene",
+    "root":{
+        "type":"class Ubpa::SObj",
+        "children":[
+            {
+                "type":"class Ubpa::SObj",
+                "name":"env light",
+                "Components":[
+                    {
+                        "type":"class Ubpa::Cmpt::Light",
+                        "light":{
+                            "type":"struct Ubpa::EnvLight",
+                            "texture":{
+                                "type":"class Ubpa::Texture2D",
+                                "inv_v":true,
+                                "path":"../data/textures/venice_sunset_4k.hdr"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type":"class Ubpa::SObj",
+                "children":[
+                    {
+                        "type":"class Ubpa::SObj",
+                        "name":"wall_down",
+                        "Components":[
+                            {
+                                "type":"class Ubpa::Cmpt::Position",
+                                "value":[
+                                    0,
+                                    -1,
+                                    0
+                                ]
+                            },
+                            {
+                                "type":"class Ubpa::Cmpt::Geometry",
+                                "primitive":{
+                                    "type":"class Ubpa::Square"
+                                }
+                            },
+
+                            {
+                                "type":"class Ubpa::Cmpt::Material",
+                                "material":{
+                                    "type":"struct Ubpa::stdBRDF",
+                                    "albedo_factor":[
+                                        0.800000011920929,
+                                        0.800000011920929,
+                                        0.800000011920929
+                                    ],
+                                    "metalness_factor":1.0,
+                                    "roughness_factor":0.4
+                                }
+                            },
+                            {
+                                "type":"class Ubpa::Cmpt::Scale",
+                                "value":[
+                                    1.5,
+                                    1,
+                                    1.5
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type":"class Ubpa::SObj",
+                        "name":"bunny",
+                        "Components":[
+                            {
+                                "type":"class Ubpa::Cmpt::Position",
+                                "value":[
+                                    0.10000000149011612,
+                                    0.10000000149011612,
+                                    0.10000000149011612
+                                ]
+                            },
+                            {
+                                "type":"class Ubpa::Cmpt::Geometry",
+                                "primitive":{
+                                    "type":"class Ubpa::TriMesh",
+                                    "path":"../data/models/bunny.obj"
+                                }
+                            },
+                            {
+                                "type":"class Ubpa::Cmpt::Material",
+                                "material":{
+                                    "type":"struct Ubpa::stdBRDF",
+                                    "albedo_factor":[
+                                        1,
+                                        1,
+                                        1
+                                    ],
+                                    "metalness_factor":1.0,
+                                    "roughness_factor":0.0
+                                }
+                            },
+                            {
+                                "type":"class Ubpa::Cmpt::Scale",
+                                "value":[
+                                    0.8,
+                                    0.8,
+                                    0.8
+                                ]
+                            },
+                            {
+                                "type":"class Ubpa::Cmpt::Position",
+                                "value":[
+                                    -0.2,
+                                    -1,
+                                    0.65
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "name":"cornellbox",
+                "Components":[
+                    {
+                        "type":"class Ubpa::Cmpt::Position",
+                        "value":[
+                            0,
+                            0,
+                            -6
+                        ]
+                    },
+                    {
+                        "type":"class Ubpa::Cmpt::Scale",
+                        "value":[
+                            2,
+                            2,
+                            2
+                        ]
+                    }
+                ]
+            },
+            {
+                "type":"class Ubpa::SObj",
+                "name":"camera_obj",
+                "Components":[
+                    {
+                        "type":"class Ubpa::Cmpt::PathTracerAgency"
+                    },
+                    {
+                        "type":"class Ubpa::Cmpt::Camera",
+                        "ar":1.7777777910232545,
+                        "fov":1.0471975803375245
+                    }
+                ]
+            }
+        ],
+        "name":"scene",
+        "Components":[
+            {
+                "type":"class Ubpa::Cmpt::Root"
+            }
+        ]
+    }
+}
